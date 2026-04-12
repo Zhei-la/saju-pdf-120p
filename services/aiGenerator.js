@@ -106,21 +106,50 @@ function getGlossary(chapterIndex) {
   return text;
 }
 
-const SYSTEM = `당신은 30년 경력의 사주명리학 최고 권위자입니다. 아래 규칙을 반드시 지켜주세요.
+const SYSTEM = `당신은 30년 경력의 사주명리학 대가입니다. 만세력 직접 뽑아가며 정통 명리학으로 사주를 해석하는 전문가이고, 수천 명의 사주를 봐온 경험이 있습니다.
 
-작성 규칙:
-1. 반드시 1500자 이상의 풍부하고 구체적인 내용으로 작성합니다.
-2. 제공된 사주 데이터(십성, 지장간, 12운성, 신강신약, 용신, 대운, 연운)를 근거로 구체적으로 설명합니다.
-3. 전문용어를 쓰되 일반인도 이해할 수 있도록 풀어 설명합니다.
-4. 단정적이지 않게, 경향성과 가능성으로 표현합니다.
-5. 부정적인 내용도 솔직히 다루되, 극복 방법과 함께 제시합니다.
-6. 여러 문단으로 구조화하여 가독성을 높입니다.
+━━━━━━━━━━━━━━━━━━
+핵심 원칙 - 정확성이 최우선
+━━━━━━━━━━━━━━━━━━
+1. 제공된 사주 원국(연월일시주), 천간지지, 오행, 십성, 지장간, 12운성, 신강신약, 용신, 대운, 연운 정보를 **반드시** 근거로 해석
+2. 애매한 일반론("~할 수도 있어요") 금지 → 사주 데이터에 근거한 확정적 해석
+3. 각 해석마다 "왜 그런지" 명리학적 근거를 구체적으로 제시
+4. 예: "일간 병화가 월지 자수의 극을 받아 신약한 구조라, 추진력은 강하지만 체력이 따라주지 않는 경향이 있습니다"
 
-금지 사항 (절대 지켜주세요):
-- 마크다운 기호를 절대 사용하지 마세요. #, ##, ###, **, -, *, 숫자. 등 기호를 쓰지 마세요.
-- 제목이나 소제목을 쓸 때는 그냥 한 줄의 텍스트로 쓰세요.
-- 이모지를 사용하지 마세요.
-- 순수 문단 형식의 한국어 텍스트만 출력하세요.`;
+━━━━━━━━━━━━━━━━━━
+문체 규칙
+━━━━━━━━━━━━━━━━━━
+1. 존댓말 ("~요", "~습니다", "~네요") - 전문 상담사 톤
+2. 마침표는 자연스럽게 사용 OK
+3. 전문용어는 한 번 쓰고 괄호로 쉬운 설명 추가 ("편관(관성, 책임감을 상징)")
+4. 단정적이지 않게: "~경향이 있어요", "~가능성이 높아요", "~하실 분입니다"
+5. 부정적인 것도 솔직히 다루되 반드시 극복법 제시
+
+━━━━━━━━━━━━━━━━━━
+분량 및 구조
+━━━━━━━━━━━━━━━━━━
+- 1000~2000자 내외 (억지로 늘리지 말고 필요한 만큼)
+- 3~5개 문단으로 자연스럽게 구분
+- 각 문단은 5~8줄
+- 도입(사주 특징) → 본론(구체적 해석) → 결론(조언)
+
+━━━━━━━━━━━━━━━━━━
+절대 금지
+━━━━━━━━━━━━━━━━━━
+- 마크다운 기호 (#, ##, **, -, *, 숫자.) 절대 사용 금지
+- 이모지 금지
+- 소제목 쓸 땐 그냥 한 줄 텍스트로
+- 뻔한 일반론 (누구에게나 해당하는 얘기) 금지
+- 사주 정보 무시하고 작성하기 금지
+
+━━━━━━━━━━━━━━━━━━
+좋은 답변 예시
+━━━━━━━━━━━━━━━━━━
+"일간 병화(丙火)에 월지 자수가 있어 겨울에 태어난 태양과 같은 구조입니다. 신약하지만 태양의 본성은 빛나는 것이라, 환경이 어려울수록 오히려 빛을 발하는 성향이 있어요.
+
+오행 분포를 보면 수 기운이 40%로 강해 생각이 깊고 신중한 편이지만, 화 기운이 20%로 적어 결단력에서 머뭇거리실 수 있습니다. 월간에 편재가 있어 재물에 대한 감각은 타고나셨고, 특히 30대 후반부터 대운이 목 기운으로 흐르면서 본격적으로 기회가 열릴 구조입니다..."
+
+이런 식으로 구체적 데이터 + 해석 + 조언이 자연스럽게 섞이게 작성하세요.`;
 
 function buildContext(userInfo) {
   const s = userInfo.saju;
@@ -171,15 +200,26 @@ ${Object.entries(s.shiShenCount).map(([k,v]) => `${k}: ${v}개`).join(', ')}`;
 async function generateChapter(openai, userInfo, title, prompt, index, extraInstruction = '') {
   const ctx = buildContext(userInfo);
   const glossary = getGlossary(index);
-  const userMsg = `${ctx}\n\n분석 항목: ${title}\n${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction : ''}\n\n반드시 1500자 이상으로 풍부하게 작성해주세요. 마크다운 기호(#, **, -, 숫자.)를 절대 사용하지 마세요.${glossary ? '\n\n이 챕터의 끝에 아래 용어 해설을 자연스럽게 포함해주세요:' + glossary : ''}`;
+  const userMsg = `${ctx}
+
+━━━━━━━━━━━━━━━━━━
+분석 항목: ${title}
+━━━━━━━━━━━━━━━━━━
+${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction : ''}
+
+작성 지침:
+- 위 사주 원국의 구체적인 정보(일간, 월지, 오행, 십성, 용신 등)를 반드시 언급하며 해석
+- "일반적으로 이런 사주는..." 같은 일반론 금지
+- 이 사주의 고유한 특징을 정확히 짚어내기
+- 1000~2000자 내외, 억지로 늘리지 말고 핵심만
+- 마크다운 기호(#, **, -, 숫자.) 절대 금지${glossary ? '\n\n이 챕터의 끝에 아래 용어 해설을 자연스럽게 한 문단 추가:\n' + glossary : ''}`;
   
-  // 429 에러 시 자동 재시도 (최대 3번)
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const res = await openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         temperature: 0.85,
-        max_tokens: 3000,
+        max_tokens: 2500,
         messages: [
           { role: 'system', content: SYSTEM },
           { role: 'user', content: userMsg }
@@ -189,10 +229,9 @@ async function generateChapter(openai, userInfo, title, prompt, index, extraInst
     } catch (err) {
       const msg = err.message || '';
       if (msg.includes('429') || msg.includes('rate limit') || msg.includes('Rate limit')) {
-        // 분당 한도 - 20초 기다렸다 재시도
         if (attempt < 2) {
-          console.log(`[챕터 ${index}] TPM 초과, 20초 대기 후 재시도...`);
-          await new Promise(r => setTimeout(r, 20000));
+          console.log(`[챕터 ${index}] TPM 초과, 10초 대기...`);
+          await new Promise(r => setTimeout(r, 10000));
           continue;
         }
       }
@@ -206,16 +245,15 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 async function generateAllChapters(apiKey, userInfo) {
   const openai = new OpenAI({ apiKey });
   const results = new Array(SECTIONS.length);
-  const BATCH = 3; // 5 → 3 (TPM 초과 방지)
+  const BATCH = 8; // gpt-4o-mini는 TPM 훨씬 여유로움
   for (let i = 0; i < SECTIONS.length; i += BATCH) {
     const batch = SECTIONS.slice(i, i + BATCH);
     const promises = batch.map(([t, p], j) =>
       generateChapter(openai, userInfo, t, p, i + j).then(r => { results[i + j] = r; })
     );
     await Promise.all(promises);
-    // 다음 배치 전에 15초 대기 (TPM 리셋 시간 확보)
     if (i + BATCH < SECTIONS.length) {
-      await sleep(15000);
+      await sleep(2000); // 짧게만 대기
     }
   }
   return results;
