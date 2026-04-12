@@ -391,6 +391,8 @@
 <script>
 // 인증 체크
 if (!localStorage.getItem('auth_token')) location.href = '/';
+// 기존 공용 API 키 자동 제거 (마이그레이션)
+localStorage.removeItem('openai_api_key');
 
 // ── 도시별 시간 보정 (분 단위, 한국 KST 기준 -32~-20분) ──
 const CITY_OFFSETS = {
@@ -441,8 +443,9 @@ window.addEventListener('DOMContentLoaded', () => {
     minSel.appendChild(opt);
   }
 
-  // 저장된 API 키
-  const saved = localStorage.getItem('openai_api_key');
+  // 저장된 API 키 (사용자별)
+  const keyName = 'openai_api_key_' + (localStorage.getItem('current_user_name') || '');
+  const saved = localStorage.getItem(keyName);
   if (saved) {
     document.getElementById('apiKey').value = saved;
     collapseKey(saved);
@@ -477,10 +480,12 @@ function openModal(id) { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
 // ── API 키 ──
+function _keyName() { return 'openai_api_key_' + (localStorage.getItem('current_user_name') || ''); }
 function saveKey() {
   const key = document.getElementById('apiKey').value.trim();
   if (!key || !key.startsWith('sk-')) { alert('올바른 OpenAI API 키를 입력해주세요 (sk-로 시작)'); return; }
-  localStorage.setItem('openai_api_key', key);
+  localStorage.setItem(_keyName(), key);
+  localStorage.removeItem('openai_api_key');
   collapseKey(key);
 }
 function collapseKey(key) {
@@ -493,7 +498,7 @@ function editKey() {
   document.getElementById('keyCollapsed').classList.add('hidden');
 }
 function getApiKey() {
-  return localStorage.getItem('openai_api_key') || document.getElementById('apiKey').value.trim();
+  return localStorage.getItem(_keyName()) || document.getElementById('apiKey').value.trim();
 }
 
 // ── 상태 ──

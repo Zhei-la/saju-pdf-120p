@@ -71,7 +71,7 @@ app.get('/api/me', requireUser, (req, res) => {
   res.json({ user: {
     id: user.id, name: user.name, status: user.status,
     isAdmin: !!user.is_admin, brandName: user.brand_name || '',
-    reviewToken: user.review_token
+    reviewToken: user.review_token, reportPrice: user.report_price || 0
   }});
 });
 
@@ -81,9 +81,19 @@ app.post('/api/me/brand', requireUser, (req, res) => {
   res.json({ ok: true });
 });
 
+// 리포트 가격 저장
+app.post('/api/me/price', requireUser, (req, res) => {
+  db.updateReportPrice(req.userId, req.body.price || 0);
+  res.json({ ok: true });
+});
+
 // ─── 대시보드 통계 ───
 app.get('/api/stats', requireUser, (req, res) => {
-  res.json({ stats: db.getUserStats(req.userId), reviewStats: db.getReviewStats(req.userId) });
+  res.json({
+    stats: db.getUserStats(req.userId),
+    reviewStats: db.getReviewStats(req.userId),
+    revenue: db.getRevenueStats(req.userId)
+  });
 });
 
 // ─── 리포트 생성 ───

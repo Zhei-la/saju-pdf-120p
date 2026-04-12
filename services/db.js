@@ -70,6 +70,7 @@ db.exec(`
 try { db.exec(`ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0`); } catch(e) {}
 try { db.exec(`ALTER TABLE users ADD COLUMN brand_name TEXT DEFAULT ''`); } catch(e) {}
 try { db.exec(`ALTER TABLE users ADD COLUMN review_token TEXT`); } catch(e) {}
+try { db.exec(`ALTER TABLE users ADD COLUMN report_price INTEGER NOT NULL DEFAULT 0`); } catch(e) {}
 
 function hash(pw) { return crypto.createHash('sha256').update(pw + 'saju_salt_9923').digest('hex'); }
 
@@ -120,13 +121,32 @@ function loginUser(name, password) {
   return { id: row.id, name: row.name, status: row.status, isAdmin: !!row.is_admin, brandName: row.brand_name || '', reviewToken: row.review_token };
 }
 function getUser(id) {
-  return db.prepare(`SELECT id, name, status, is_admin, brand_name, review_token, created_at, last_login_at FROM users WHERE id = ?`).get(id);
+  return db.prepare(`SELECT id, name, status, is_admin, brand_name, review_token, report_price, created_at, last_login_at FROM users WHERE id = ?`).get(id);
 }
 function getUserByReviewToken(token) {
   return db.prepare(`SELECT id, name, brand_name FROM users WHERE review_token = ?`).get(token);
 }
 function updateBrandName(id, brandName) {
   db.prepare(`UPDATE users SET brand_name = ? WHERE id = ?`).run(brandName || '', id);
+}
+function updateReportPrice(id, price) {
+  db.prepare(`UPDATE users SET report_price = ? WHERE id = ?`).run(parseInt(price) || 0, id);
+}
+function getRevenueStats(userId) {
+  const user = db.prepare(`SELECT report_price FROM users WHERE id = ?`).get(userId);
+  const price = user ? (user.report_price || 0) : 0;
+  const now = Date.now();
+  const oneDayAgo = now - 24 * 60 * 60 * 1000;
+  const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const today = db.prepare(`SELECT COUNT(*) as c FROM reports WHERE user_id = ? AND created_at >= ?`).get(userId, oneDayAgo).c;
+  const week = db.prepare(`SELECT COUNT(*) as c FROM reports WHERE user_id = ? AND created_at >= ?`).get(userId, oneWeekAgo).c;
+  const total = db.prepare(`SELECT COUNT(*) as c FROM reports WHERE user_id = ?`).get(userId).c;
+  return {
+    price,
+    today: today * price,
+    week: week * price,
+    total: total * price
+  };
 }
 function listAllUsers() {
   return db.prepare(`
@@ -266,10 +286,10 @@ setInterval(cleanupOldReports, 24 * 60 * 60 * 1000);
 module.exports = {
   ensureAdmin,
   createUser, loginUser, getUser, getUserByReviewToken, listAllUsers, updateUserStatus, deleteUser,
-  updateBrandName,
+  updateBrandName, updateReportPrice,
   saveReport, listUserReports, getReport, deleteReport, updateMemo,
   createChatSession, listUserSessions, getChatSession, deleteChatSession,
   addMessage, getMessages,
-  getUserStats, cleanupOldReports,
+  getUserStats, getRevenueStats, cleanupOldReports,
   createReview, listUserReviews, deleteReview, getReviewStats
 };

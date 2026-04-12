@@ -134,6 +134,24 @@
     <div class="stat"><div class="label">평균 별점</div><div class="val" id="stAvg">-</div></div>
   </div>
 
+  <div class="stats">
+    <div class="stat"><div class="label">오늘 수익</div><div class="val" id="rvToday" style="font-size:18px;">0원</div></div>
+    <div class="stat"><div class="label">이번 주 수익</div><div class="val" id="rvWeek" style="font-size:18px;">0원</div></div>
+    <div class="stat"><div class="label">총 누적 수익</div><div class="val" id="rvTotal" style="font-size:18px;">0원</div></div>
+    <div class="stat"><div class="label">리포트 가격</div><div class="val" id="rvPrice" style="font-size:18px;">0원</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-t">사주 리포트 가격 (원)</div>
+    <div class="row">
+      <input id="reportPrice" type="number" placeholder="예: 30000" min="0">
+      <button class="btn-gold btn-sm" onclick="savePrice()" style="flex:0 0 auto;">저장</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;">
+      리포트 1개당 가격입니다. 수익 통계 계산에 사용됩니다.
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-t">사주 브랜드 이름</div>
     <div class="row">
@@ -226,9 +244,17 @@ function api(url, opts = {}) {
 }
 
 async function init() {
-  if (!token) return showLogin();
+  if (!token) {
+    localStorage.removeItem('openai_api_key');
+    return showLogin();
+  }
   const res = await fetch('/api/me', { headers: { 'x-auth-token': token }});
-  if (!res.ok) { token = ''; localStorage.removeItem('auth_token'); return showLogin(); }
+  if (!res.ok) {
+    token = '';
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('openai_api_key');
+    return showLogin();
+  }
   const { user } = await res.json();
   currentUser = user;
   showDash();
@@ -279,6 +305,7 @@ async function doLogout() {
   token = ''; 
   localStorage.removeItem('auth_token');
   localStorage.removeItem('openai_api_key');
+  localStorage.removeItem('current_user_name');
   currentUser = null;
   showLogin();
 }
@@ -288,6 +315,9 @@ async function showDash() {
   document.getElementById('dashPage').classList.remove('hidden');
   document.getElementById('navName').textContent = currentUser.name + ' 님';
 
+  // 현재 사용자 이름 저장 (report.html 등에서 사용)
+  localStorage.setItem('current_user_name', currentUser.name);
+
   // 관리자면 버튼 표시
   if (currentUser.isAdmin) {
     document.getElementById('adminBtn').classList.remove('hidden');
@@ -296,14 +326,18 @@ async function showDash() {
   // 브랜드 이름
   document.getElementById('brandName').value = currentUser.brandName || '';
 
+  // 리포트 가격
+  document.getElementById('reportPrice').value = currentUser.reportPrice || '';
+
   // 후기 링크
   if (currentUser.reviewToken) {
     const link = `${location.origin}/review.html?t=${currentUser.reviewToken}`;
     document.getElementById('reviewLink').value = link;
   }
 
-  // 키 불러오기
-  const saved = localStorage.getItem('openai_api_key');
+  // 키 불러오기 (사용자별)
+  const keyName = 'openai_api_key_' + currentUser.name;
+  const saved = localStorage.getItem(keyName);
   if (saved) { document.getElementById('apiKey').value = saved; collapseKey(saved); }
 
   // 통계
@@ -315,6 +349,13 @@ async function showDash() {
   if (s.reviewStats) {
     document.getElementById('stReviews').textContent = s.reviewStats.total;
     document.getElementById('stAvg').textContent = s.reviewStats.avgRating > 0 ? s.reviewStats.avgRating + '★' : '-';
+  }
+  if (s.revenue) {
+    const fmt = n => (n || 0).toLocaleString() + '원';
+    document.getElementById('rvToday').textContent = fmt(s.revenue.today);
+    document.getElementById('rvWeek').textContent = fmt(s.revenue.week);
+    document.getElementById('rvTotal').textContent = fmt(s.revenue.total);
+    document.getElementById('rvPrice').textContent = fmt(s.revenue.price);
   }
 
   // 리포트 목록
@@ -341,8 +382,22 @@ async function saveBrand() {
   const brandName = document.getElementById('brandName').value.trim();
   const res = await api('/api/me/brand', { method: 'POST', body: JSON.stringify({ brandName }) });
   if (res.ok) {
-    currentUser.brandName = brandName;
-    alert('브랜드 이름이 저장되었습니다');
+    alert('브랜드 이름이 저장되었습니다!\n후기 작성 페이지에 "' + (brandName || '○○사주') + ' 후기 작성"으로 표시됩니다.');
+    // 페이지 새로고침으로 확실하게 반영
+    location.reload();
+  } else {
+    alert('저장 실패');
+  }
+}
+
+async function savePrice() {
+  const price = parseInt(document.getElementById('reportPrice').value) || 0;
+  const res = await api('/api/me/price', { method: 'POST', body: JSON.stringify({ price }) });
+  if (res.ok) {
+    alert('리포트 가격이 ' + price.toLocaleString() + '원으로 저장되었습니다');
+    location.reload();
+  } else {
+    alert('저장 실패');
   }
 }
 
@@ -372,7 +427,9 @@ async function goChatNew(reportId) {
 function saveKey() {
   const key = document.getElementById('apiKey').value.trim();
   if (!key || !key.startsWith('sk-')) { alert('올바른 키를 입력해주세요'); return; }
-  localStorage.setItem('openai_api_key', key);
+  localStorage.setItem('openai_api_key_' + currentUser.name, key);
+  // 기존 공용 키는 삭제
+  localStorage.removeItem('openai_api_key');
   collapseKey(key);
 }
 function collapseKey(key) {
