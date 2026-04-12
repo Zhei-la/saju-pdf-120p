@@ -27,10 +27,10 @@
 
   .review-card { background: rgba(255,253,248,0.9); border: 1px solid var(--parch-d); padding: 22px 26px;
     margin-bottom: 12px; position: relative; }
-  .review-card .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .review-card .top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-right: 60px; }
   .review-card .writer { font-weight: 700; color: var(--deep); font-size: 15px; }
-  .review-card .rating { font-size: 18px; color: var(--gold); letter-spacing: 2px; }
-  .review-card .content { font-size: 14px; line-height: 1.9; color: var(--ink); white-space: pre-wrap; margin-bottom: 10px; }
+  .review-card .rating { font-size: 16px; color: var(--gold); letter-spacing: 1px; }
+  .review-card .content { font-size: 14px; line-height: 1.9; color: var(--ink); white-space: pre-wrap; margin-bottom: 12px; }
   .review-card .date { font-size: 11px; color: var(--muted); text-align: right; }
   .del-btn { position: absolute; top: 14px; right: 14px; padding: 4px 10px; font-size: 11px;
     background: transparent; border: 1px solid var(--parch-d); color: var(--muted); }
@@ -58,6 +58,13 @@ function api(url, opts = {}) {
   return fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', 'x-auth-token': token, ...(opts.headers || {}) }});
 }
 function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function maskName(name) {
+  if (!name) return '';
+  if (name.length <= 1) return name;
+  if (name.length === 2) return name[0] + '○';
+  // 3자 이상: 첫 글자 + ○ + 마지막 글자 (중간 가림)
+  return name[0] + '○'.repeat(name.length - 2) + name[name.length - 1];
+}
 
 async function load() {
   const { reviews, stats } = await (await api('/api/my/reviews')).json();
@@ -79,7 +86,7 @@ async function load() {
     return `<div class="review-card">
       <button class="del-btn" onclick="delReview(${r.id})">삭제</button>
       <div class="top">
-        <div class="writer">${escapeHtml(r.writer_name)}</div>
+        <div class="writer">${escapeHtml(maskName(r.writer_name))}</div>
         <div class="rating">${stars}</div>
       </div>
       <div class="content">${escapeHtml(r.content)}</div>
