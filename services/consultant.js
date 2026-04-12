@@ -464,7 +464,6 @@ async function freeThreadReading({ apiKey, saju, clientName, question, length })
   const targetLen = lengthMap[length] || 1000;
 
   const sajuInfo = `[사주 정보 - 내부 참고용]
-이름: ${clientName || '익명'}
 사주: ${saju.fullKorean}
 일간: ${saju.dayMaster?.korean}(${saju.dayMaster?.element})
 오행: 목${saju.elements?.목} 화${saju.elements?.화} 토${saju.elements?.토} 금${saju.elements?.금} 수${saju.elements?.수}
@@ -487,6 +486,7 @@ async function freeThreadReading({ apiKey, saju, clientName, question, length })
 [톤]
 - 친한 친구가 사주 봐주듯 친근하고 따뜻하게
 - 이름이 있어도 "안녕 OO아" 같은 인사말은 절대 쓰지 마세요
+- 이름을 부르지 말고 "너"라고만 지칭하세요
 - 바로 본론부터 시작하세요 ("사주 보니까~", "너는 ~한 편이야")
 - 단정적이지 않게 "~한 편이야", "~할 수 있어"
 
