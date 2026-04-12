@@ -21,8 +21,11 @@
   .card-t { font-size: 11px; font-weight: 600; letter-spacing: 3px; color: var(--gold); margin-bottom: 14px; }
   label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; letter-spacing: 1px; }
   input, select { width: 100%; border: 1px solid var(--parch-d); padding: 11px 14px;
-    background: rgba(255,255,255,0.7); font-family: inherit; font-size: 14px; outline: none; }
+    background: rgba(255,255,255,0.7); font-family: inherit; font-size: 14px; outline: none; color: var(--ink); }
+  select { cursor: pointer; }
+  select:disabled { opacity: 0.5; cursor: not-allowed; }
   input:focus, select:focus { border-color: var(--gold); }
+  input[type="checkbox"] { width: auto; margin-right: 6px; }
   .row { display: grid; gap: 10px; margin-bottom: 12px; }
   .row-2 { grid-template-columns: 1fr 1fr; }
   .row-3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -95,14 +98,33 @@ if (!localStorage.getItem('auth_token')) location.href = '/';
         </div>
       </div>
       <div class="row row-3">
-        <div><label>년</label><input id="year" type="number" placeholder="1990"></div>
-        <div><label>월</label><input id="month" type="number" placeholder="1" min="1" max="12"></div>
-        <div><label>일</label><input id="day" type="number" placeholder="1" min="1" max="31"></div>
+        <div><label>년</label><select id="year"></select></div>
+        <div><label>월</label><select id="month"></select></div>
+        <div><label>일</label><select id="day"></select></div>
       </div>
-      <div class="row row-2">
-        <div><label>시 (0~23)</label><input id="hour" type="number" placeholder="12" min="0" max="23"></div>
-        <div><label>분</label><input id="minute" type="number" placeholder="0" min="0" max="59" value="0"></div>
+      <div class="row">
+        <label><input type="checkbox" id="timeUnknown" onchange="toggleTimeUnknown()"> 시간을 모름 (정오 12시로 자동 설정)</label>
       </div>
+      <div class="row">
+        <label>태어난 시 (12지지)</label>
+        <select id="hourSelect" onchange="setHourFromZodiac()">
+          <option value="">선택하세요</option>
+          <option value="0">자시 (子) · 23시~01시</option>
+          <option value="2">축시 (丑) · 01시~03시</option>
+          <option value="4">인시 (寅) · 03시~05시</option>
+          <option value="6">묘시 (卯) · 05시~07시</option>
+          <option value="8">진시 (辰) · 07시~09시</option>
+          <option value="10">사시 (巳) · 09시~11시</option>
+          <option value="12">오시 (午) · 11시~13시</option>
+          <option value="14">미시 (未) · 13시~15시</option>
+          <option value="16">신시 (申) · 15시~17시</option>
+          <option value="18">유시 (酉) · 17시~19시</option>
+          <option value="20">술시 (戌) · 19시~21시</option>
+          <option value="22">해시 (亥) · 21시~23시</option>
+        </select>
+      </div>
+      <input type="hidden" id="hour" value="">
+      <input type="hidden" id="minute" value="0">
     </div>
 
     <div class="card">
@@ -153,6 +175,43 @@ let selectedGender = '남성';
 let selectedCal = 'solar';
 let selectedCat = null;
 let currentResult = null;
+let timeUnknownFlag = false;
+
+// 년/월/일 select 초기화
+(function initDateSelects() {
+  const yearSel = document.getElementById('year');
+  const now = new Date().getFullYear();
+  yearSel.innerHTML = '<option value="">년도</option>';
+  for (let y = now; y >= 1930; y--) {
+    yearSel.innerHTML += `<option value="${y}">${y}년</option>`;
+  }
+  const monthSel = document.getElementById('month');
+  monthSel.innerHTML = '<option value="">월</option>';
+  for (let m = 1; m <= 12; m++) {
+    monthSel.innerHTML += `<option value="${m}">${m}월</option>`;
+  }
+  const daySel = document.getElementById('day');
+  daySel.innerHTML = '<option value="">일</option>';
+  for (let d = 1; d <= 31; d++) {
+    daySel.innerHTML += `<option value="${d}">${d}일</option>`;
+  }
+})();
+
+function toggleTimeUnknown() {
+  timeUnknownFlag = document.getElementById('timeUnknown').checked;
+  const hs = document.getElementById('hourSelect');
+  hs.disabled = timeUnknownFlag;
+  if (timeUnknownFlag) {
+    hs.value = '';
+    document.getElementById('hour').value = '12';
+  } else {
+    document.getElementById('hour').value = '';
+  }
+}
+function setHourFromZodiac() {
+  const h = document.getElementById('hourSelect').value;
+  document.getElementById('hour').value = h;
+}
 
 function setG(g) { selectedGender = g; document.querySelectorAll('[data-g]').forEach(b => b.classList.toggle('active', b.dataset.g === g)); }
 function setC(c) { selectedCal = c; document.querySelectorAll('[data-c]').forEach(b => b.classList.toggle('active', b.dataset.c === c)); }
@@ -176,7 +235,8 @@ async function submitConsult() {
   err.textContent = '';
 
   if (!name) { err.textContent = '이름을 입력해주세요'; return; }
-  if (!year || !month || !day) { err.textContent = '생년월일을 모두 입력해주세요'; return; }
+  if (!year || !month || !day) { err.textContent = '생년월일을 모두 선택해주세요'; return; }
+  if (!timeUnknownFlag && hour === '') { err.textContent = '태어난 시를 선택하거나 "시간을 모름"을 체크해주세요'; return; }
   if (!selectedCat) { err.textContent = '상담 분야를 선택해주세요'; return; }
 
   const userName = localStorage.getItem('current_user_name') || '';
