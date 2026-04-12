@@ -103,12 +103,10 @@ const CONSULTATION_SYSTEM = `당신은 따뜻하고 친절한 사주 상담사�
 좋은 답: "이직 생각하고 계시는군요. 내년 흐름 보니까 변화의 기운이 들어와서 움직이기 나쁘지 않은 시기예요. 다만 급하게 결정하기보단 3~4월 지나고 나서 움직이시는 게 더 안정적일 것 같아요. 지금 일이 많이 힘드세요?"`;
 
 async function consultAnswer(report, question, history = [], apiKey) {
-  const openai = new OpenAI({ apiKey: apiKey || process.env.OPENAI_API_KEY });
   const saju = report.saju_data;
   const chapters = report.chapters;
   const relevantChapters = selectRelevantChapters(chapters, question);
 
-  // 내부 참고용 사주 정보
   const sajuInfo = `[내부 참고 - 상담자 정보]
 이름: ${report.name} (${report.gender})
 사주: ${saju.fullKorean}
@@ -120,28 +118,33 @@ async function consultAnswer(report, question, history = [], apiKey) {
 [관련 리포트 챕터 요약]
 ${relevantChapters.map(c => `■ ${c.title}\n${c.content.slice(0, 600)}...`).join('\n\n')}`;
 
-  const messages = [
-    { role: 'system', content: CONSULTATION_SYSTEM },
-    { role: 'system', content: sajuInfo }
-  ];
-
-  // 이전 대화 히스토리 (최근 5개만)
+  // 이전 대화 히스토리
   const recentHistory = history.slice(-5);
+  let historyText = '';
   for (const h of recentHistory) {
-    messages.push({ role: 'user', content: h.question });
-    messages.push({ role: 'assistant', content: h.answer });
+    historyText += `\n[이전 질문]: ${h.question}\n[이전 답변]: ${h.answer}\n`;
   }
 
-  messages.push({ role: 'user', content: question });
+  const fullPrompt = `${CONSULTATION_SYSTEM}\n\n${sajuInfo}${historyText}\n\n[현재 질문]\n${question}\n\n위 질문에 답변해주세요`;
 
-  const res = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    temperature: 0.9,
-    max_tokens: 800,
-    messages
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+    generationConfig: { temperature: 0.9, maxOutputTokens: 1500 }
+  };
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   });
-
-  return res.choices[0].message.content;
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error('Gemini API 오류: ' + errText.slice(0, 200));
+  }
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('Gemini 응답이 비어있습니다');
+  return text;
 }
 
 const CONSULT_CATEGORIES = {
@@ -395,8 +398,6 @@ ${cat.prompt}
 }
 
 async function personalConsultFollowup({ apiKey, saju, clientName, clientGender, category, initialResult, history, question }) {
-  const openai = new OpenAI({ apiKey });
-
   const sajuInfo = `[상담자 사주 정보]
 이름: ${clientName} (${clientGender})
 사주: ${saju.fullKorean}
@@ -435,27 +436,34 @@ ${initialResult.slice(0, 1500)}`;
 [분량]
 - 질문에 따라 5~15줄 정도 자연스럽게`;
 
-  const messages = [
-    { role: 'system', content: SYSTEM },
-    { role: 'system', content: sajuInfo }
-  ];
-
-  // 이전 대화 (최근 6개)
+  // 이전 대화 히스토리 텍스트로
   const recentHistory = history.slice(-6);
+  let historyText = '';
   for (const h of recentHistory) {
-    messages.push({ role: h.role, content: h.content });
+    const role = h.role === 'user' ? '[이전 질문]' : '[이전 답변]';
+    historyText += `\n${role}: ${h.content}\n`;
   }
 
-  messages.push({ role: 'user', content: question });
+  const fullPrompt = `${SYSTEM}\n\n${sajuInfo}${historyText}\n\n[현재 질문]\n${question}\n\n위 질문에 답변해주세요`;
 
-  const res = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    temperature: 0.88,
-    max_tokens: 1500,
-    messages
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+    generationConfig: { temperature: 0.88, maxOutputTokens: 2000 }
+  };
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   });
-
-  return res.choices[0].message.content;
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error('Gemini API 오류: ' + errText.slice(0, 200));
+  }
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('Gemini 응답이 비어있습니다');
+  return text;
 }
 
 // ─── 무료 사주 (스레드 홍보용) - Gemini 무료 API 사용 ───
@@ -538,3 +546,4 @@ async function freeThreadReading({ apiKey, saju, clientName, question, length })
 }
 
 module.exports = { consultAnswer, personalConsult, personalConsultFollowup, freeThreadReading, CONSULT_CATEGORIES };
+
