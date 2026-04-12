@@ -316,9 +316,12 @@ const CONSULT_CATEGORIES = {
   }
 };
 
-async function personalConsult({ apiKey, saju, category, clientName, clientGender }) {
+async function personalConsult({ apiKey, saju, category, clientName, clientGender, length }) {
   const openai = new OpenAI({ apiKey });
   const cat = CONSULT_CATEGORIES[category] || CONSULT_CATEGORIES.general;
+  const targetLength = parseInt(length) || 3000;
+  // 한글 글자 1자 ≈ 1.5 토큰, 여유 있게
+  const maxTokens = Math.min(Math.ceil(targetLength * 2.2) + 500, 6000);
 
   const sajuInfo = `[사주 정보]
 이름: ${clientName} (${clientGender})
@@ -340,32 +343,37 @@ async function personalConsult({ apiKey, saju, category, clientName, clientGende
 4. 문장 끝은 "~요", "~네요", "~어요", "~랍니다", "~세요" 같은 부드러운 종결어미로 끝내세요
 5. 마크다운 기호(#, **, -, 숫자.) 절대 사용 금지
 6. 이모지 사용 금지
-7. 전문용어("갑목 일간", "편관", "식상" 등) 절대 금지
+
+[쉬운 말 규칙 - 가장 중요]
+- 전문용어를 절대 쓰지 마세요: 갑목, 편관, 식상, 정인, 겁재, 비견, 십성, 지장간, 용신, 대운, 세운 등
+- 꼭 쓸 수밖에 없으면 반드시 괄호로 쉬운 풀이를 붙이세요
+  예: "용신(인생의 핵심이 되는 기운)", "대운(10년 단위의 큰 흐름)"
+- "신강/신약" 대신 "기운이 강한/약한"으로
+- "오행" 대신 "다섯 가지 기운"으로
+- 초등학생도 이해할 수 있게 설명하세요
+- 추상적인 말 대신 구체적이고 실생활에 적용 가능한 조언으로
 
 [톤]
 - 따뜻하고 친근한 상담사처럼
 - 내담자의 이름을 자주 부르면서 상담
 - 진심으로 걱정하고 응원하는 느낌
-- 단정적이지 않게 "~경향이 있어요", "~하실 수 있어요", "~에 가까워요"
+- 단정적이지 않게 "~경향이 있어요", "~하실 수 있어요"
 
 [분량 및 구조]
-- 약 2000~2500자 분량으로 충분히 풍성하게 작성
+- 반드시 ${targetLength}자 내외로 풍성하게 작성 (중요!)
 - 요청된 모든 주제를 빠짐없이 다루기
-- 각 주제마다 2~4줄씩 설명
+- 각 주제마다 여러 줄로 자세히 설명
 - 주제가 바뀔 때는 문단을 비워서 구분
 - 인사 → 여러 주제 상세 상담 → 마무리 격려 순서
 
-[작성 예시 - 이 스타일로 작성해주세요]
+[작성 예시 - 이 스타일로]
 김가영 님, 사주를 찬찬히 살펴봤어요
 
 김가영 님은 타고나기를 감정이 깊고 진중하신 편이에요
-겉으로는 밝고 사람을 잘 대하시지만 속으로는 쉽게 마음을 열지 않으세요
-한 번 마음을 열면 오래 가는 타입이라 주변에서 신중하다는 말을 들으실 거예요
+겉으로는 밝아 보이시지만 속으로는 쉽게 마음을 열지 않으세요
+한 번 정이 들면 오래 가는 타입이라 주변에서 신중하다는 말을 들으실 거예요
 
-연애에 있어서는 안정감 있고 책임감 강한 사람에게 끌리시는 경향이 있어요
-너무 화려하거나 즉흥적인 사람과는 처음엔 끌려도 금방 지치실 수 있답니다
-
-(이런 식으로 마침표 없이, 한 문장마다 줄바꿈하여 작성)`;
+(이런 식으로 마침표 없이, 한 문장마다 줄바꿈, 전문용어 없이 쉬운 말로)`;
 
   const userMsg = `${sajuInfo}
 
@@ -377,7 +385,7 @@ ${cat.prompt}
   const res = await openai.chat.completions.create({
     model: 'gpt-4o',
     temperature: 0.88,
-    max_tokens: 3500,
+    max_tokens: maxTokens,
     messages: [
       { role: 'system', content: SYSTEM },
       { role: 'user', content: userMsg }
@@ -386,4 +394,68 @@ ${cat.prompt}
   return { title: cat.title, content: res.choices[0].message.content };
 }
 
-module.exports = { consultAnswer, personalConsult, CONSULT_CATEGORIES };
+async function personalConsultFollowup({ apiKey, saju, clientName, clientGender, category, initialResult, history, question }) {
+  const openai = new OpenAI({ apiKey });
+
+  const sajuInfo = `[상담자 사주 정보]
+이름: ${clientName} (${clientGender})
+사주: ${saju.fullKorean}
+일간: ${saju.dayMaster?.korean}(${saju.dayMaster?.element})
+오행: 목${saju.elements?.목} 화${saju.elements?.화} 토${saju.elements?.토} 금${saju.elements?.금} 수${saju.elements?.수}
+신강/신약: ${saju.strength?.label}
+용신: ${saju.yongShin?.element}
+
+[첫 상담 요약 - 이걸 기반으로 이어서 답변]
+주제: ${CONSULT_CATEGORIES[category]?.title || '종합'}
+${initialResult.slice(0, 1500)}`;
+
+  const SYSTEM = `당신은 30년 경력의 사주 상담사입니다. 고객이 처음 상담을 받은 후 추가 질문을 하고 있습니다.
+이전 상담 내용을 기억하면서 이어서 상담하세요.
+
+[절대 규칙]
+1. 마침표(.) 절대 쓰지 마세요
+2. 문장이 끝나면 반드시 줄바꿈해서 새 줄에 시작
+3. 한 문장 = 한 줄
+4. 문장 끝은 "~요", "~네요", "~어요"로
+5. 마크다운 기호(#, **, -) 금지
+6. 이모지 금지
+
+[쉬운 말 규칙]
+- 전문용어 절대 금지 (갑목, 편관, 용신, 대운, 신강 등)
+- 꼭 써야 하면 괄호로 쉬운 풀이 추가
+- 초등학생도 이해할 수 있게 설명
+
+[톤]
+- 따뜻한 상담사처럼 친근하게
+- 상담자 이름을 부르며 답변
+- 이전 상담 내용과 연결해서 답변
+- 질문에 직접적으로 답변 (말 돌리지 말고)
+- 단정적이지 않게 "~경향이 있어요"
+
+[분량]
+- 질문에 따라 5~15줄 정도 자연스럽게`;
+
+  const messages = [
+    { role: 'system', content: SYSTEM },
+    { role: 'system', content: sajuInfo }
+  ];
+
+  // 이전 대화 (최근 6개)
+  const recentHistory = history.slice(-6);
+  for (const h of recentHistory) {
+    messages.push({ role: h.role, content: h.content });
+  }
+
+  messages.push({ role: 'user', content: question });
+
+  const res = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    temperature: 0.88,
+    max_tokens: 1500,
+    messages
+  });
+
+  return res.choices[0].message.content;
+}
+
+module.exports = { consultAnswer, personalConsult, personalConsultFollowup, CONSULT_CATEGORIES };

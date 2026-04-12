@@ -60,10 +60,32 @@ db.exec(`
     created_at INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
+  CREATE TABLE IF NOT EXISTS personal_consults (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    client_name TEXT NOT NULL,
+    client_gender TEXT,
+    saju_data TEXT NOT NULL,
+    category TEXT NOT NULL,
+    initial_result TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
+  CREATE TABLE IF NOT EXISTS personal_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    consult_id INTEGER NOT NULL,
+    role TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (consult_id) REFERENCES personal_consults(id) ON DELETE CASCADE
+  );
   CREATE INDEX IF NOT EXISTS idx_reports_user ON reports(user_id);
   CREATE INDEX IF NOT EXISTS idx_sessions_user ON chat_sessions(user_id);
   CREATE INDEX IF NOT EXISTS idx_msgs_session ON messages(session_id);
   CREATE INDEX IF NOT EXISTS idx_reviews_user ON reviews(user_id);
+  CREATE INDEX IF NOT EXISTS idx_pconsult_user ON personal_consults(user_id);
+  CREATE INDEX IF NOT EXISTS idx_pmsg_consult ON personal_messages(consult_id);
 `);
 
 // 기존 DB 마이그레이션 (컬럼 추가)
@@ -194,6 +216,41 @@ function getReviewStats(userId) {
     avgRating: row.avg_rating ? Math.round(row.avg_rating * 10) / 10 : 0
   };
 }
+
+// ─── 개인 상담 (Personal Consult) ───
+function createPersonalConsult({ userId, clientName, clientGender, sajuData, category, initialResult }) {
+  const now = Date.now();
+  const info = db.prepare(`
+    INSERT INTO personal_consults (user_id, client_name, client_gender, saju_data, category, initial_result, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(userId, clientName, clientGender, JSON.stringify(sajuData), category, initialResult, now, now);
+  return info.lastInsertRowid;
+}
+function listPersonalConsults(userId) {
+  return db.prepare(`
+    SELECT id, client_name, client_gender, category, created_at, updated_at,
+      (SELECT COUNT(*) FROM personal_messages WHERE consult_id = personal_consults.id) as msg_count
+    FROM personal_consults WHERE user_id = ? ORDER BY updated_at DESC
+  `).all(userId);
+}
+function getPersonalConsult(id, userId) {
+  const row = db.prepare(`SELECT * FROM personal_consults WHERE id = ? AND user_id = ?`).get(id, userId);
+  if (!row) return null;
+  db.prepare(`UPDATE personal_consults SET updated_at = ? WHERE id = ?`).run(Date.now(), id);
+  return { ...row, saju_data: JSON.parse(row.saju_data) };
+}
+function deletePersonalConsult(id, userId) {
+  db.prepare(`DELETE FROM personal_consults WHERE id = ? AND user_id = ?`).run(id, userId);
+}
+function addPersonalMessage(consultId, role, content) {
+  const now = Date.now();
+  db.prepare(`INSERT INTO personal_messages (consult_id, role, content, created_at) VALUES (?, ?, ?, ?)`)
+    .run(consultId, role, content, now);
+  db.prepare(`UPDATE personal_consults SET updated_at = ? WHERE id = ?`).run(now, consultId);
+}
+function getPersonalMessages(consultId) {
+  return db.prepare(`SELECT * FROM personal_messages WHERE consult_id = ? ORDER BY created_at ASC`).all(consultId);
+}
 function updateUserStatus(id, status) {
   db.prepare(`UPDATE users SET status = ? WHERE id = ?`).run(status, id);
 }
@@ -294,8 +351,9 @@ function getUserStats(userId) {
 // ─── Cleanup ───
 function cleanupOldReports() {
   const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
-  const info = db.prepare(`DELETE FROM reports WHERE last_accessed_at < ?`).run(cutoff);
-  return info.changes;
+  const r1 = db.prepare(`DELETE FROM reports WHERE last_accessed_at < ?`).run(cutoff);
+  const r2 = db.prepare(`DELETE FROM personal_consults WHERE updated_at < ?`).run(cutoff);
+  return r1.changes + r2.changes;
 }
 cleanupOldReports();
 setInterval(cleanupOldReports, 24 * 60 * 60 * 1000);
@@ -308,5 +366,7 @@ module.exports = {
   createChatSession, listUserSessions, getChatSession, deleteChatSession,
   addMessage, getMessages,
   getUserStats, getRevenueStats, cleanupOldReports,
-  createReview, listUserReviews, deleteReview, getReviewStats
+  createReview, listUserReviews, deleteReview, getReviewStats,
+  createPersonalConsult, listPersonalConsults, getPersonalConsult,
+  deletePersonalConsult, addPersonalMessage, getPersonalMessages
 };

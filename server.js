@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { calculateSaju } = require('./services/sajuCalculator');
 const { generateAllChapters, regenerateChapter } = require('./services/aiGenerator');
-const { consultAnswer, personalConsult, CONSULT_CATEGORIES } = require('./services/consultant');
+const { consultAnswer, personalConsult, personalConsultFollowup, CONSULT_CATEGORIES } = require('./services/consultant');
 const db = require('./services/db');
 
 const app = express();
@@ -227,7 +227,7 @@ app.get('/api/consult-categories', (req, res) => {
 
 app.post('/api/personal-consult', requireUser, async (req, res) => {
   try {
-    const { apiKey, name, gender, year, month, day, hour, minute, isLunar, category } = req.body;
+    const { apiKey, name, gender, year, month, day, hour, minute, isLunar, category, length } = req.body;
     if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI API 키를 입력해주세요' });
     if (!name || !year || !month || !day) return res.status(400).json({ error: '이름과 생년월일은 필수입니다' });
     if (!category) return res.status(400).json({ error: '상담 분야를 선택해주세요' });
@@ -241,13 +241,78 @@ app.post('/api/personal-consult', requireUser, async (req, res) => {
 
     const result = await personalConsult({
       apiKey, saju, category,
-      clientName: name, clientGender: gender || '남성'
+      clientName: name, clientGender: gender || '남성',
+      length
     });
-    res.json({ ok: true, result, saju });
+
+    // DB 저장
+    const consultId = db.createPersonalConsult({
+      userId: req.userId,
+      clientName: name,
+      clientGender: gender || '남성',
+      sajuData: saju,
+      category,
+      initialResult: result.content
+    });
+    // 첫 메시지로 초기 결과 저장
+    db.addPersonalMessage(consultId, 'assistant', result.content);
+
+    res.json({ ok: true, result, saju, consultId });
   } catch (e) {
     console.error('개인상담 오류:', e.message);
     res.status(500).json({ error: e.message });
   }
+});
+
+// 개인상담 목록
+app.get('/api/personal-consults', requireUser, (req, res) => {
+  res.json({ consults: db.listPersonalConsults(req.userId) });
+});
+
+// 개인상담 불러오기 (이전 대화 포함)
+app.get('/api/personal-consults/:id', requireUser, (req, res) => {
+  const consult = db.getPersonalConsult(parseInt(req.params.id), req.userId);
+  if (!consult) return res.status(404).json({ error: '없음' });
+  const messages = db.getPersonalMessages(consult.id);
+  res.json({ consult, messages });
+});
+
+// 개인상담 후속 질문
+app.post('/api/personal-consults/:id/chat', requireUser, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { question, apiKey } = req.body;
+    if (!question) return res.status(400).json({ error: '질문이 비어있습니다' });
+    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI 키 필요' });
+
+    const consult = db.getPersonalConsult(id, req.userId);
+    if (!consult) return res.status(404).json({ error: '없음' });
+    const history = db.getPersonalMessages(id);
+
+    const answer = await personalConsultFollowup({
+      apiKey,
+      saju: consult.saju_data,
+      clientName: consult.client_name,
+      clientGender: consult.client_gender,
+      category: consult.category,
+      initialResult: consult.initial_result,
+      history,
+      question
+    });
+
+    db.addPersonalMessage(id, 'user', question);
+    db.addPersonalMessage(id, 'assistant', answer);
+    res.json({ ok: true, answer });
+  } catch (e) {
+    console.error('후속 상담 오류:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// 개인상담 삭제
+app.delete('/api/personal-consults/:id', requireUser, (req, res) => {
+  db.deletePersonalConsult(parseInt(req.params.id), req.userId);
+  res.json({ ok: true });
 });
 
 // ─── 후기 (공개 - 로그인 불필요) ───

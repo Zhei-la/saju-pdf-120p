@@ -63,6 +63,18 @@
   @keyframes spin { 0%{transform:rotate(0);} 100%{transform:rotate(360deg);} }
   .hidden { display: none !important; }
   .err { color: var(--accent); font-size: 13px; text-align: center; padding: 10px; }
+
+  .chat-msg { margin-bottom: 14px; max-width: 85%; }
+  .chat-msg.user { margin-left: auto; }
+  .chat-msg .bub { padding: 12px 16px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
+  .chat-msg.user .bub { background: var(--deep); color: var(--gold-l); border-radius: 14px 14px 2px 14px; }
+  .chat-msg.ai .bub { background: rgba(184,134,11,0.08); color: var(--ink); border: 1px solid var(--parch-d); border-radius: 2px 14px 14px 14px; }
+  .chat-msg .time { font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .chat-msg.user .time { text-align: right; }
+  .chat-msg .cp-btn { background: transparent; border: 1px solid var(--parch-d); color: var(--muted); padding: 3px 8px; font-size: 10px; font-family: inherit; cursor: pointer; float: right; margin-left: 8px; }
+  .chat-msg .cp-btn:hover { border-color: var(--gold); color: var(--deep); }
+  .loading-dots::after { content: '...'; animation: dots 1.5s infinite; }
+  @keyframes dots { 0%,20%{content:'.';} 40%{content:'..';} 60%,100%{content:'...';} }
 </style>
 </head>
 <body>
@@ -73,6 +85,26 @@ if (!localStorage.getItem('auth_token')) location.href = '/';
   <div class="nav">
     <div class="left">📜 개인 상담</div>
     <button onclick="location.href='/'">← 대시보드</button>
+  </div>
+
+  <!-- 안내 문구 -->
+  <div class="card" style="background:rgba(184,134,11,0.08);border-color:var(--gold);">
+    <div class="card-t" style="color:var(--accent);">⚠️ 토큰 절약 필독 안내</div>
+    <div style="font-size:13px;line-height:2;color:var(--ink);">
+      <b>상담 1회당 AI 사용료가 실시간으로 발생합니다.</b><br>
+      반드시 아래 팁을 참고해서 비용을 아껴 쓰세요.<br><br>
+
+      <b>📌 상담 스타일 2가지 추천</b><br>
+      ● <b>간단 상담</b>: 1000~2000자 선택 + 추가 질문 1~2번 (약 300~600원)<br>
+      ● <b>자세한 상담</b>: 3000~4000자 선택 + 추가 질문 4~5번 (약 1000~2000원)<br><br>
+
+      <b>💡 토큰 절약 팁</b><br>
+      ● 같은 사람 상담은 <b>하단 "이전 상담 목록"에서 이어가기</b>로 재사용 (생년월일 재입력 없음)<br>
+      ● 추가 질문은 <b>꼭 필요한 것만 모아서 한 번에</b> 질문하세요<br>
+      ● 테스트할 땐 <b>1000자</b>로 해서 비용 최소화<br>
+      ● <b>너무 많은 추가 질문은 비용이 금방 늘어납니다</b> (스스로 제한 두세요)<br>
+      ● 이전 상담은 <b>90일간 자동 보관</b>되니 급하게 다시 질문 안 해도 됩니다
+    </div>
   </div>
 
   <!-- 입력 폼 -->
@@ -132,8 +164,27 @@ if (!localStorage.getItem('auth_token')) location.href = '/';
       <div class="cat-grid" id="catGrid"></div>
     </div>
 
+    <div class="card">
+      <div class="card-t">상담 글자 수 (길수록 비용 ↑)</div>
+      <select id="lengthSelect">
+        <option value="1000">1000자 (약 250원 · 짧고 가볍게)</option>
+        <option value="1500">1500자 (약 350원 · 간단 상담)</option>
+        <option value="2000">2000자 (약 500원)</option>
+        <option value="2500">2500자 (약 600원)</option>
+        <option value="3000" selected>3000자 (약 750원 · 추천)</option>
+        <option value="3500">3500자 (약 900원)</option>
+        <option value="4000">4000자 (약 1100원 · 가장 상세)</option>
+      </select>
+    </div>
+
     <button class="btn-main" id="submitBtn" onclick="submitConsult()">AI 상담 받기</button>
     <div id="errMsg" class="err"></div>
+
+    <!-- 이전 상담 목록 -->
+    <div class="card" style="margin-top:24px;">
+      <div class="card-t">📂 이전 상담 목록 (생년월일 재입력 없이 다시 상담)</div>
+      <div id="prevList" style="font-size:13px;"></div>
+    </div>
   </div>
 
   <!-- 로딩 -->
@@ -151,6 +202,19 @@ if (!localStorage.getItem('auth_token')) location.href = '/';
     <div class="result-actions">
       <button onclick="copyResult()">결과 복사</button>
       <button onclick="newConsult()">새 상담</button>
+    </div>
+
+    <!-- 추가 질문 채팅 -->
+    <div class="card" id="chatBox" style="margin-top:24px;">
+      <div class="card-t">💬 추가 질문하기</div>
+      <div id="chatMsgs" style="margin-bottom:16px;max-height:500px;overflow-y:auto;"></div>
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <textarea id="chatInput" placeholder="궁금한 점을 물어보세요..." style="flex:1;min-height:60px;resize:vertical;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFollowup();}"></textarea>
+        <button class="btn-main" id="chatSendBtn" onclick="sendFollowup()" style="min-width:80px;padding:14px;">전송</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">
+        Enter로 전송 · Shift+Enter로 줄바꿈 · 대화는 자동 저장됩니다
+      </div>
     </div>
   </div>
 </div>
@@ -175,6 +239,7 @@ let selectedGender = '남성';
 let selectedCal = 'solar';
 let selectedCat = null;
 let currentResult = null;
+let currentConsultId = null;
 let timeUnknownFlag = false;
 
 // 년/월/일 select 초기화
@@ -224,6 +289,82 @@ function renderCats() {
 function selectCat(k) { selectedCat = k; document.querySelectorAll('.cat-item').forEach(b => b.classList.toggle('active', b.dataset.k === k)); }
 renderCats();
 
+// 이전 상담 목록
+async function loadPrevList() {
+  try {
+    const res = await fetch('/api/personal-consults', {
+      headers: { 'x-auth-token': localStorage.getItem('auth_token') }
+    });
+    const { consults } = await res.json();
+    const box = document.getElementById('prevList');
+    if (!consults || !consults.length) {
+      box.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">아직 이전 상담이 없습니다</div>';
+      return;
+    }
+    const catMap = {general:'🔮 종합',love:'💕 연애',career:'💼 직업',money:'💰 재물',health:'🌿 건강',business:'🏪 사업',study:'🎓 학업',move:'🏠 이사',children:'👶 자녀',helper:'🤝 귀인',year:'📅 올해',month:'🗓️ 이번달'};
+    box.innerHTML = consults.map(c => {
+      const d = new Date(c.updated_at).toLocaleDateString('ko-KR');
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--parch-d);margin-bottom:6px;background:rgba(255,253,248,0.6);">
+        <div>
+          <div style="font-weight:600;color:var(--deep);">${escapeHtml(c.client_name)} (${escapeHtml(c.client_gender || '')}) · ${catMap[c.category] || c.category}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">${d} · 추가질문 ${Math.max(0, (c.msg_count || 1) - 1)}회</div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="reopenConsult(${c.id})" style="padding:6px 12px;font-size:11px;background:var(--deep);color:var(--gold-l);border:none;cursor:pointer;">이어가기</button>
+          <button onclick="delPrev(${c.id})" style="padding:6px 12px;font-size:11px;background:transparent;border:1px solid var(--parch-d);color:var(--muted);cursor:pointer;">삭제</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) { console.error(e); }
+}
+
+async function reopenConsult(id) {
+  try {
+    const res = await fetch('/api/personal-consults/' + id, {
+      headers: { 'x-auth-token': localStorage.getItem('auth_token') }
+    });
+    const { consult, messages } = await res.json();
+    currentConsultId = consult.id;
+    currentResult = { title: '', content: consult.initial_result };
+
+    document.getElementById('resultBox').innerHTML = `
+      <h2>${escapeHtml(consult.client_name)} 님 · 이전 상담 이어가기</h2>
+      <div class="meta">${consult.saju_data.fullKorean} · 일간 ${consult.saju_data.dayMaster.korean}(${consult.saju_data.dayMaster.element})</div>
+      <div class="content">${escapeHtml(consult.initial_result)}</div>
+    `;
+
+    const chatBox = document.getElementById('chatMsgs');
+    chatBox.innerHTML = '';
+    for (let i = 1; i < messages.length; i++) {
+      const m = messages[i];
+      const t = new Date(m.created_at).toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'});
+      if (m.role === 'user') {
+        chatBox.insertAdjacentHTML('beforeend',
+          `<div class="chat-msg user"><div class="bub">${escapeHtml(m.content)}</div><div class="time">${t}</div></div>`);
+      } else {
+        const esc = m.content.replace(/`/g,'\\`').replace(/\$/g,'\\$');
+        chatBox.insertAdjacentHTML('beforeend',
+          `<div class="chat-msg ai"><div class="bub">${escapeHtml(m.content)}</div><div class="time">${t}<button class="cp-btn" onclick="navigator.clipboard.writeText(\`${esc}\`);alert('복사됨')">복사</button></div></div>`);
+      }
+    }
+
+    document.getElementById('formScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  } catch (e) { alert('불러오기 실패: ' + e.message); }
+}
+
+async function delPrev(id) {
+  if (!confirm('이 상담을 삭제할까요? 복구할 수 없습니다')) return;
+  await fetch('/api/personal-consults/' + id, {
+    method: 'DELETE',
+    headers: { 'x-auth-token': localStorage.getItem('auth_token') }
+  });
+  loadPrevList();
+}
+
+loadPrevList();
+
 async function submitConsult() {
   const name = document.getElementById('name').value.trim();
   const year = document.getElementById('year').value;
@@ -243,6 +384,8 @@ async function submitConsult() {
   const apiKey = localStorage.getItem('openai_api_key_' + userName);
   if (!apiKey) { err.textContent = 'OpenAI API 키가 없습니다. 대시보드에서 먼저 저장해주세요'; return; }
 
+  const length = parseInt(document.getElementById('lengthSelect').value) || 3000;
+
   document.getElementById('formScreen').classList.add('hidden');
   document.getElementById('loadingScreen').classList.remove('hidden');
 
@@ -254,19 +397,24 @@ async function submitConsult() {
         apiKey, name, gender: selectedGender,
         year, month, day, hour, minute,
         isLunar: selectedCal === 'lunar',
-        category: selectedCat
+        category: selectedCat,
+        length
       })
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || '오류');
 
     currentResult = json.result;
+    currentConsultId = json.consultId;
     const saju = json.saju;
     document.getElementById('resultBox').innerHTML = `
       <h2>${escapeHtml(name)} 님 · ${escapeHtml(json.result.title)}</h2>
       <div class="meta">${saju.fullKorean} · 일간 ${saju.dayMaster.korean}(${saju.dayMaster.element}) · ${saju.strength.label}</div>
       <div class="content">${escapeHtml(json.result.content)}</div>
     `;
+    // 채팅창 초기화
+    document.getElementById('chatMsgs').innerHTML = '';
+    document.getElementById('chatInput').value = '';
     document.getElementById('loadingScreen').classList.add('hidden');
     document.getElementById('resultScreen').classList.remove('hidden');
   } catch (e) {
@@ -284,9 +432,59 @@ function copyResult() {
 
 function newConsult() {
   currentResult = null;
+  currentConsultId = null;
   document.getElementById('resultScreen').classList.add('hidden');
   document.getElementById('formScreen').classList.remove('hidden');
+  document.getElementById('chatMsgs').innerHTML = '';
+  loadPrevList();
   window.scrollTo(0, 0);
+}
+
+async function sendFollowup() {
+  if (!currentConsultId) return;
+  const input = document.getElementById('chatInput');
+  const question = input.value.trim();
+  if (!question) return;
+
+  const userName = localStorage.getItem('current_user_name') || '';
+  const apiKey = localStorage.getItem('openai_api_key_' + userName);
+  if (!apiKey) { alert('OpenAI API 키가 없습니다'); return; }
+
+  const btn = document.getElementById('chatSendBtn');
+  btn.disabled = true; btn.textContent = '...';
+  input.value = '';
+
+  const box = document.getElementById('chatMsgs');
+  const now = new Date().toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'});
+
+  // 유저 메시지 즉시 표시
+  box.insertAdjacentHTML('beforeend',
+    `<div class="chat-msg user"><div class="bub">${escapeHtml(question)}</div><div class="time">${now}</div></div>`);
+  box.insertAdjacentHTML('beforeend',
+    `<div class="chat-msg ai" id="loadMsg"><div class="bub"><span class="loading-dots">답변 생성 중</span></div></div>`);
+  box.scrollTop = box.scrollHeight;
+
+  try {
+    const res = await fetch('/api/personal-consults/' + currentConsultId + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('auth_token') },
+      body: JSON.stringify({ question, apiKey })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || '오류');
+
+    document.getElementById('loadMsg')?.remove();
+    const t = new Date().toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'});
+    const escaped = json.answer.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+    box.insertAdjacentHTML('beforeend',
+      `<div class="chat-msg ai"><div class="bub">${escapeHtml(json.answer)}</div><div class="time">${t}<button class="cp-btn" onclick="navigator.clipboard.writeText(\`${escaped}\`);alert('복사됨')">복사</button></div></div>`);
+    box.scrollTop = box.scrollHeight;
+  } catch (e) {
+    document.getElementById('loadMsg')?.remove();
+    alert('오류: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '전송';
+  }
 }
 
 function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
