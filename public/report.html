@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사주팔자 리포트</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#1a1209; --gold:#b8860b; --gold-light:#d4a843;
+    --parchment:#f5ede0; --parchment-dark:#e0ceb4;
+    --deep:#2c1810; --muted:#7a6652; --accent:#8b1a1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Serif KR', serif; background: var(--parchment); color: var(--ink); min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 15% 40%, rgba(184,134,11,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(139,26,26,0.06) 0%, transparent 50%);
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 18px 80px; }
+  .header { text-align: center; padding: 36px 0 28px; }
+  .emblem { font-size: 42px; color: var(--gold); margin-bottom: 14px;
+    animation: glow 4s ease-in-out infinite; }
+  @keyframes glow { 0%,100%{transform:translateY(0);filter:drop-shadow(0 0 6px rgba(184,134,11,0.3));}
+    50%{transform:translateY(-4px);filter:drop-shadow(0 0 14px rgba(184,134,11,0.6));} }
+  .divider { height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 10px auto; max-width: 340px; }
+  h1 { font-size: 26px; font-weight: 700; color: var(--deep); letter-spacing: 8px; margin: 10px 0 6px; }
+  .subtitle { font-size: 11.5px; color: var(--muted); font-family: 'Noto Sans KR', sans-serif; letter-spacing: 3px; }
+  .card { background: rgba(255,253,248,0.72); border: 1px solid var(--parchment-dark);
+    padding: 24px 28px; margin-bottom: 18px; box-shadow: 0 2px 20px rgba(44,24,16,0.07); }
+  .card-label { font-size: 10.5px; font-weight: 600; letter-spacing: 4px; color: var(--gold);
+    margin-bottom: 16px; font-family: 'Noto Sans KR', sans-serif; display: flex; align-items: center; gap: 10px; }
+  .card-label::after { content: ''; flex: 1; height: 1px;
+    background: linear-gradient(to right, var(--parchment-dark), transparent); }
+  .label-with-icon { display: flex; align-items: center; justify-content: space-between; }
+  .icon-btn { background: none; border: none; cursor: pointer; color: var(--gold);
+    font-size: 13px; font-family: 'Noto Sans KR', sans-serif; display: flex; align-items: center; gap: 4px;
+    padding: 4px 8px; border-radius: 2px; transition: all 0.2s; }
+  .icon-btn:hover { background: rgba(184,134,11,0.1); }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  label { font-size: 10.5px; letter-spacing: 2px; color: var(--muted);
+    font-family: 'Noto Sans KR', sans-serif; font-weight: 500; }
+  input, select, textarea { border: 1px solid var(--parchment-dark); background: rgba(255,255,255,0.65);
+    padding: 10px 13px; font-size: 13.5px; font-family: 'Noto Sans KR', sans-serif;
+    color: var(--ink); outline: none; transition: all 0.2s; width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184,134,11,0.1); background: rgba(255,255,255,0.9); }
+  input::placeholder, textarea::placeholder { color: #c4aa88; }
+  textarea { resize: vertical; min-height: 240px; line-height: 1.8; font-size: 13px; }
+
+  /* 토글 버튼 */
+  .toggle-group { display: flex; gap: 0; border: 1px solid var(--parchment-dark);
+    background: rgba(255,255,255,0.4); }
+  .toggle-btn { flex: 1; padding: 12px; border: none; background: transparent;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: var(--muted);
+    cursor: pointer; transition: all 0.2s; letter-spacing: 1px; }
+  .toggle-btn:hover { color: var(--deep); }
+  .toggle-btn.active { background: var(--deep); color: var(--gold-light); font-weight: 600; }
+  .toggle-btn + .toggle-btn { border-left: 1px solid var(--parchment-dark); }
+  .toggle-btn.active + .toggle-btn { border-left-color: var(--deep); }
+
+  /* 생년월일 + 시간 한줄 레이아웃 */
+  .date-row { display: grid; grid-template-columns: 90px 1fr 1fr; gap: 8px; }
+  .date-row select, .date-row input { padding: 10px 8px; }
+
+  /* 체크박스 */
+  .check-row { display: flex; align-items: center; gap: 8px; margin-top: 10px;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; }
+  .check-row input[type="checkbox"] { width: auto; cursor: pointer; }
+
+  .btn { padding: 13px 22px; border: none; cursor: pointer;
+    font-family: 'Noto Serif KR', serif; font-size: 13px; letter-spacing: 3px;
+    transition: all 0.22s; }
+  .btn-primary { background: var(--deep); color: var(--gold-light); width: 100%; padding: 16px; letter-spacing: 5px; }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(44,24,16,0.22); }
+  .btn-gold { background: linear-gradient(135deg, var(--gold), #a07000); color: var(--deep); font-weight: 700; }
+  .btn-gold:hover:not(:disabled) { transform: translateY(-1px); }
+  .btn-ghost { background: transparent; border: 1px solid var(--parchment-dark); color: var(--muted); }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--gold); color: var(--deep); }
+  .btn-small { padding: 6px 12px; font-size: 11px; letter-spacing: 1px; font-family: 'Noto Sans KR', sans-serif; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-row .btn { flex: 1; }
+
+  /* API 키 카드 */
+  .key-card { border: 1px solid var(--parchment-dark); padding: 20px 24px;
+    background: rgba(255,253,248,0.85); margin-bottom: 18px; }
+  .key-row { display: flex; gap: 10px; align-items: flex-end; }
+  .key-row .field { flex: 1; margin-bottom: 0; }
+  .key-collapsed { display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: var(--muted); }
+  .key-collapsed .status { display: flex; align-items: center; gap: 8px; }
+  .key-collapsed .dot { width: 8px; height: 8px; border-radius: 50%; background: #2d9d52; }
+  .key-help { font-size: 11px; color: var(--muted); font-family: 'Noto Sans KR', sans-serif;
+    margin-top: 8px; line-height: 1.7; }
+  .key-help a { color: var(--gold); text-decoration: none; border-bottom: 1px dotted var(--gold); }
+
+  /* 모달 */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(26,18,9,0.75);
+    display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+    backdrop-filter: blur(4px); }
+  .modal-backdrop.show { display: flex; }
+  .modal { background: var(--parchment); border: 2px solid var(--gold);
+    max-width: 520px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 28px 32px;
+    position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none;
+    font-size: 24px; color: var(--muted); cursor: pointer; line-height: 1; }
+  .modal-close:hover { color: var(--deep); }
+  .modal h2 { font-size: 18px; color: var(--deep); margin-bottom: 14px; letter-spacing: 2px; }
+  .modal p { font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: var(--muted);
+    line-height: 1.8; margin-bottom: 14px; }
+  .modal table { width: 100%; border-collapse: collapse; font-family: 'Noto Sans KR', sans-serif; }
+  .modal th, .modal td { padding: 10px 12px; text-align: center; font-size: 13px;
+    border-bottom: 1px solid var(--parchment-dark); }
+  .modal th { background: rgba(184,134,11,0.1); color: var(--deep); font-weight: 600; }
+  .modal td:first-child { color: var(--gold); font-weight: 600; }
+  .modal td:last-child { color: var(--ink); }
+
+  /* 상태 */
+  .status-box { font-size: 13px; font-family: 'Noto Sans KR', sans-serif; text-align: center;
+    padding: 14px 16px; margin-top: 14px; line-height: 1.7; }
+  .status-box.err { background: rgba(139,26,26,0.08); color: var(--accent); border: 1px solid rgba(139,26,26,0.2); }
+  .status-box.ok { background: rgba(45,157,82,0.08); color: #2d9d52; border: 1px solid rgba(45,157,82,0.25); }
+  .status-box.loading { background: rgba(26,18,9,0.05); color: var(--muted); border: 1px solid var(--parchment-dark); }
+  .loader { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--parchment-dark);
+    border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite;
+    vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* 챕터 */
+  .saju-info { background: rgba(184,134,11,0.08); border: 1px solid rgba(184,134,11,0.25);
+    padding: 16px 20px; margin-bottom: 18px; font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; color: var(--muted); line-height: 1.9; text-align: center; }
+  .saju-info b { color: var(--deep); }
+  .chapter { background: rgba(255,253,248,0.72); border: 1px solid var(--parchment-dark);
+    padding: 24px 28px; margin-bottom: 16px; }
+  .chapter-head { display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--parchment-dark); }
+  .chapter-title { font-size: 17px; color: var(--deep); font-weight: 700; }
+  .chapter-num { font-size: 10px; color: var(--gold); font-family: 'Noto Sans KR', sans-serif;
+    letter-spacing: 2px; margin-bottom: 4px; }
+  .chapter-actions { display: flex; gap: 6px; }
+  .chapter-body { font-family: 'Noto Sans KR', sans-serif; font-size: 13px; line-height: 1.95;
+    white-space: pre-wrap; color: var(--ink); }
+  .chapter.editing .chapter-body { display: none; }
+  .chapter .edit-area { display: none; }
+  .chapter.editing .edit-area { display: block; }
+  .regen-box { display: none; margin-top: 12px; padding: 14px; background: rgba(184,134,11,0.05);
+    border: 1px dashed var(--gold); }
+  .chapter.regenerating .regen-box { display: block; }
+  .regen-box textarea { min-height: 70px; }
+
+  .hidden { display: none !important; }
+  .toolbar { position: sticky; top: 12px; z-index: 10; display: flex; gap: 10px;
+    padding: 12px 16px; background: rgba(245,237,224,0.95); backdrop-filter: blur(6px);
+    border: 1px solid var(--parchment-dark); margin-bottom: 18px; }
+  .toolbar .btn { flex: 1; }
+
+  /* PDF 렌더용 */
+  .pdf-render { position: absolute; left: -99999px; top: 0; width: 794px; }
+  .pdf-page { width: 794px; min-height: 1123px; padding: 80px 70px; background: #f5ede0;
+    border: 2px solid #b8860b; box-sizing: border-box; font-family: 'Noto Serif KR', serif; color: #1a1209; }
+  .pdf-cover { display: flex; flex-direction: column; justify-content: center; align-items: center;
+    min-height: 1123px; text-align: center; }
+  .pdf-cover .em { font-size: 80px; color: #b8860b; margin-bottom: 30px; }
+  .pdf-cover h1 { font-size: 42px; letter-spacing: 12px; color: #2c1810; margin-bottom: 18px; }
+  .pdf-cover .sub { font-size: 16px; color: #b8860b; letter-spacing: 6px;
+    font-family: 'Noto Sans KR', sans-serif; margin-bottom: 60px; }
+  .pdf-cover .ln { width: 300px; height: 1px; background: #b8860b; margin: 20px 0; }
+  .pdf-cover .nm { font-size: 30px; color: #2c1810; font-weight: 700; margin: 40px 0 12px; }
+  .pdf-cover .if { font-size: 16px; color: #7a6652; font-family: 'Noto Sans KR', sans-serif; line-height: 2; }
+  .pdf-cnum { font-size: 13px; color: #b8860b; letter-spacing: 4px;
+    font-family: 'Noto Sans KR', sans-serif; font-weight: 600; margin-bottom: 10px; }
+  .pdf-ctitle { font-size: 28px; color: #2c1810; font-weight: 700; margin-bottom: 14px; letter-spacing: 2px; }
+  .pdf-cline { height: 1px; background: #b8860b; margin-bottom: 28px; }
+  .pdf-cbody { font-size: 15px; line-height: 2.1; color: #1a1209; white-space: pre-wrap;
+    font-family: 'Noto Sans KR', sans-serif; text-align: justify; }
+
+  /* 목차 페이지 */
+  .pdf-toc-title { font-size: 32px; color: #2c1810; font-weight: 700; letter-spacing: 8px;
+    text-align: center; margin-bottom: 10px; }
+  .pdf-toc-sub { font-size: 14px; color: #b8860b; text-align: center; letter-spacing: 4px;
+    font-family: 'Noto Sans KR', sans-serif; margin-bottom: 40px; }
+  .pdf-toc-divider { width: 200px; height: 1px; background: #b8860b; margin: 0 auto 40px; }
+  .pdf-toc-part { font-size: 14px; color: #b8860b; font-weight: 600; letter-spacing: 3px;
+    font-family: 'Noto Sans KR', sans-serif; margin: 22px 0 10px; padding-bottom: 6px;
+    border-bottom: 1px solid #e0ceb4; }
+  .pdf-toc-part:first-child { margin-top: 0; }
+  .pdf-toc-item { font-size: 13px; color: #1a1209; font-family: 'Noto Sans KR', sans-serif;
+    padding: 5px 0; display: flex; justify-content: space-between; }
+  .pdf-toc-item .num { color: #b8860b; font-weight: 600; margin-right: 10px; min-width: 30px; }
+  .pdf-toc-item .title { flex: 1; }
+
+  /* 안내/배너 박스 */
+  .pdf-info-box { background: rgba(184,134,11,0.08); border: 2px solid #b8860b;
+    padding: 28px 32px; margin: 30px 0; text-align: center; }
+  .pdf-info-box h3 { font-size: 18px; color: #2c1810; font-weight: 700; margin-bottom: 12px;
+    letter-spacing: 3px; }
+  .pdf-info-box p { font-size: 13px; color: #7a6652; font-family: 'Noto Sans KR', sans-serif;
+    line-height: 1.9; margin-bottom: 14px; }
+  .pdf-info-box .link { font-size: 14px; color: #2c1810; font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif; word-break: break-all;
+    background: rgba(255,255,255,0.6); padding: 10px 16px; border-radius: 2px;
+    display: inline-block; margin-top: 6px; }
+
+  /* 중간 상담 배너 (챕터 사이) */
+  .pdf-banner { background: #2c1810; color: #d4a843; padding: 26px 30px; margin: 30px 0;
+    text-align: center; border: 1px solid #b8860b; }
+  .pdf-banner h4 { font-size: 16px; font-weight: 700; margin-bottom: 10px; letter-spacing: 3px;
+    color: #d4a843; }
+  .pdf-banner p { font-size: 12px; color: #e0ceb4; font-family: 'Noto Sans KR', sans-serif;
+    line-height: 1.8; margin-bottom: 12px; }
+  .pdf-banner .link { font-size: 12px; color: #d4a843;
+    font-family: 'Noto Sans KR', sans-serif; word-break: break-all;
+    border: 1px solid #b8860b; padding: 8px 14px; display: inline-block; }
+
+  @media(max-width:520px){
+    .card{padding:20px 18px;} h1{font-size:21px;letter-spacing:5px;}
+    .chapter{padding:20px 18px;}
+    .chapter-head{flex-direction:column;align-items:flex-start;gap:10px;}
+    .toolbar{flex-direction:column;} .date-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="emblem">☯</div>
+    <div class="divider"></div>
+    <h1>사주팔자 리포트</h1>
+    <div class="subtitle">AI 40챕터 분석 · 편집 · PDF 저장</div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- API 키 카드 -->
+  <div class="key-card" id="keyCard">
+    <div id="keyExpanded">
+      <div class="card-label">OpenAI API 키</div>
+      <div class="key-row">
+        <div class="field"><input type="password" id="apiKey" placeholder="sk-proj-..."></div>
+        <button class="btn btn-gold btn-small" onclick="saveKey()">저장</button>
+      </div>
+      <div class="key-help">
+        🔑 키가 없으신가요? <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>에서 발급받으세요.<br>
+        먼저 <a href="https://platform.openai.com/settings/organization/billing/overview" target="_blank">결제 수단 등록</a> 후 최소 $10 충전을 권장합니다. (리포트 1회당 약 1000~1500원, gpt-4o 사용)
+      </div>
+    </div>
+    <div id="keyCollapsed" class="key-collapsed hidden">
+      <div class="status"><span class="dot"></span>API 키 저장됨 (<span id="keyPreview"></span>)</div>
+      <button class="btn btn-ghost btn-small" onclick="editKey()">수정</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: 입력 -->
+  <div id="inputScreen">
+    <div class="card">
+      <div class="card-label">의뢰인 정보</div>
+
+      <div class="field">
+        <label>이름</label>
+        <input id="name" placeholder="홍길동">
+      </div>
+
+      <div class="field">
+        <label>성별</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn active" data-gender="남성" onclick="selectGender('남성')">남자</button>
+          <button type="button" class="toggle-btn" data-gender="여성" onclick="selectGender('여성')">여자</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="label-with-icon">
+          <label>생년월일시</label>
+          <button class="icon-btn" onclick="openModal('zishiModal')">🔍 12간지 시간표</button>
+        </div>
+        <div class="toggle-group" style="margin-bottom: 10px;">
+          <button type="button" class="toggle-btn active" data-cal="solar" onclick="selectCalendar('solar')">양력</button>
+          <button type="button" class="toggle-btn" data-cal="lunar" onclick="selectCalendar('lunar')">음력</button>
+        </div>
+        <div class="date-row">
+          <input id="year" type="number" placeholder="년" min="1900" max="2100">
+          <input id="month" type="number" placeholder="월" min="1" max="12">
+          <input id="day" type="number" placeholder="일" min="1" max="31">
+        </div>
+        <div class="date-row" style="margin-top: 8px; grid-template-columns: 1fr 1fr;">
+          <select id="hour"><option value="">시 선택</option></select>
+          <select id="minute"><option value="0">00분</option></select>
+        </div>
+        <label class="check-row">
+          <input type="checkbox" id="timeUnknown" onchange="toggleTimeUnknown()">
+          <span>시간을 모름 (정오 기준으로 계산)</span>
+        </label>
+      </div>
+
+      <div class="field">
+        <div class="label-with-icon">
+          <label>태어난 도시</label>
+          <button class="icon-btn" onclick="openModal('cityModal')">🔍 도시 보정이란?</button>
+        </div>
+        <select id="city">
+          <option value="seoul">서울</option>
+          <option value="busan">부산</option>
+          <option value="incheon">인천</option>
+          <option value="daegu">대구</option>
+          <option value="daejeon">대전</option>
+          <option value="gwangju">광주</option>
+          <option value="ulsan">울산</option>
+          <option value="sejong">세종</option>
+          <option value="suwon">수원</option>
+          <option value="changwon">창원</option>
+          <option value="goyang">고양</option>
+          <option value="yongin">용인</option>
+          <option value="seongnam">성남</option>
+          <option value="cheongju">청주</option>
+          <option value="jeonju">전주</option>
+          <option value="cheonan">천안</option>
+          <option value="pohang">포항</option>
+          <option value="jeju">제주</option>
+          <option value="chuncheon">춘천</option>
+          <option value="gangneung">강릉</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="genBtn" onclick="generateReport()">리포트 생성 시작</button>
+    <div id="genStatus"></div>
+  </div>
+
+  <!-- STEP 2: 미리보기 -->
+  <div id="previewScreen" class="hidden">
+    <div class="toolbar">
+      <button class="btn btn-ghost btn-small" onclick="backToInput()">← 새 리포트</button>
+      <button class="btn btn-gold btn-small" onclick="downloadPDF()" id="dlBtn">↓ PDF 저장</button>
+    </div>
+    <div class="saju-info" id="sajuInfo"></div>
+    <div id="chaptersBox"></div>
+    <div id="dlStatus"></div>
+  </div>
+</div>
+
+<!-- 12간지 모달 -->
+<div class="modal-backdrop" id="zishiModal" onclick="if(event.target===this)closeModal('zishiModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('zishiModal')">×</button>
+    <h2>12간지 시간표</h2>
+    <p>어른들이 "인시에 태어났다"고 말씀하시는 경우, 아래 표를 참고해 시간을 입력해주세요.
+    한국 표준시 기준으로 각 간지별 시작 시간에서 약 30분 정도 늦게 입력하시는 것을 추천드립니다.
+    예) 자시라면 <b>00:00</b>, 축시라면 <b>02:00</b></p>
+    <table>
+      <thead><tr><th>간지</th><th>시간</th></tr></thead>
+      <tbody>
+        <tr><td>자시 (子時)</td><td>23:30 ~ 01:30</td></tr>
+        <tr><td>축시 (丑時)</td><td>01:30 ~ 03:30</td></tr>
+        <tr><td>인시 (寅時)</td><td>03:30 ~ 05:30</td></tr>
+        <tr><td>묘시 (卯時)</td><td>05:30 ~ 07:30</td></tr>
+        <tr><td>진시 (辰時)</td><td>07:30 ~ 09:30</td></tr>
+        <tr><td>사시 (巳時)</td><td>09:30 ~ 11:30</td></tr>
+        <tr><td>오시 (午時)</td><td>11:30 ~ 13:30</td></tr>
+        <tr><td>미시 (未時)</td><td>13:30 ~ 15:30</td></tr>
+        <tr><td>신시 (申時)</td><td>15:30 ~ 17:30</td></tr>
+        <tr><td>유시 (酉時)</td><td>17:30 ~ 19:30</td></tr>
+        <tr><td>술시 (戌時)</td><td>19:30 ~ 21:30</td></tr>
+        <tr><td>해시 (亥時)</td><td>21:30 ~ 23:30</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 도시 보정 설명 모달 -->
+<div class="modal-backdrop" id="cityModal" onclick="if(event.target===this)closeModal('cityModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('cityModal')">×</button>
+    <h2>도시 보정이란?</h2>
+    <p>한국 표준시(KST)는 <b>동경 135도</b>를 기준으로 합니다. 하지만 실제 한국 도시들은 동경 126~130도에 위치해
+    표준시보다 실제 태양시가 <b>20~32분 정도 늦습니다</b>.</p>
+    <p>사주는 <b>실제 태양시</b>를 기준으로 계산해야 정확하므로, 태어난 도시의 경도에 맞춰 시간을 자동 보정합니다.</p>
+    <p>예) 서울에서 오전 8시에 태어났다면 → 실제 태양시는 오전 7시 28분 → 이 시간으로 사주를 계산합니다.</p>
+    <p style="color:var(--accent);">⚠ 태어난 도시를 정확히 선택해야 시주(時柱)가 정확하게 나옵니다.</p>
+  </div>
+</div>
+
+<div class="pdf-render" id="pdfRender"></div>
+
+<script>
+// 인증 체크
+if (!localStorage.getItem('auth_token')) location.href = '/';
+
+// ── 도시별 시간 보정 (분 단위, 한국 KST 기준 -32~-20분) ──
+const CITY_OFFSETS = {
+  seoul: -32,     // 서울 126.98
+  busan: -24,     // 부산 129.07
+  incheon: -33,   // 인천 126.70
+  daegu: -26,     // 대구 128.60
+  daejeon: -30,   // 대전 127.39
+  gwangju: -33,   // 광주 126.85
+  ulsan: -25,     // 울산 129.31
+  sejong: -30,    // 세종 127.29
+  suwon: -32,     // 수원 127.03
+  changwon: -26,  // 창원 128.68
+  goyang: -33,    // 고양 126.83
+  yongin: -31,    // 용인 127.18
+  seongnam: -32,  // 성남 127.14
+  cheongju: -30,  // 청주 127.49
+  jeonju: -31,    // 전주 127.15
+  cheonan: -31,   // 천안 127.15
+  pohang: -23,    // 포항 129.34
+  jeju: -32,      // 제주 126.53
+  chuncheon: -28, // 춘천 127.73
+  gangneung: -24  // 강릉 128.88
+};
+
+// ── 상태 ──
+let currentUserInfo = null;
+let currentChapters = [];
+let selectedGender = '남성';
+let selectedCalendar = 'solar';
+
+// ── 초기화 ──
+window.addEventListener('DOMContentLoaded', () => {
+  // 시/분 드롭다운
+  const hourSel = document.getElementById('hour');
+  for (let h = 0; h < 24; h++) {
+    const opt = document.createElement('option');
+    opt.value = h;
+    opt.textContent = String(h).padStart(2, '0') + '시';
+    hourSel.appendChild(opt);
+  }
+  const minSel = document.getElementById('minute');
+  minSel.innerHTML = '';
+  for (let m = 0; m < 60; m += 5) {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = String(m).padStart(2, '0') + '분';
+    minSel.appendChild(opt);
+  }
+
+  // 저장된 API 키
+  const saved = localStorage.getItem('openai_api_key');
+  if (saved) {
+    document.getElementById('apiKey').value = saved;
+    collapseKey(saved);
+  }
+});
+
+// ── 토글 버튼 ──
+function selectGender(g) {
+  selectedGender = g;
+  document.querySelectorAll('[data-gender]').forEach(b =>
+    b.classList.toggle('active', b.dataset.gender === g));
+}
+function selectCalendar(c) {
+  selectedCalendar = c;
+  document.querySelectorAll('[data-cal]').forEach(b =>
+    b.classList.toggle('active', b.dataset.cal === c));
+}
+
+// ── 시간 모름 체크박스 ──
+function toggleTimeUnknown() {
+  const checked = document.getElementById('timeUnknown').checked;
+  document.getElementById('hour').disabled = checked;
+  document.getElementById('minute').disabled = checked;
+  if (checked) {
+    document.getElementById('hour').value = '';
+    document.getElementById('minute').value = '0';
+  }
+}
+
+// ── 모달 ──
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ── API 키 ──
+function saveKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key || !key.startsWith('sk-')) { alert('올바른 OpenAI API 키를 입력해주세요 (sk-로 시작)'); return; }
+  localStorage.setItem('openai_api_key', key);
+  collapseKey(key);
+}
+function collapseKey(key) {
+  document.getElementById('keyExpanded').classList.add('hidden');
+  document.getElementById('keyCollapsed').classList.remove('hidden');
+  document.getElementById('keyPreview').textContent = key.slice(0, 7) + '...' + key.slice(-4);
+}
+function editKey() {
+  document.getElementById('keyExpanded').classList.remove('hidden');
+  document.getElementById('keyCollapsed').classList.add('hidden');
+}
+function getApiKey() {
+  return localStorage.getItem('openai_api_key') || document.getElementById('apiKey').value.trim();
+}
+
+// ── 상태 ──
+function showStatus(elId, html, type) {
+  const el = document.getElementById(elId);
+  el.className = 'status-box ' + type;
+  el.innerHTML = html;
+}
+function clearStatus(elId) {
+  document.getElementById(elId).className = '';
+  document.getElementById(elId).innerHTML = '';
+}
+
+// ── 시간 보정 적용 ──
+function applyCityOffset(hour, minute, cityKey) {
+  const offset = CITY_OFFSETS[cityKey] || 0;
+  let totalMin = hour * 60 + minute + offset;
+  let dayShift = 0;
+  while (totalMin < 0) { totalMin += 24 * 60; dayShift--; }
+  while (totalMin >= 24 * 60) { totalMin -= 24 * 60; dayShift++; }
+  return {
+    hour: Math.floor(totalMin / 60),
+    minute: totalMin % 60,
+    dayShift
+  };
+}
+
+// ── 리포트 생성 ──
+async function generateReport() {
+  const apiKey = getApiKey();
+  if (!apiKey) { showStatus('genStatus', 'OpenAI API 키를 먼저 저장해주세요.', 'err'); return; }
+
+  const name = document.getElementById('name').value.trim();
+  const year = document.getElementById('year').value;
+  const month = document.getElementById('month').value;
+  const day = document.getElementById('day').value;
+  const isTimeUnknown = document.getElementById('timeUnknown').checked;
+  const cityKey = document.getElementById('city').value;
+
+  if (!name) return showStatus('genStatus', '이름을 입력해주세요.', 'err');
+  if (!year || !month || !day) return showStatus('genStatus', '생년월일을 모두 입력해주세요.', 'err');
+
+  let hourVal, minuteVal;
+  if (isTimeUnknown) {
+    hourVal = 12; minuteVal = 0;
+  } else {
+    const hv = document.getElementById('hour').value;
+    if (hv === '') return showStatus('genStatus', '태어난 시간을 선택하거나 "시간을 모름"을 체크해주세요.', 'err');
+    hourVal = parseInt(hv);
+    minuteVal = parseInt(document.getElementById('minute').value) || 0;
+  }
+
+  // 도시 보정 적용
+  let yearN = parseInt(year), monthN = parseInt(month), dayN = parseInt(day);
+  if (!isTimeUnknown) {
+    const adjusted = applyCityOffset(hourVal, minuteVal, cityKey);
+    hourVal = adjusted.hour;
+    minuteVal = adjusted.minute;
+    if (adjusted.dayShift !== 0) {
+      const d = new Date(yearN, monthN - 1, dayN);
+      d.setDate(d.getDate() + adjusted.dayShift);
+      yearN = d.getFullYear();
+      monthN = d.getMonth() + 1;
+      dayN = d.getDate();
+    }
+  }
+
+  const data = {
+    apiKey, name,
+    gender: selectedGender,
+    year: yearN, month: monthN, day: dayN,
+    hour: hourVal, minute: minuteVal,
+    timeUnknown: isTimeUnknown,
+    city: cityKey,
+    isLunar: selectedCalendar === 'lunar'
+  };
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true; btn.textContent = '생성 중...';
+  showStatus('genStatus', '<span class="loader"></span>40챕터 분석 중... 약 3~5분 소요됩니다. 잠시만 기다려주세요.', 'loading');
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('auth_token') || '' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || '오류');
+
+    currentUserInfo = json.userInfo;
+    currentUserInfo.cityName = document.getElementById('city').selectedOptions[0].textContent;
+    currentChapters = json.chapters;
+    renderPreview();
+  } catch (e) {
+    showStatus('genStatus', '❌ ' + e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = '리포트 생성 시작';
+  }
+}
+
+// ── 미리보기 ──
+function renderPreview() {
+  document.getElementById('inputScreen').classList.add('hidden');
+  document.getElementById('previewScreen').classList.remove('hidden');
+  clearStatus('genStatus');
+
+  const s = currentUserInfo.saju;
+  const timeWarning = currentUserInfo.timeUnknown
+    ? '<br><span style="color:var(--accent);font-size:12px;">⚠ 태어난 시간을 모르셔서 정오 기준으로 계산되었습니다. 시주 관련 분석은 참고용입니다.</span>'
+    : '';
+  const cityInfo = currentUserInfo.cityName ? ` · ${currentUserInfo.cityName} 기준` : '';
+  document.getElementById('sajuInfo').innerHTML =
+    `<b>${currentUserInfo.name}</b> (${currentUserInfo.gender})${cityInfo}<br>
+     양력 ${s.solarDate} · 음력 ${s.lunarDate} · ${s.zodiac}띠<br>
+     ${s.fullKorean}<br>
+     일간 <b>${s.dayMaster.korean}(${s.dayMaster.hanja}) · ${s.dayMaster.element}</b> · 
+     오행 목${s.elements.목} 화${s.elements.화} 토${s.elements.토} 금${s.elements.금} 수${s.elements.수}${timeWarning}`;
+
+  const box = document.getElementById('chaptersBox');
+  box.innerHTML = currentChapters.map((c, i) => `
+    <div class="chapter" id="ch-${i}">
+      <div class="chapter-head">
+        <div>
+          <div class="chapter-num">CHAPTER ${String(i+1).padStart(2,'0')}</div>
+          <div class="chapter-title">${escapeHtml(c.title)}</div>
+        </div>
+        <div class="chapter-actions">
+          <button class="btn btn-ghost btn-small" onclick="toggleEdit(${i})">편집</button>
+          <button class="btn btn-ghost btn-small" onclick="toggleRegen(${i})">재생성</button>
+        </div>
+      </div>
+      <div class="chapter-body">${escapeHtml(c.content)}</div>
+      <div class="edit-area">
+        <textarea id="edit-${i}">${escapeHtml(c.content)}</textarea>
+        <div class="btn-row">
+          <button class="btn btn-gold btn-small" onclick="saveEdit(${i})">저장</button>
+          <button class="btn btn-ghost btn-small" onclick="cancelEdit(${i})">취소</button>
+        </div>
+      </div>
+      <div class="regen-box">
+        <label style="font-size:11px;color:var(--muted);font-family:'Noto Sans KR',sans-serif;">추가 지시사항 (선택)</label>
+        <textarea id="regen-${i}" placeholder="예: 더 구체적으로 / 긍정적으로 / 더 짧게"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-gold btn-small" onclick="doRegen(${i})">다시 생성</button>
+          <button class="btn btn-ghost btn-small" onclick="toggleRegen(${i})">취소</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ── 편집/재생성 ──
+function toggleEdit(i) {
+  const el = document.getElementById('ch-' + i);
+  el.classList.remove('regenerating');
+  el.classList.toggle('editing');
+}
+function saveEdit(i) {
+  const newText = document.getElementById('edit-' + i).value;
+  currentChapters[i].content = newText;
+  const el = document.getElementById('ch-' + i);
+  el.querySelector('.chapter-body').textContent = newText;
+  el.classList.remove('editing');
+}
+function cancelEdit(i) {
+  document.getElementById('edit-' + i).value = currentChapters[i].content;
+  document.getElementById('ch-' + i).classList.remove('editing');
+}
+function toggleRegen(i) {
+  const el = document.getElementById('ch-' + i);
+  el.classList.remove('editing');
+  el.classList.toggle('regenerating');
+}
+async function doRegen(i) {
+  const apiKey = getApiKey();
+  if (!apiKey) return alert('API 키가 없습니다');
+  const instruction = document.getElementById('regen-' + i).value.trim();
+  const el = document.getElementById('ch-' + i);
+  const body = el.querySelector('.chapter-body');
+  const actions = el.querySelectorAll('.chapter-actions button');
+  actions.forEach(b => b.disabled = true);
+  const origText = body.textContent;
+  body.innerHTML = '<span class="loader"></span><span style="color:var(--muted);">재생성 중...</span>';
+  try {
+    const res = await fetch('/api/regenerate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('auth_token') || '' },
+      body: JSON.stringify({ apiKey, userInfo: currentUserInfo, index: i, instruction })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || '오류');
+    currentChapters[i] = json.chapter;
+    body.textContent = json.chapter.content;
+    document.getElementById('edit-' + i).value = json.chapter.content;
+    el.classList.remove('regenerating');
+    document.getElementById('regen-' + i).value = '';
+  } catch (e) {
+    body.textContent = origText;
+    alert('재생성 실패: ' + e.message);
+  } finally {
+    actions.forEach(b => b.disabled = false);
+  }
+}
+
+function backToInput() {
+  if (!confirm('현재 리포트가 사라집니다. 계속하시겠습니까?')) return;
+  document.getElementById('previewScreen').classList.add('hidden');
+  document.getElementById('inputScreen').classList.remove('hidden');
+  currentUserInfo = null; currentChapters = [];
+}
+
+// ── PDF ──
+async function downloadPDF() {
+  if (!currentChapters.length) return;
+  const btn = document.getElementById('dlBtn');
+  btn.disabled = true; btn.textContent = 'PDF 생성 중...';
+  showStatus('dlStatus', '<span class="loader"></span>PDF 렌더링 중...', 'loading');
+
+  const s = currentUserInfo.saju;
+  const render = document.getElementById('pdfRender');
+
+  // 6부 구성 메타데이터
+  const PARTS = [
+    { title: 'PART 1. 본성과 성격', range: [0, 5] },
+    { title: 'PART 2. 커리어와 재물', range: [5, 11] },
+    { title: 'PART 3. 인간관계와 인연', range: [11, 17] },
+    { title: 'PART 4. 건강과 인생', range: [17, 22] },
+    { title: 'PART 5. 인생 굴곡과 운명', range: [22, 28] },
+    { title: 'PART 6. 2025년 월별 상세 운세', range: [28, 40] }
+  ];
+  const KAKAO_LINK = 'https://open.kakao.com/o/sb05ouMh';
+
+  // === 표지 ===
+  let html = `
+    <div class="pdf-page pdf-cover">
+      <div class="em">☯</div>
+      <h1>사주팔자</h1>
+      <div class="sub">SAJU PALGWAE REPORT</div>
+      <div class="ln"></div>
+      <div class="nm">${escapeHtml(currentUserInfo.name)} (${escapeHtml(currentUserInfo.gender)})</div>
+      <div class="if">
+        양력 ${s.solarDate}<br>
+        음력 ${s.lunarDate} · ${s.zodiac}띠<br>
+        ${s.fullKorean}<br>
+        일간 ${s.dayMaster.korean}(${s.dayMaster.hanja}) · ${s.dayMaster.element}
+      </div>
+      <div class="ln"></div>
+      <div style="font-size:13px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:30px;letter-spacing:2px;">
+        AI 종합 분석 · 40챕터 · 약 120페이지
+      </div>
+    </div>`;
+
+  // === 목차 페이지 ===
+  let tocHtml = `
+    <div class="pdf-page">
+      <div class="pdf-toc-title">목 차</div>
+      <div class="pdf-toc-sub">CONTENTS</div>
+      <div class="pdf-toc-divider"></div>`;
+  PARTS.forEach(part => {
+    tocHtml += `<div class="pdf-toc-part">${part.title}</div>`;
+    for (let i = part.range[0]; i < part.range[1]; i++) {
+      if (currentChapters[i]) {
+        tocHtml += `<div class="pdf-toc-item"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="title">${escapeHtml(currentChapters[i].title)}</span></div>`;
+      }
+    }
+  });
+  tocHtml += `</div>`;
+  html += tocHtml;
+
+  // === 챕터들 (중간 배너 포함) ===
+  const BANNER_AFTER = [9, 19, 29]; // 10, 20, 30번 챕터 뒤
+  currentChapters.forEach((c, i) => {
+    html += `
+      <div class="pdf-page">
+        <div class="pdf-cnum">CHAPTER ${String(i+1).padStart(2,'0')}</div>
+        <div class="pdf-ctitle">${escapeHtml(c.title)}</div>
+        <div class="pdf-cline"></div>
+        <div class="pdf-cbody">${escapeHtml(c.content)}</div>
+      </div>`;
+
+    // 중간 배너
+    if (BANNER_AFTER.includes(i)) {
+      html += `
+        <div class="pdf-page">
+          <div style="padding-top:120px;text-align:center;">
+            <div style="font-size:60px;color:#b8860b;margin-bottom:24px;">☯</div>
+            <div class="pdf-toc-title" style="font-size:26px;letter-spacing:6px;">잠시, 쉬어가기</div>
+            <div class="pdf-toc-divider" style="margin:24px auto;"></div>
+          </div>
+          <div class="pdf-banner">
+            <h4>직접 상담받으러 가기</h4>
+            <p>사주에 대해 궁금한 점이 있으신가요?<br>
+            리포트를 읽다가 더 깊이 알고 싶은 부분이 있다면<br>
+            언제든 카카오 오픈채팅으로 문의해주세요.</p>
+            <div class="link">${KAKAO_LINK}</div>
+          </div>
+          <div style="font-size:12px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;text-align:center;margin-top:30px;line-height:1.9;">
+            다음 페이지부터 챕터 ${i+2}번이 이어집니다.
+          </div>
+        </div>`;
+    }
+  });
+
+  // === 엔딩 페이지 ===
+  html += `
+    <div class="pdf-page">
+      <div style="text-align:center;padding-top:50px;">
+        <div style="font-size:50px;color:#b8860b;margin-bottom:20px;">☯</div>
+        <div class="pdf-toc-title" style="font-size:26px;">리포트를 마치며</div>
+        <div class="pdf-toc-divider" style="margin-top:20px;"></div>
+      </div>
+      <div style="font-size:14px;color:#1a1209;font-family:'Noto Sans KR',sans-serif;line-height:2.1;margin-top:30px;padding:0 10px;">
+        ${escapeHtml(currentUserInfo.name)} 님, 여기까지 읽어주셔서 감사합니다.
+        <br><br>
+        본 리포트가 ${escapeHtml(currentUserInfo.name)} 님의 인생을 이해하고 앞으로의 방향을 잡는 데 작은 도움이 되었기를 바랍니다.
+        <br><br>
+        사주는 타고난 기운의 지도와 같습니다. 같은 지도를 가지고도 어떻게 걸어가느냐에 따라 도착지는 달라집니다. 이 리포트를 참고 자료로 활용하시되, 결국 인생의 주인공은 본인임을 잊지 마시기 바랍니다.
+      </div>
+      <div class="pdf-info-box">
+        <h3>💬 더 궁금한 점이 있으신가요?</h3>
+        <p>리포트를 읽고 궁금한 점이나 추가 상담이 필요하시면<br>카카오 오픈채팅으로 편하게 문의해주세요.</p>
+        <div class="link">${KAKAO_LINK}</div>
+      </div>
+      <div style="font-size:11px;color:#b8860b;font-family:'Noto Sans KR',sans-serif;text-align:center;margin-top:30px;letter-spacing:2px;">
+        — 이 리포트는 전통 명리학 + AI 기술로 제작되었습니다 —
+      </div>
+    </div>`;
+
+  render.innerHTML = html;
+  await new Promise(r => setTimeout(r, 400));
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+    const pages = render.querySelectorAll('.pdf-page');
+    for (let i = 0; i < pages.length; i++) {
+      showStatus('dlStatus', `<span class="loader"></span>PDF ${i+1}/${pages.length} 페이지 생성 중...`, 'loading');
+      const canvas = await html2canvas(pages[i], { scale: 2, backgroundColor: '#f5ede0', useCORS: true });
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+    }
+    pdf.save(`사주분석_${currentUserInfo.name}.pdf`);
+    showStatus('dlStatus', '✅ PDF 저장 완료!', 'ok');
+  } catch (e) {
+    showStatus('dlStatus', '❌ PDF 생성 실패: ' + e.message, 'err');
+  } finally {
+    render.innerHTML = '';
+    btn.disabled = false; btn.textContent = '↓ PDF 저장';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>AI 상담 채팅</title>
+<style>
+  body { font-family: 'Noto Sans KR', sans-serif; background: #f5ede0; color: #1a1209;
+    display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; text-align: center; padding: 20px; }
+  .box { max-width: 500px; background: rgba(255,253,248,0.9); padding: 40px 30px; border: 1px solid #e0ceb4; }
+  h1 { font-size: 22px; margin-bottom: 14px; color: #2c1810; }
+  p { color: #7a6652; line-height: 1.8; font-size: 14px; margin-bottom: 20px; }
+  a { display: inline-block; padding: 12px 24px; background: #2c1810; color: #d4a843;
+    text-decoration: none; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+<script>
+if (!localStorage.getItem('auth_token')) location.href = '/';
+</script>
+<div class="box">
+  <div style="font-size:42px;color:#b8860b;margin-bottom:14px;">💬</div>
+  <h1>AI 상담 채팅</h1>
+  <p>이 페이지는 다음 단계에서 완성될 예정입니다.<br>
+  ChatGPT 스타일의 상담 채팅 UI가 여기에 만들어집니다.<br><br>
+  지금은 대시보드로 돌아가 리포트 생성부터 사용해보세요.</p>
+  <a href="/">홈으로</a>
+</div>
+</body>
+</html>
