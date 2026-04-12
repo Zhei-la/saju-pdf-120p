@@ -42,8 +42,11 @@
   .session-item .del:hover { color: var(--accent); }
   .side-empty { text-align: center; padding: 30px 20px; color: var(--muted); font-size: 12px; line-height: 1.7; }
 
-  /* 채팅 메인 */
-  .chat { display: flex; flex-direction: column; min-height: 0; }
+  /* 채팅 메인 컨테이너 (outer) */
+  .chat-main { display: flex; flex-direction: column; min-height: 0; position: relative; }
+
+  /* 채팅 화면 (inner - chatView) */
+  .chat { display: flex; flex-direction: column; min-height: 0; flex: 1; height: 100%; }
   .chat-info { padding: 12px 20px; background: rgba(255,253,248,0.5); border-bottom: 1px solid var(--parch-d);
     font-size: 12px; color: var(--muted); }
   .msgs { flex: 1; overflow-y: auto; padding: 20px 24px; }
@@ -98,11 +101,16 @@
   @keyframes dots { 0%,20%{content:'.';} 40%{content:'..';} 60%,100%{content:'...';} }
 
   @media(max-width:768px) {
-    .main { grid-template-columns: 1fr; }
-    .side { position: fixed; left: -100%; top: 52px; bottom: 0; width: 280px; z-index: 10;
-      transition: left 0.2s; border-right: 1px solid var(--parch-d); }
-    .side.open { left: 0; }
+    .main { grid-template-columns: 1fr; display: block; position: relative; }
+    .chat-main { min-height: calc(100vh - 52px); }
+    .side { 
+      position: fixed; left: -100%; top: 52px; bottom: 0; width: 280px; z-index: 10;
+      transition: left 0.25s ease; border-right: 1px solid var(--parch-d);
+      background: var(--parchment);
+    }
+    .side.open { left: 0; box-shadow: 2px 0 12px rgba(0,0,0,0.15); }
     .menu-btn { display: inline-block; }
+    .input-box { padding-bottom: env(safe-area-inset-bottom, 12px); }
   }
 </style>
 </head>
@@ -129,7 +137,7 @@ if (!localStorage.getItem('auth_token')) location.href = '/';
   </div>
 
   <!-- 메인 -->
-  <div class="chat">
+  <div class="chat-main">
     <!-- 리포트 선택 -->
     <div class="picker hidden" id="pickerView">
       <h2>상담할 사주 선택</h2>
@@ -145,7 +153,7 @@ if (!localStorage.getItem('auth_token')) location.href = '/';
     </div>
 
     <!-- 채팅 화면 -->
-    <div class="chat hidden" id="chatView" style="display:none;flex:1;flex-direction:column;min-height:0;">
+    <div class="chat hidden" id="chatView">
       <div class="chat-info" id="chatInfo"></div>
       <div class="msgs" id="msgsBox"></div>
       <div class="input-box">
