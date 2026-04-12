@@ -494,5 +494,5 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 app.listen(PORT, () => {
   console.log(`🔮 제일라 사주 AI 플랫폼: http://localhost:${PORT}`);
-  console.log(`👤 총관리자 로그인: name=김가영, pw=${ADMIN_PASSWORD}`);
+  console.log(`👤 총관리자: 김가영 (비밀번호는 Railway Variables에서 관리)`);
 });
