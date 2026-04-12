@@ -172,28 +172,51 @@ async function generateChapter(openai, userInfo, title, prompt, index, extraInst
   const ctx = buildContext(userInfo);
   const glossary = getGlossary(index);
   const userMsg = `${ctx}\n\n분석 항목: ${title}\n${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction : ''}\n\n반드시 1500자 이상으로 풍부하게 작성해주세요. 마크다운 기호(#, **, -, 숫자.)를 절대 사용하지 마세요.${glossary ? '\n\n이 챕터의 끝에 아래 용어 해설을 자연스럽게 포함해주세요:' + glossary : ''}`;
-  const res = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    temperature: 0.85,
-    max_tokens: 3000,
-    messages: [
-      { role: 'system', content: SYSTEM },
-      { role: 'user', content: userMsg }
-    ]
-  });
-  return { title, content: res.choices[0].message.content };
+  
+  // 429 에러 시 자동 재시도 (최대 3번)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        temperature: 0.85,
+        max_tokens: 3000,
+        messages: [
+          { role: 'system', content: SYSTEM },
+          { role: 'user', content: userMsg }
+        ]
+      });
+      return { title, content: res.choices[0].message.content };
+    } catch (err) {
+      const msg = err.message || '';
+      if (msg.includes('429') || msg.includes('rate limit') || msg.includes('Rate limit')) {
+        // 분당 한도 - 20초 기다렸다 재시도
+        if (attempt < 2) {
+          console.log(`[챕터 ${index}] TPM 초과, 20초 대기 후 재시도...`);
+          await new Promise(r => setTimeout(r, 20000));
+          continue;
+        }
+      }
+      throw err;
+    }
+  }
 }
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 async function generateAllChapters(apiKey, userInfo) {
   const openai = new OpenAI({ apiKey });
   const results = new Array(SECTIONS.length);
-  const BATCH = 5;
+  const BATCH = 3; // 5 → 3 (TPM 초과 방지)
   for (let i = 0; i < SECTIONS.length; i += BATCH) {
     const batch = SECTIONS.slice(i, i + BATCH);
     const promises = batch.map(([t, p], j) =>
       generateChapter(openai, userInfo, t, p, i + j).then(r => { results[i + j] = r; })
     );
     await Promise.all(promises);
+    // 다음 배치 전에 15초 대기 (TPM 리셋 시간 확보)
+    if (i + BATCH < SECTIONS.length) {
+      await sleep(15000);
+    }
   }
   return results;
 }
@@ -205,3 +228,4 @@ async function regenerateChapter(apiKey, userInfo, index, extraInstruction) {
 }
 
 module.exports = { generateAllChapters, regenerateChapter, SECTIONS };
+
