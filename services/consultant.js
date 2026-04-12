@@ -486,7 +486,8 @@ async function freeThreadReading({ apiKey, saju, clientName, question, length })
 
 [톤]
 - 친한 친구가 사주 봐주듯 친근하고 따뜻하게
-- 이름이 있으면 이름을 부르며 이야기
+- 이름이 있어도 "안녕 OO아" 같은 인사말은 절대 쓰지 마세요
+- 바로 본론부터 시작하세요 ("사주 보니까~", "너는 ~한 편이야")
 - 단정적이지 않게 "~한 편이야", "~할 수 있어"
 
 [분량]
@@ -495,8 +496,6 @@ async function freeThreadReading({ apiKey, saju, clientName, question, length })
 - 질문이 없으면 올해 전반적인 운세 + 주의점 + 조언
 
 [예시]
-안녕 홍길동
-
 사주 보니까 너는 감정이 깊고 진중한 편이야
 겉으로는 밝아 보여도 속마음은 쉽게 드러내지 않지
 
@@ -504,7 +503,7 @@ async function freeThreadReading({ apiKey, saju, clientName, question, length })
 봄에 좋은 인연이나 기회가 들어올 수 있어
 다만 감정 기복이 있을 수 있으니 무리하지 말고 쉬어가면서 가자
 
-(반말 + 마침표 없음 + 줄바꿈)`;
+(반말 + 마침표 없음 + 줄바꿈 + 인사말 없이 바로 본론)`;
 
   const userMsg = question
     ? `${sajuInfo}\n\n[고객 질문]\n${question}\n\n위 질문에 대해 사주를 바탕으로 친근한 반말로 답변해줘`

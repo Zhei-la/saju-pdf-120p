@@ -258,7 +258,6 @@ async function generate(){
     let content=json.content;
     const sel=snippets.filter(s=>selectedSnippets.has(s.id));
     if(sel.length>0){
-      content+='\n\n━━━━━━━━━━━━';
       for(const s of sel)content+='\n\n'+buildText(s);
     }
     currentResult=content;
