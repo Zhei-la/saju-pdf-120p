@@ -380,7 +380,7 @@ app.post('/api/free-reading/parse', requireUser, (req, res) => {
 app.post('/api/free-reading/generate', requireUser, async (req, res) => {
   try {
     const { apiKey, name, gender, year, month, day, hour, minute, isLunar, timeUnknown, question, length } = req.body;
-    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI API 키 필요' });
+    if (!apiKey) return res.status(400).json({ error: 'Gemini API 키 필요' });
     if (!year || !month || !day) return res.status(400).json({ error: '생년월일이 필요합니다' });
 
     const saju = calculateSaju({
