@@ -511,7 +511,7 @@ async function freeThreadReading({ apiKey, saju, clientName, question, length })
     : `${sajuInfo}\n\n질문이 없으니 올해 전반적인 운세와 조언을 친근한 반말로 봐줘`;
 
   // Gemini API 호출 (REST)
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
   const body = {
     system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
     contents: [{ role: 'user', parts: [{ text: userMsg }] }],
