@@ -409,10 +409,17 @@ app.get('/api/promo-snippets', requireUser, (req, res) => {
 });
 
 app.post('/api/promo-snippets', requireUser, (req, res) => {
-  const { title, link, text } = req.body;
+  const { title, link, text, linkPosition } = req.body;
   if (!title || !text) return res.status(400).json({ error: '제목과 내용은 필수입니다' });
-  const id = db.createPromoSnippet(req.userId, title, link || '', text);
+  const id = db.createPromoSnippet(req.userId, title, link || '', text, linkPosition || 'below');
   res.json({ ok: true, id });
+});
+
+app.put('/api/promo-snippets/:id', requireUser, (req, res) => {
+  const { title, link, text, linkPosition } = req.body;
+  if (!title || !text) return res.status(400).json({ error: '제목과 내용은 필수입니다' });
+  db.updatePromoSnippet(parseInt(req.params.id), req.userId, title, link || '', text, linkPosition || 'below');
+  res.json({ ok: true });
 });
 
 app.delete('/api/promo-snippets/:id', requireUser, (req, res) => {

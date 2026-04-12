@@ -460,7 +460,7 @@ ${initialResult.slice(0, 1500)}`;
 
 // ─── 무료 사주 (스레드 홍보용) - Gemini 무료 API 사용 ───
 async function freeThreadReading({ apiKey, saju, clientName, question, length }) {
-  const lengthMap = { short: 500, medium: 1000, long: 1800 };
+  const lengthMap = { short: 300, medium: 500, long: 800 };
   const targetLen = lengthMap[length] || 1000;
 
   const sajuInfo = `[사주 정보 - 내부 참고용]

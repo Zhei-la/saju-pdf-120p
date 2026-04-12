@@ -86,6 +86,7 @@ db.exec(`
     title TEXT NOT NULL,
     link TEXT,
     text TEXT NOT NULL,
+    link_position TEXT DEFAULT 'below',
     created_at INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
@@ -102,6 +103,7 @@ try { db.exec(`ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0`
 try { db.exec(`ALTER TABLE users ADD COLUMN brand_name TEXT DEFAULT ''`); } catch(e) {}
 try { db.exec(`ALTER TABLE users ADD COLUMN review_token TEXT`); } catch(e) {}
 try { db.exec(`ALTER TABLE users ADD COLUMN report_price INTEGER NOT NULL DEFAULT 0`); } catch(e) {}
+try { db.exec(`ALTER TABLE promo_snippets ADD COLUMN link_position TEXT DEFAULT 'below'`); } catch(e) {}
 
 function hash(pw) { return crypto.createHash('sha256').update(pw + 'saju_salt_9923').digest('hex'); }
 
@@ -262,11 +264,17 @@ function getPersonalMessages(consultId) {
 }
 
 // ─── 홍보 스니펫 ───
-function createPromoSnippet(userId, title, link, text) {
+function createPromoSnippet(userId, title, link, text, linkPosition) {
   const info = db.prepare(`
-    INSERT INTO promo_snippets (user_id, title, link, text, created_at) VALUES (?, ?, ?, ?, ?)
-  `).run(userId, title, link || '', text, Date.now());
+    INSERT INTO promo_snippets (user_id, title, link, text, link_position, created_at) VALUES (?, ?, ?, ?, ?, ?)
+  `).run(userId, title, link || '', text, linkPosition || 'below', Date.now());
   return info.lastInsertRowid;
+}
+function updatePromoSnippet(id, userId, title, link, text, linkPosition) {
+  db.prepare(`
+    UPDATE promo_snippets SET title = ?, link = ?, text = ?, link_position = ?
+    WHERE id = ? AND user_id = ?
+  `).run(title, link || '', text, linkPosition || 'below', id, userId);
 }
 function listPromoSnippets(userId) {
   return db.prepare(`SELECT * FROM promo_snippets WHERE user_id = ? ORDER BY created_at DESC`).all(userId);
@@ -392,5 +400,5 @@ module.exports = {
   createReview, listUserReviews, deleteReview, getReviewStats,
   createPersonalConsult, listPersonalConsults, getPersonalConsult,
   deletePersonalConsult, addPersonalMessage, getPersonalMessages,
-  createPromoSnippet, listPromoSnippets, deletePromoSnippet
+  createPromoSnippet, updatePromoSnippet, listPromoSnippets, deletePromoSnippet
 };

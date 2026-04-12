@@ -3,365 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>무료 사주 (스레드 홍보용)</title>
+<title>무료 사주</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --ink:#1a1209; --gold:#b8860b; --gold-l:#d4a843; --parchment:#f5ede0;
-    --parch-d:#e0ceb4; --deep:#2c1810; --muted:#7a6652; --accent:#8b1a1a; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Noto Sans KR', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; }
-  .wrap { max-width: 820px; margin: 0 auto; padding: 20px 14px 60px; }
-  .nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;
-    background: rgba(255,253,248,0.95); border: 1px solid var(--parch-d); margin-bottom: 16px; }
-  .nav .left { font-weight: 700; color: var(--deep); letter-spacing: 2px; }
-  .nav button { background: transparent; border: 1px solid var(--parch-d); color: var(--muted);
-    padding: 8px 14px; font-family: inherit; font-size: 12px; cursor: pointer; }
-  .card { background: rgba(255,253,248,0.9); border: 1px solid var(--parch-d); padding: 20px 22px; margin-bottom: 14px; }
-  .card-t { font-size: 11px; font-weight: 600; letter-spacing: 3px; color: var(--gold); margin-bottom: 14px; }
-  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-  input, textarea, select { width: 100%; border: 1px solid var(--parch-d); padding: 11px 14px;
-    background: rgba(255,255,255,0.8); font-family: inherit; font-size: 14px; outline: none; color: var(--ink); }
-  input:focus, textarea:focus, select:focus { border-color: var(--gold); }
-  textarea { resize: vertical; min-height: 100px; line-height: 1.8; }
-  .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-  .row-2 { grid-template-columns: 1fr 1fr; }
-  .toggle { display: flex; gap: 6px; }
-  .toggle button { flex: 1; padding: 10px; border: 1px solid var(--parch-d); background: transparent;
-    color: var(--muted); cursor: pointer; font-family: inherit; font-size: 13px; transition: all 0.15s; }
-  .toggle button.active { background: var(--deep); color: var(--gold-l); border-color: var(--deep); }
-
-  .length-toggle { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-  .len-btn { padding: 16px 10px; border: 2px solid var(--parch-d); background: rgba(255,253,248,0.5);
-    cursor: pointer; text-align: center; font-family: inherit; color: var(--ink); }
-  .len-btn.active { border-color: var(--gold); background: rgba(184,134,11,0.12); }
-  .len-btn .tt { font-size: 13px; font-weight: 700; }
-  .len-btn .sm { font-size: 10px; color: var(--muted); margin-top: 3px; }
-
-  .btn-main { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--gold), #a07000);
-    color: var(--deep); border: none; font-weight: 700; font-size: 15px; letter-spacing: 3px; cursor: pointer;
-    font-family: 'Noto Serif KR', serif; }
-  .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-sm { padding: 6px 12px; font-size: 11px; font-family: inherit; cursor: pointer; border: 1px solid var(--parch-d); background: transparent; color: var(--muted); }
-  .btn-gold { background: var(--gold); color: var(--deep); font-weight: 700; border: none; }
-  .btn-danger { background: var(--accent); color: #fff; border: none; }
-
-  .result-box { background: rgba(255,253,248,0.95); border: 2px solid var(--gold); padding: 24px 26px;
-    white-space: pre-wrap; font-size: 14px; line-height: 1.9; color: var(--ink); margin-bottom: 10px; }
-
-  .snippet-item { padding: 12px 14px; border: 1px solid var(--parch-d); margin-bottom: 6px;
-    background: rgba(255,253,248,0.6); display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
-  .snippet-item input[type="checkbox"] { width: auto; margin: 0; }
-  .snippet-item .ttl { font-weight: 600; color: var(--deep); font-size: 13px; }
-  .snippet-item .tx { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-
-  .empty { text-align: center; padding: 30px; color: var(--muted); font-size: 12px; }
-  .err { color: var(--accent); font-size: 13px; text-align: center; padding: 10px; }
-  .loading { text-align: center; padding: 40px; color: var(--muted); }
-  .spin { font-size: 30px; animation: spin 2s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .hidden { display: none !important; }
-
-  @media(max-width:560px){
-    .wrap { padding: 14px 10px; }
-    .row { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-    .length-toggle { grid-template-columns: 1fr; }
-  }
+:root{--ink:#1a1209;--gold:#b8860b;--gold-l:#d4a843;--parchment:#f5ede0;--parch-d:#e0ceb4;--deep:#2c1810;--muted:#7a6652;--accent:#8b1a1a;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--parchment);color:var(--ink);min-height:100vh;}
+.wrap{max-width:820px;margin:0 auto;padding:20px 14px 60px;}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:rgba(255,253,248,0.95);border:1px solid var(--parch-d);margin-bottom:16px;}
+.nav .left{font-weight:700;color:var(--deep);letter-spacing:2px;}
+.nav button{background:transparent;border:1px solid var(--parch-d);color:var(--muted);padding:8px 14px;font-family:inherit;font-size:12px;cursor:pointer;}
+.card{background:rgba(255,253,248,0.9);border:1px solid var(--parch-d);padding:20px 22px;margin-bottom:14px;}
+.card-t{font-size:11px;font-weight:600;letter-spacing:3px;color:var(--gold);margin-bottom:14px;}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;}
+input,textarea,select{width:100%;border:1px solid var(--parch-d);padding:11px 14px;background:rgba(255,255,255,0.8);font-family:inherit;font-size:14px;outline:none;color:var(--ink);}
+input:focus,textarea:focus{border-color:var(--gold);}
+textarea{resize:vertical;min-height:100px;line-height:1.8;}
+.length-toggle{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.len-btn{padding:16px 10px;border:2px solid var(--parch-d);background:rgba(255,253,248,0.5);cursor:pointer;text-align:center;}
+.len-btn.active{border-color:var(--gold);background:rgba(184,134,11,0.12);}
+.len-btn .tt{font-size:13px;font-weight:700;}
+.len-btn .sm{font-size:10px;color:var(--muted);margin-top:3px;}
+.btn-main{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),#a07000);color:var(--deep);border:none;font-weight:700;font-size:15px;letter-spacing:3px;cursor:pointer;font-family:'Noto Serif KR',serif;}
+.btn-main:disabled{opacity:0.5;}
+.btn-sm{padding:6px 12px;font-size:11px;font-family:inherit;cursor:pointer;border:1px solid var(--parch-d);background:transparent;color:var(--muted);}
+.btn-gold{background:var(--gold);color:var(--deep);font-weight:700;border:none;}
+.btn-danger{background:var(--accent);color:#fff;border:none;}
+.result-box{background:rgba(255,253,248,0.95);border:2px solid var(--gold);padding:24px 26px;white-space:pre-wrap;font-size:14px;line-height:1.9;margin-bottom:10px;}
+.snippet-item{padding:14px;border:1px solid var(--parch-d);margin-bottom:6px;background:rgba(255,253,248,0.6);}
+.snippet-row{display:flex;align-items:center;gap:10px;}
+.snippet-check input{width:auto;margin:0;}
+.snippet-main{flex:1;min-width:0;}
+.snippet-main .ttl{font-weight:600;color:var(--deep);font-size:13px;margin-bottom:3px;}
+.snippet-main .tx{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.snippet-btns{display:flex;gap:4px;flex-shrink:0;}
+.snippet-edit{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--parch-d);}
+.snippet-edit.show{display:block;}
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:12px;}
+.err{color:var(--accent);font-size:13px;text-align:center;padding:10px;}
+.loading{text-align:center;padding:40px;color:var(--muted);}
+.spin{font-size:30px;animation:spin 2s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.hidden{display:none!important;}
+.radio-group{display:flex;gap:6px;margin-top:6px;}
+.radio-group label{flex:1;padding:8px;border:1px solid var(--parch-d);cursor:pointer;text-align:center;font-size:12px;color:var(--muted);margin:0;}
+.radio-group label.active{background:var(--deep);color:var(--gold-l);border-color:var(--deep);}
+@media(max-width:560px){.wrap{padding:14px 10px;}.length-toggle{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<script>
-if (!localStorage.getItem('auth_token')) location.href = '/';
-</script>
+<script>if(!localStorage.getItem('auth_token'))location.href='/';</script>
 <div class="wrap">
-  <div class="nav">
-    <div class="left">🎁 무료 사주 (스레드용)</div>
-    <button onclick="location.href='/'">← 대시보드</button>
-  </div>
+<div class="nav"><div class="left">🎁 무료 사주</div><button onclick="location.href='/'">← 대시보드</button></div>
 
-  <div class="card" style="background:rgba(184,134,11,0.08);border-color:var(--gold);">
-    <div class="card-t" style="color:var(--accent);">🎁 무료 사주 사용법 (완전 무료!)</div>
-    <div style="font-size:13px;line-height:2;">
-      이 메뉴는 <b>Google Gemini 무료 API</b>를 사용해서 <b>비용이 들지 않아</b><br>
-      하루 1500회 무료 → 스레드 홍보용으로 사실상 무제한<br><br>
+<div class="card" style="background:rgba(184,134,11,0.08);border-color:var(--gold);">
+<div class="card-t" style="color:var(--accent);">🎁 무료 사주 사용법 (완전 무료!)</div>
+<div style="font-size:13px;line-height:2;">
+Google Gemini 무료 API 사용 → <b>비용 0원</b><br>
+하루 1500회 무제한 사용 가능<br><br>
+<b>📌 사용 전 준비 (1회만)</b><br>
+1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--gold);font-weight:700;">Gemini 키 발급</a> (AIza...로 시작)<br>
+2. 아래 키 입력란에 저장<br><br>
+<b>📝 사용 순서</b><br>
+1. 스레드 댓글/DM을 <b>그대로 복붙</b> (생년월일만 있으면 OK)<br>
+2. 글 길이 선택 → 홍보문구 체크 → 버튼 클릭<br>
+3. 결과 자동으로 <b>반말</b> + 홍보문구 첨부돼서 나옴<br>
+4. 📋 복사해서 스레드에 답글로
+</div>
+</div>
 
-      <b>📌 사용 전 준비 (1회만)</b><br>
-      1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--gold);font-weight:700;">aistudio.google.com/app/apikey</a> 접속<br>
-      2. 구글 로그인 → <b>"Create API key"</b> 클릭<br>
-      3. <b>AIza...</b>로 시작하는 키 복사<br>
-      4. 아래 입력란에 붙여넣고 저장<br><br>
+<div class="card">
+<div class="card-t">Gemini API 키</div>
+<input id="geminiKey" type="password" placeholder="AIzaSy...">
+<button class="btn-sm btn-gold" onclick="saveGeminiKey()" style="margin-top:8px;padding:8px 16px;">키 저장</button>
+</div>
 
-      <b>📝 상담 순서</b><br>
-      1. 스레드에서 고객이 보낸 댓글/DM 복사<br>
-      2. <b>"고객이 보낸 글"</b>란에 그대로 붙여넣기<br>
-      3. <b>🔍 자동 파싱</b> 버튼 누르면 생년월일·시간·질문이 자동 추출돼<br>
-      4. 잘못 파싱된 부분은 직접 수정<br>
-      5. 글 길이 선택 (짧은글/중간글/긴글)<br>
-      6. 아래 <b>홍보 문구</b> 체크박스로 답변 뒤에 붙일 문구 선택<br>
-      7. <b>"무료 사주 봐주기"</b> 버튼 클릭<br>
-      8. 결과 나오면 <b>📋 전체 복사</b>로 스레드에 붙여넣기<br><br>
+<div class="card">
+<div class="card-t">1. 고객이 보낸 글 복붙</div>
+<textarea id="pasteText" placeholder="예) 안녕하세요 홍길동입니다 1995년 8월 15일 남자 올해 연애운 봐주세요"></textarea>
+</div>
 
-      <b>💡 특징</b><br>
-      ● 전부 <b>반말</b>로 작성돼 (스레드 톤)<br>
-      ● 질문 있으면 그 질문에, 없으면 올해 운세로 자동 답변<br>
-      ● 홍보 문구는 여러 개 저장해두고 매번 다른 걸 선택 가능<br>
-      ● 브랜드 링크도 같이 자동 첨부 가능
-    </div>
-  </div>
+<div class="card">
+<div class="card-t">2. 글 길이</div>
+<div class="length-toggle">
+<div class="len-btn" data-l="short" onclick="setL('short')"><div class="tt">짧은글</div><div class="sm">약 300자</div></div>
+<div class="len-btn active" data-l="medium" onclick="setL('medium')"><div class="tt">중간글</div><div class="sm">약 500자</div></div>
+<div class="len-btn" data-l="long" onclick="setL('long')"><div class="tt">긴글</div><div class="sm">약 800자</div></div>
+</div>
+</div>
 
-  <!-- Gemini 키 -->
-  <div class="card">
-    <div class="card-t">Gemini API 키 (무료)</div>
-    <input id="geminiKey" type="password" placeholder="AIzaSy...">
-    <button class="btn-sm btn-gold" onclick="saveGeminiKey()" style="margin-top:8px;padding:8px 16px;">키 저장</button>
-    <div style="font-size:11px;color:var(--muted);margin-top:8px;">
-      브라우저에만 저장돼 · <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--gold);">키 발급 페이지</a>
-    </div>
-  </div>
+<div class="card">
+<div class="card-t">3. 홍보 문구 (체크한 것 자동 첨부)</div>
+<div id="snippetList"></div>
+<details style="margin-top:12px;">
+<summary style="cursor:pointer;color:var(--gold);font-size:13px;">+ 새 홍보 문구 추가</summary>
+<div style="margin-top:10px;">
+<label>제목</label><input id="newTitle" placeholder="예: 기본 홍보">
+<label style="margin-top:8px;">링크</label><input id="newLink" placeholder="https://...">
+<label style="margin-top:8px;">링크 위치</label>
+<div class="radio-group" id="newPosGroup">
+<label class="active" data-np="above" onclick="setNewPos('above')">문구 위에</label>
+<label data-np="below" onclick="setNewPos('below')">문구 아래에</label>
+</div>
+<label style="margin-top:8px;">본문</label><textarea id="newText" placeholder="더 자세한 상담은 프로필로 와" style="min-height:70px;"></textarea>
+<button class="btn-gold btn-sm" onclick="saveSnippet()" style="margin-top:8px;padding:8px 16px;">저장</button>
+</div>
+</details>
+</div>
 
-  <!-- 입력 -->
-  <div class="card">
-    <div class="card-t">1. 고객이 보낸 글 붙여넣기</div>
-    <textarea id="pasteText" placeholder="예) 안녕하세요 홍길동입니다 1995년 8월 15일 오전 10시 남자 올해 연애운 봐주세요"></textarea>
-    <button class="btn-sm" onclick="parseText()" style="margin-top:6px;">🔍 자동 파싱</button>
-  </div>
+<button class="btn-main" id="genBtn" onclick="generate()">🎁 무료 사주 봐주기</button>
+<div id="errMsg" class="err"></div>
 
-  <div class="card">
-    <div class="card-t">2. 파싱된 정보 (수정 가능)</div>
-    <label>이름 (선택)</label>
-    <input id="name" placeholder="홍길동">
-    <div style="margin:10px 0;">
-      <label>성별</label>
-      <div class="toggle">
-        <button data-g="남성" class="active" onclick="setG('남성')">남성</button>
-        <button data-g="여성" onclick="setG('여성')">여성</button>
-      </div>
-    </div>
-    <div>
-      <label>양력/음력</label>
-      <div class="toggle">
-        <button data-c="solar" class="active" onclick="setC('solar')">양력</button>
-        <button data-c="lunar" onclick="setC('lunar')">음력</button>
-      </div>
-    </div>
-    <div class="row" style="margin-top:10px;">
-      <div><label>년</label><input id="year" type="number" placeholder="1995"></div>
-      <div><label>월</label><input id="month" type="number" placeholder="8" min="1" max="12"></div>
-      <div><label>일</label><input id="day" type="number" placeholder="15" min="1" max="31"></div>
-    </div>
-    <div class="row row-2">
-      <div><label>시 (0~23, 모르면 비움)</label><input id="hour" type="number" placeholder="10" min="0" max="23"></div>
-      <div><label>분</label><input id="minute" type="number" placeholder="0" min="0" max="59" value="0"></div>
-    </div>
-    <label style="margin-top:6px;"><input type="checkbox" id="timeUnknown" style="width:auto;margin-right:6px;"> 시간 모름</label>
-    <label style="margin-top:12px;">질문 (없으면 비워도 돼)</label>
-    <textarea id="question" placeholder="예) 올해 연애운 어떤가요?" style="min-height:60px;"></textarea>
-  </div>
+<div class="loading hidden" id="loadView"><div class="spin">☯</div><div style="margin-top:12px;">사주를 봐주고 있어...</div></div>
 
-  <div class="card">
-    <div class="card-t">3. 글 길이 선택</div>
-    <div class="length-toggle">
-      <div class="len-btn" data-l="short" onclick="setL('short')">
-        <div class="tt">짧은글</div><div class="sm">약 500자 · 무료</div>
-      </div>
-      <div class="len-btn active" data-l="medium" onclick="setL('medium')">
-        <div class="tt">중간글</div><div class="sm">약 1000자 · 무료</div>
-      </div>
-      <div class="len-btn" data-l="long" onclick="setL('long')">
-        <div class="tt">긴글</div><div class="sm">약 1800자 · 무료</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-t">4. 홍보 문구 첨부 (선택)</div>
-    <div id="snippetList"></div>
-    <details style="margin-top:12px;">
-      <summary style="cursor:pointer;color:var(--gold);font-size:13px;">+ 새 홍보 문구 추가</summary>
-      <div style="margin-top:10px;">
-        <label>제목 (구분용)</label>
-        <input id="newTitle" placeholder="예: 기본 홍보">
-        <label style="margin-top:8px;">링크 (선택)</label>
-        <input id="newLink" placeholder="https://...">
-        <label style="margin-top:8px;">본문 (답변 뒤에 붙을 문구)</label>
-        <textarea id="newText" placeholder="더 자세한 상담은 프로필 링크로 와"></textarea>
-        <button class="btn-gold btn-sm" onclick="saveSnippet()" style="margin-top:8px;padding:8px 16px;">저장</button>
-      </div>
-    </details>
-  </div>
-
-  <button class="btn-main" id="genBtn" onclick="generate()">🎁 무료 사주 봐주기</button>
-  <div id="errMsg" class="err"></div>
-
-  <!-- 로딩 -->
-  <div class="loading hidden" id="loadView">
-    <div class="spin">☯</div>
-    <div style="margin-top:12px;">사주를 봐주고 있어...</div>
-  </div>
-
-  <!-- 결과 -->
-  <div class="card hidden" id="resView" style="margin-top:20px;">
-    <div class="card-t">✨ 결과 (복사해서 스레드에 답글로 달기)</div>
-    <div class="result-box" id="resBox"></div>
-    <button class="btn-gold" onclick="copyResult()" style="width:100%;padding:14px;font-weight:700;letter-spacing:2px;">📋 전체 복사</button>
-  </div>
+<div class="card hidden" id="resView" style="margin-top:20px;">
+<div class="card-t">✨ 결과</div>
+<div class="result-box" id="resBox"></div>
+<button class="btn-gold" onclick="copyResult()" style="width:100%;padding:14px;font-weight:700;letter-spacing:2px;">📋 전체 복사</button>
+</div>
 </div>
 
 <script>
-const token = localStorage.getItem('auth_token');
-const userName = localStorage.getItem('current_user_name') || '';
-let selectedG = '남성';
-let selectedC = 'solar';
-let selectedL = 'medium';
-let snippets = [];
-let selectedSnippets = new Set();
-let currentResult = '';
+const token=localStorage.getItem('auth_token');
+const userName=localStorage.getItem('current_user_name')||'';
+let selectedL='medium',newLinkPos='above',snippets=[],selectedSnippets=new Set(),currentResult='';
 
-function api(url, opts = {}) {
-  return fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', 'x-auth-token': token, ...(opts.headers || {}) }});
+function api(url,opts={}){return fetch(url,{...opts,headers:{'Content-Type':'application/json','x-auth-token':token,...(opts.headers||{})}});}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function setL(l){selectedL=l;document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('active',b.dataset.l===l));}
+function setNewPos(p){newLinkPos=p;document.querySelectorAll('#newPosGroup [data-np]').forEach(b=>b.classList.toggle('active',b.dataset.np===p));}
+
+function saveGeminiKey(){
+  const k=document.getElementById('geminiKey').value.trim();
+  if(!k||!k.startsWith('AIza')){alert('AIza로 시작하는 Gemini 키 입력');return;}
+  localStorage.setItem('gemini_api_key_'+userName,k);
+  alert('저장됨');
 }
-function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+(function(){const s=localStorage.getItem('gemini_api_key_'+userName);if(s)document.getElementById('geminiKey').value=s;})();
 
-function setG(g) { selectedG = g; document.querySelectorAll('[data-g]').forEach(b => b.classList.toggle('active', b.dataset.g === g)); }
-function setC(c) { selectedC = c; document.querySelectorAll('[data-c]').forEach(b => b.classList.toggle('active', b.dataset.c === c)); }
-function setL(l) { selectedL = l; document.querySelectorAll('[data-l]').forEach(b => b.classList.toggle('active', b.dataset.l === l)); }
-
-async function parseText() {
-  const text = document.getElementById('pasteText').value.trim();
-  if (!text) return alert('텍스트를 붙여넣어주세요');
-  const res = await api('/api/free-reading/parse', { method: 'POST', body: JSON.stringify({ text }) });
-  const { parsed } = await res.json();
-  if (parsed.name) document.getElementById('name').value = parsed.name;
-  if (parsed.gender) setG(parsed.gender);
-  if (parsed.isLunar) setC('lunar');
-  if (parsed.year) document.getElementById('year').value = parsed.year;
-  if (parsed.month) document.getElementById('month').value = parsed.month;
-  if (parsed.day) document.getElementById('day').value = parsed.day;
-  if (parsed.hour != null) document.getElementById('hour').value = parsed.hour;
-  if (parsed.timeUnknown) document.getElementById('timeUnknown').checked = true;
-  if (parsed.question) document.getElementById('question').value = parsed.question;
-  alert('파싱 완료! 잘못된 부분 있으면 직접 수정하세요');
-}
-
-async function loadSnippets() {
-  const res = await api('/api/promo-snippets');
-  const { snippets: list } = await res.json();
-  snippets = list || [];
-  const box = document.getElementById('snippetList');
-  if (!snippets.length) {
-    box.innerHTML = '<div class="empty">저장된 홍보 문구가 없어 아래에서 추가해줘</div>';
-    return;
-  }
-  box.innerHTML = snippets.map(s => `
+async function loadSnippets(){
+  const res=await api('/api/promo-snippets');
+  const j=await res.json();
+  snippets=j.snippets||[];
+  const box=document.getElementById('snippetList');
+  if(!snippets.length){box.innerHTML='<div class="empty">저장된 홍보 문구가 없어</div>';return;}
+  box.innerHTML=snippets.map(s=>`
     <div class="snippet-item">
-      <input type="checkbox" ${selectedSnippets.has(s.id) ? 'checked' : ''} onchange="toggleSnippet(${s.id})">
-      <div>
-        <div class="ttl">${escapeHtml(s.title)}</div>
-        <div class="tx">${escapeHtml(s.link ? s.link + ' · ' : '')}${escapeHtml(s.text)}</div>
+      <div class="snippet-row">
+        <div class="snippet-check"><input type="checkbox" ${selectedSnippets.has(s.id)?'checked':''} onchange="toggleSn(${s.id})"></div>
+        <div class="snippet-main"><div class="ttl">${esc(s.title)}</div><div class="tx">${esc(s.text)}</div></div>
+        <div class="snippet-btns">
+          <button class="btn-sm" onclick="copySn(${s.id})">복사</button>
+          <button class="btn-sm" onclick="tEdit(${s.id})">수정</button>
+          <button class="btn-sm btn-danger" onclick="delSn(${s.id})">삭제</button>
+        </div>
       </div>
-      <button class="btn-sm btn-danger" onclick="delSnippet(${s.id})">삭제</button>
+      <div class="snippet-edit" id="edit-${s.id}">
+        <label>제목</label><input id="et-${s.id}" value="${esc(s.title)}">
+        <label style="margin-top:8px;">링크</label><input id="el-${s.id}" value="${esc(s.link||'')}">
+        <label style="margin-top:8px;">링크 위치</label>
+        <div class="radio-group" id="ep-${s.id}" data-pos="${s.link_position||'below'}">
+          <label class="${s.link_position==='above'?'active':''}" data-eg="above" onclick="setEp(${s.id},'above')">문구 위에</label>
+          <label class="${s.link_position!=='above'?'active':''}" data-eg="below" onclick="setEp(${s.id},'below')">문구 아래에</label>
+        </div>
+        <label style="margin-top:8px;">본문</label><textarea id="ex-${s.id}" style="min-height:60px;">${esc(s.text)}</textarea>
+        <button class="btn-gold btn-sm" onclick="saveEd(${s.id})" style="margin-top:8px;padding:6px 14px;">저장</button>
+      </div>
     </div>
   `).join('');
 }
 
-function toggleSnippet(id) {
-  if (selectedSnippets.has(id)) selectedSnippets.delete(id);
-  else selectedSnippets.add(id);
+function toggleSn(id){if(selectedSnippets.has(id))selectedSnippets.delete(id);else selectedSnippets.add(id);}
+function tEdit(id){document.getElementById('edit-'+id).classList.toggle('show');}
+function setEp(id,p){const box=document.getElementById('ep-'+id);box.querySelectorAll('[data-eg]').forEach(b=>b.classList.toggle('active',b.dataset.eg===p));box.dataset.pos=p;}
+
+function buildText(s){
+  const link=s.link||'';
+  if(!link)return s.text;
+  return s.link_position==='above'?link+'\n'+s.text:s.text+'\n'+link;
 }
 
-async function saveSnippet() {
-  const title = document.getElementById('newTitle').value.trim();
-  const link = document.getElementById('newLink').value.trim();
-  const text = document.getElementById('newText').value.trim();
-  if (!title || !text) return alert('제목과 본문은 필수야');
-  const res = await api('/api/promo-snippets', { method: 'POST', body: JSON.stringify({ title, link, text }) });
-  if (res.ok) {
-    document.getElementById('newTitle').value = '';
-    document.getElementById('newLink').value = '';
-    document.getElementById('newText').value = '';
+function copySn(id){
+  const s=snippets.find(x=>x.id===id);
+  if(!s)return;
+  navigator.clipboard.writeText(buildText(s));
+  alert('복사됨');
+}
+
+async function saveSnippet(){
+  const title=document.getElementById('newTitle').value.trim();
+  const link=document.getElementById('newLink').value.trim();
+  const text=document.getElementById('newText').value.trim();
+  if(!title||!text){alert('제목과 본문 필수');return;}
+  const res=await api('/api/promo-snippets',{method:'POST',body:JSON.stringify({title,link,text,linkPosition:newLinkPos})});
+  if(res.ok){
+    document.getElementById('newTitle').value='';
+    document.getElementById('newLink').value='';
+    document.getElementById('newText').value='';
     loadSnippets();
   }
 }
 
-async function delSnippet(id) {
-  if (!confirm('삭제할까?')) return;
-  await api('/api/promo-snippets/' + id, { method: 'DELETE' });
+async function saveEd(id){
+  const title=document.getElementById('et-'+id).value.trim();
+  const link=document.getElementById('el-'+id).value.trim();
+  const text=document.getElementById('ex-'+id).value.trim();
+  const pos=document.getElementById('ep-'+id).dataset.pos||'below';
+  if(!title||!text){alert('필수');return;}
+  const res=await api('/api/promo-snippets/'+id,{method:'PUT',body:JSON.stringify({title,link,text,linkPosition:pos})});
+  if(res.ok){alert('수정됨');loadSnippets();}
+}
+
+async function delSn(id){
+  if(!confirm('삭제?'))return;
+  await api('/api/promo-snippets/'+id,{method:'DELETE'});
   selectedSnippets.delete(id);
   loadSnippets();
 }
 
-async function generate() {
-  const year = document.getElementById('year').value;
-  const month = document.getElementById('month').value;
-  const day = document.getElementById('day').value;
-  if (!year || !month || !day) { document.getElementById('errMsg').textContent = '생년월일을 입력해줘'; return; }
-
-  const apiKey = localStorage.getItem('gemini_api_key_' + userName);
-  if (!apiKey) { document.getElementById('errMsg').textContent = 'Gemini 키를 먼저 저장해줘 (위쪽에서)'; return; }
-
-  document.getElementById('errMsg').textContent = '';
-  document.getElementById('genBtn').disabled = true;
+async function generate(){
+  const text=document.getElementById('pasteText').value.trim();
+  if(!text){document.getElementById('errMsg').textContent='고객 글을 붙여넣어줘';return;}
+  const apiKey=localStorage.getItem('gemini_api_key_'+userName);
+  if(!apiKey){document.getElementById('errMsg').textContent='Gemini 키를 먼저 저장해줘';return;}
+  
+  document.getElementById('errMsg').textContent='';
+  document.getElementById('genBtn').disabled=true;
   document.getElementById('resView').classList.add('hidden');
   document.getElementById('loadView').classList.remove('hidden');
-
-  try {
-    const res = await api('/api/free-reading/generate', {
-      method: 'POST',
-      body: JSON.stringify({
+  
+  try{
+    const pr=await api('/api/free-reading/parse',{method:'POST',body:JSON.stringify({text})});
+    const {parsed}=await pr.json();
+    if(!parsed.year||!parsed.month||!parsed.day)throw new Error('생년월일을 못 찾았어');
+    
+    const res=await api('/api/free-reading/generate',{
+      method:'POST',
+      body:JSON.stringify({
         apiKey,
-        name: document.getElementById('name').value.trim(),
-        gender: selectedG,
-        year, month, day,
-        hour: document.getElementById('hour').value,
-        minute: document.getElementById('minute').value || 0,
-        isLunar: selectedC === 'lunar',
-        timeUnknown: document.getElementById('timeUnknown').checked,
-        question: document.getElementById('question').value.trim(),
-        length: selectedL
+        name:parsed.name||'',
+        gender:parsed.gender||'남성',
+        year:parsed.year,month:parsed.month,day:parsed.day,
+        hour:parsed.hour!=null?parsed.hour:'',
+        minute:0,
+        isLunar:!!parsed.isLunar,
+        timeUnknown:!!parsed.timeUnknown||parsed.hour==null,
+        question:parsed.question||'',
+        length:selectedL
       })
     });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error);
-
-    let content = json.content;
-    // 선택한 스니펫 붙이기
-    const selected = snippets.filter(s => selectedSnippets.has(s.id));
-    if (selected.length > 0) {
-      content += '\n\n━━━━━━━━━━━━\n';
-      for (const s of selected) {
-        content += '\n' + s.text;
-        if (s.link) content += '\n' + s.link;
-      }
+    const json=await res.json();
+    if(!res.ok)throw new Error(json.error);
+    
+    let content=json.content;
+    const sel=snippets.filter(s=>selectedSnippets.has(s.id));
+    if(sel.length>0){
+      content+='\n\n━━━━━━━━━━━━';
+      for(const s of sel)content+='\n\n'+buildText(s);
     }
-    currentResult = content;
-    document.getElementById('resBox').textContent = content;
+    currentResult=content;
+    document.getElementById('resBox').textContent=content;
     document.getElementById('loadView').classList.add('hidden');
     document.getElementById('resView').classList.remove('hidden');
-    document.getElementById('resView').scrollIntoView({ behavior: 'smooth' });
-  } catch (e) {
+    document.getElementById('resView').scrollIntoView({behavior:'smooth'});
+  }catch(e){
     document.getElementById('loadView').classList.add('hidden');
-    document.getElementById('errMsg').textContent = '오류: ' + e.message;
-  } finally {
-    document.getElementById('genBtn').disabled = false;
+    document.getElementById('errMsg').textContent='오류: '+e.message;
+  }finally{
+    document.getElementById('genBtn').disabled=false;
   }
 }
 
-function copyResult() {
-  navigator.clipboard.writeText(currentResult);
-  alert('복사됨! 스레드에 붙여넣기 해');
-}
-
-function saveGeminiKey() {
-  const key = document.getElementById('geminiKey').value.trim();
-  if (!key || !key.startsWith('AIza')) { alert('올바른 Gemini 키를 입력해줘 (AIza로 시작)'); return; }
-  localStorage.setItem('gemini_api_key_' + userName, key);
-  alert('Gemini 키 저장됨! 이제 무료로 사주 봐줄 수 있어');
-}
-
-// 저장된 키 불러오기
-(function loadGeminiKey() {
-  const saved = localStorage.getItem('gemini_api_key_' + userName);
-  if (saved) document.getElementById('geminiKey').value = saved;
-})();
+function copyResult(){navigator.clipboard.writeText(currentResult);alert('복사됨');}
 
 loadSnippets();
 </script>
