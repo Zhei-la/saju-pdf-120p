@@ -30,6 +30,17 @@
   .badge.active { background: #d1fae5; color: #065f46; }
   .badge.rejected, .badge.disabled { background: #fee2e2; color: #991b1b; }
   .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+
+  @media(max-width:600px){
+    .wrap { padding: 14px 10px; }
+    .nav { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+    .nav .left { font-size: 13px; flex: 1 1 100%; text-align: center; }
+    .nav .right { flex: 1 1 100%; justify-content: center; }
+    .card { padding: 16px 14px; }
+    .user-row { grid-template-columns: 1fr; gap: 8px; text-align: center; }
+    .user-row > *:nth-child(n+2) { justify-self: center; }
+    .badge { display: inline-block; }
+  }
 </style>
 </head>
 <body>

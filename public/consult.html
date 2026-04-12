@@ -43,7 +43,25 @@
   .cat-item.active { border-color: var(--gold); background: rgba(184,134,11,0.12); }
   .cat-item .ic { font-size: 24px; margin-bottom: 4px; }
   .cat-item .tt { font-size: 12px; font-weight: 600; color: var(--deep); }
-  @media(max-width:560px) { .cat-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media(max-width:560px) {
+    .wrap { padding: 14px 10px; }
+    .nav { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+    .nav .left { font-size: 13px; flex: 1 1 100%; text-align: center; }
+    .nav .right { flex: 1 1 100%; justify-content: center; }
+    .card { padding: 16px 14px; }
+    .card-t { font-size: 10px; letter-spacing: 2px; }
+    .cat-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .cat-item { padding: 12px 4px; }
+    .cat-item .ic { font-size: 22px; }
+    .cat-item .tt { font-size: 11px; }
+    .row-3 { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .row-2 { grid-template-columns: 1fr 1fr; gap: 6px; }
+    input, select { padding: 10px 12px; font-size: 14px; }
+    .result { padding: 22px 18px; }
+    .result h2 { font-size: 18px; }
+    .result .content { font-size: 13px; line-height: 2; }
+    .chat-msg { max-width: 92%; }
+  }
 
   .btn-main { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--gold), #a07000);
     color: var(--deep); border: none; font-weight: 700; font-size: 15px; letter-spacing: 3px; cursor: pointer;

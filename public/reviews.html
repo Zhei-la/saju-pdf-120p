@@ -36,6 +36,18 @@
     background: transparent; border: 1px solid var(--parch-d); color: var(--muted); }
   .del-btn:hover { border-color: var(--accent); color: var(--accent); }
   .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; line-height: 1.9; }
+
+  @media(max-width:600px){
+    .wrap { padding: 14px 10px 40px; }
+    .nav { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+    .nav .left { font-size: 13px; flex: 1 1 100%; text-align: center; }
+    .summary { padding: 24px 16px; }
+    .summary .big-rating { font-size: 40px; }
+    .review-card { padding: 18px 18px; }
+    .review-card .top { flex-wrap: wrap; gap: 8px; padding-right: 50px; }
+    .review-card .writer { font-size: 14px; }
+    .review-card .content { font-size: 13px; }
+  }
 </style>
 </head>
 <body>

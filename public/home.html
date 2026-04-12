@@ -80,7 +80,29 @@
   .hidden { display: none !important; }
   .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
 
-  @media(max-width:600px){ .menu,.stats{grid-template-columns:1fr 1fr;} }
+  @media(max-width:600px){
+    .wrap { padding: 14px 10px; }
+    .nav { padding: 12px 14px; flex-wrap: wrap; gap: 8px; }
+    .nav .left { font-size: 13px; letter-spacing: 1px; flex: 1 1 100%; text-align: center; }
+    .nav .right { flex: 1 1 100%; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .nav .uname { font-size: 11px; }
+    h1 { font-size: 18px; letter-spacing: 2px; }
+    .card { padding: 16px 14px; margin-bottom: 12px; }
+    .card-t { font-size: 10px; letter-spacing: 2px; }
+    .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat { padding: 14px 8px; }
+    .stat .label { font-size: 10px; }
+    .stat .val { font-size: 20px !important; }
+    .menu { grid-template-columns: 1fr !important; gap: 10px; }
+    .menu-item { padding: 20px 20px; text-align: center; }
+    .menu-item .ic { font-size: 36px; margin-bottom: 8px; }
+    .menu-item .ttl { font-size: 16px; margin-bottom: 4px; white-space: nowrap; }
+    .menu-item .desc { font-size: 11px; }
+    .rep-item { grid-template-columns: 1fr; gap: 8px; }
+    .rep-item > *:nth-child(2), .rep-item > *:nth-child(3) { justify-self: stretch; }
+    input, select, button { font-size: 14px; }
+    .row { flex-direction: row; }
+  }
 </style>
 </head>
 <body>
