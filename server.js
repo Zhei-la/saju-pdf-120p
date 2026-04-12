@@ -18,6 +18,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'home.htm
 
 // 관리자 계정 초기화
 db.ensureAdmin(ADMIN_PASSWORD);
+db.ensureReviewTokens();
 
 // ─── 세션 관리 (메모리) ───
 const sessions = new Map(); // token → { userId, isAdmin }

@@ -85,14 +85,25 @@ function ensureAdmin(adminPassword) {
     `).run('김가영', hash(adminPassword), token, Date.now());
     console.log('[관리자 계정 생성] 김가영');
   } else {
-    // 비밀번호 동기화 (환경변수 바꾸면 자동 반영)
     db.prepare(`UPDATE users SET password_hash = ?, is_admin = 1, status = 'active' WHERE name = ?`)
       .run(hash(adminPassword), '김가영');
-    if (!existing.review_token) {
+    // review_token 없거나 빈 문자열이면 새로 발급
+    if (!existing.review_token || existing.review_token === '') {
       const token = crypto.randomBytes(16).toString('hex');
       db.prepare(`UPDATE users SET review_token = ? WHERE id = ?`).run(token, existing.id);
+      console.log('[관리자 review_token 재발급]');
     }
   }
+}
+
+// 모든 사용자 중 review_token 없는 사람에게 자동 발급 (마이그레이션)
+function ensureReviewTokens() {
+  const users = db.prepare(`SELECT id FROM users WHERE review_token IS NULL OR review_token = ''`).all();
+  for (const u of users) {
+    const token = crypto.randomBytes(16).toString('hex');
+    db.prepare(`UPDATE users SET review_token = ? WHERE id = ?`).run(token, u.id);
+  }
+  if (users.length > 0) console.log(`[review_token 마이그레이션] ${users.length}명 발급`);
 }
 
 // ─── Users ───
@@ -284,7 +295,7 @@ cleanupOldReports();
 setInterval(cleanupOldReports, 24 * 60 * 60 * 1000);
 
 module.exports = {
-  ensureAdmin,
+  ensureAdmin, ensureReviewTokens,
   createUser, loginUser, getUser, getUserByReviewToken, listAllUsers, updateUserStatus, deleteUser,
   updateBrandName, updateReportPrice,
   saveReport, listUserReports, getReport, deleteReport, updateMemo,
