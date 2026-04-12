@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>개인 상담</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1a1209; --gold:#b8860b; --gold-l:#d4a843; --parchment:#f5ede0;
+    --parch-d:#e0ceb4; --deep:#2c1810; --muted:#7a6652; --accent:#8b1a1a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 18px 60px; }
+  .nav { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;
+    background: rgba(255,253,248,0.9); border: 1px solid var(--parch-d); margin-bottom: 18px; }
+  .nav .left { font-weight: 700; color: var(--deep); letter-spacing: 2px; }
+  .nav button { background: transparent; border: 1px solid var(--parch-d); color: var(--muted);
+    padding: 8px 14px; font-size: 12px; font-family: inherit; cursor: pointer; }
+
+  .card { background: rgba(255,253,248,0.88); border: 1px solid var(--parch-d); padding: 24px 26px; margin-bottom: 16px; }
+  .card-t { font-size: 11px; font-weight: 600; letter-spacing: 3px; color: var(--gold); margin-bottom: 14px; }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; letter-spacing: 1px; }
+  input, select { width: 100%; border: 1px solid var(--parch-d); padding: 11px 14px;
+    background: rgba(255,255,255,0.7); font-family: inherit; font-size: 14px; outline: none; }
+  input:focus, select:focus { border-color: var(--gold); }
+  .row { display: grid; gap: 10px; margin-bottom: 12px; }
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  .toggle { display: flex; gap: 6px; }
+  .toggle button { flex: 1; padding: 10px; border: 1px solid var(--parch-d); background: transparent;
+    color: var(--muted); cursor: pointer; font-family: inherit; font-size: 13px; transition: all 0.15s; }
+  .toggle button.active { background: var(--deep); color: var(--gold-l); border-color: var(--deep); }
+
+  .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .cat-item { padding: 14px 10px; border: 2px solid var(--parch-d); background: rgba(255,253,248,0.5);
+    cursor: pointer; text-align: center; transition: all 0.15s; }
+  .cat-item:hover { border-color: var(--gold); }
+  .cat-item.active { border-color: var(--gold); background: rgba(184,134,11,0.12); }
+  .cat-item .ic { font-size: 28px; margin-bottom: 4px; }
+  .cat-item .tt { font-size: 13px; font-weight: 600; color: var(--deep); }
+
+  .btn-main { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--gold), #a07000);
+    color: var(--deep); border: none; font-weight: 700; font-size: 15px; letter-spacing: 3px; cursor: pointer;
+    font-family: 'Noto Serif KR', serif; }
+  .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .result { background: rgba(255,253,248,0.95); border: 2px solid var(--gold); padding: 32px 30px; }
+  .result h2 { font-family: 'Noto Serif KR', serif; font-size: 22px; color: var(--deep); margin-bottom: 8px; letter-spacing: 2px; }
+  .result .meta { font-size: 12px; color: var(--muted); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--parch-d); }
+  .result .content { font-size: 14px; line-height: 2.1; color: var(--ink); white-space: pre-wrap; }
+  .result-actions { margin-top: 24px; display: flex; gap: 8px; }
+  .result-actions button { flex: 1; padding: 12px; background: var(--deep); color: var(--gold-l);
+    border: none; font-family: inherit; cursor: pointer; font-size: 13px; letter-spacing: 1px; }
+
+  .loading { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+  .loading .spin { font-size: 36px; margin-bottom: 14px; animation: spin 2s linear infinite; }
+  @keyframes spin { 0%{transform:rotate(0);} 100%{transform:rotate(360deg);} }
+  .hidden { display: none !important; }
+  .err { color: var(--accent); font-size: 13px; text-align: center; padding: 10px; }
+</style>
+</head>
+<body>
+<script>
+if (!localStorage.getItem('auth_token')) location.href = '/';
+</script>
+<div class="wrap">
+  <div class="nav">
+    <div class="left">📜 개인 상담</div>
+    <button onclick="location.href='/'">← 대시보드</button>
+  </div>
+
+  <!-- 입력 폼 -->
+  <div id="formScreen">
+    <div class="card">
+      <div class="card-t">상담자 정보</div>
+      <div class="row">
+        <label>이름</label>
+        <input id="name" placeholder="홍길동">
+      </div>
+      <div class="row">
+        <label>성별</label>
+        <div class="toggle">
+          <button data-g="남성" class="active" onclick="setG('남성')">남성</button>
+          <button data-g="여성" onclick="setG('여성')">여성</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>양력/음력</label>
+        <div class="toggle">
+          <button data-c="solar" class="active" onclick="setC('solar')">양력</button>
+          <button data-c="lunar" onclick="setC('lunar')">음력</button>
+        </div>
+      </div>
+      <div class="row row-3">
+        <div><label>년</label><input id="year" type="number" placeholder="1990"></div>
+        <div><label>월</label><input id="month" type="number" placeholder="1" min="1" max="12"></div>
+        <div><label>일</label><input id="day" type="number" placeholder="1" min="1" max="31"></div>
+      </div>
+      <div class="row row-2">
+        <div><label>시 (0~23)</label><input id="hour" type="number" placeholder="12" min="0" max="23"></div>
+        <div><label>분</label><input id="minute" type="number" placeholder="0" min="0" max="59" value="0"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-t">상담 분야 선택</div>
+      <div class="cat-grid" id="catGrid"></div>
+    </div>
+
+    <button class="btn-main" id="submitBtn" onclick="submitConsult()">AI 상담 받기</button>
+    <div id="errMsg" class="err"></div>
+  </div>
+
+  <!-- 로딩 -->
+  <div id="loadingScreen" class="hidden">
+    <div class="card loading">
+      <div class="spin">☯</div>
+      <div>사주를 분석하고 있습니다...</div>
+      <div style="font-size:12px;margin-top:10px;">약 20~30초 소요</div>
+    </div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="resultScreen" class="hidden">
+    <div class="result" id="resultBox"></div>
+    <div class="result-actions">
+      <button onclick="copyResult()">결과 복사</button>
+      <button onclick="newConsult()">새 상담</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATEGORIES = [
+  { key: 'general', ic: '🔮', title: '종합 운세' },
+  { key: 'love', ic: '💕', title: '연애/결혼' },
+  { key: 'career', ic: '💼', title: '직업/커리어' },
+  { key: 'money', ic: '💰', title: '재물/돈' },
+  { key: 'health', ic: '🌿', title: '건강' },
+  { key: 'business', ic: '🏪', title: '사업운' },
+];
+
+let selectedGender = '남성';
+let selectedCal = 'solar';
+let selectedCat = null;
+let currentResult = null;
+
+function setG(g) { selectedGender = g; document.querySelectorAll('[data-g]').forEach(b => b.classList.toggle('active', b.dataset.g === g)); }
+function setC(c) { selectedCal = c; document.querySelectorAll('[data-c]').forEach(b => b.classList.toggle('active', b.dataset.c === c)); }
+
+function renderCats() {
+  document.getElementById('catGrid').innerHTML = CATEGORIES.map(c =>
+    `<div class="cat-item" data-k="${c.key}" onclick="selectCat('${c.key}')"><div class="ic">${c.ic}</div><div class="tt">${c.title}</div></div>`
+  ).join('');
+}
+function selectCat(k) { selectedCat = k; document.querySelectorAll('.cat-item').forEach(b => b.classList.toggle('active', b.dataset.k === k)); }
+renderCats();
+
+async function submitConsult() {
+  const name = document.getElementById('name').value.trim();
+  const year = document.getElementById('year').value;
+  const month = document.getElementById('month').value;
+  const day = document.getElementById('day').value;
+  const hour = document.getElementById('hour').value;
+  const minute = document.getElementById('minute').value || 0;
+  const err = document.getElementById('errMsg');
+  err.textContent = '';
+
+  if (!name) { err.textContent = '이름을 입력해주세요'; return; }
+  if (!year || !month || !day) { err.textContent = '생년월일을 모두 입력해주세요'; return; }
+  if (!selectedCat) { err.textContent = '상담 분야를 선택해주세요'; return; }
+
+  const userName = localStorage.getItem('current_user_name') || '';
+  const apiKey = localStorage.getItem('openai_api_key_' + userName);
+  if (!apiKey) { err.textContent = 'OpenAI API 키가 없습니다. 대시보드에서 먼저 저장해주세요'; return; }
+
+  document.getElementById('formScreen').classList.add('hidden');
+  document.getElementById('loadingScreen').classList.remove('hidden');
+
+  try {
+    const res = await fetch('/api/personal-consult', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('auth_token') },
+      body: JSON.stringify({
+        apiKey, name, gender: selectedGender,
+        year, month, day, hour, minute,
+        isLunar: selectedCal === 'lunar',
+        category: selectedCat
+      })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || '오류');
+
+    currentResult = json.result;
+    const saju = json.saju;
+    document.getElementById('resultBox').innerHTML = `
+      <h2>${escapeHtml(name)} 님 · ${escapeHtml(json.result.title)}</h2>
+      <div class="meta">${saju.fullKorean} · 일간 ${saju.dayMaster.korean}(${saju.dayMaster.element}) · ${saju.strength.label}</div>
+      <div class="content">${escapeHtml(json.result.content)}</div>
+    `;
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.remove('hidden');
+  } catch (e) {
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('formScreen').classList.remove('hidden');
+    err.textContent = '오류: ' + e.message;
+  }
+}
+
+function copyResult() {
+  if (!currentResult) return;
+  navigator.clipboard.writeText(currentResult.content);
+  alert('결과가 복사되었습니다');
+}
+
+function newConsult() {
+  currentResult = null;
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('formScreen').classList.remove('hidden');
+  window.scrollTo(0, 0);
+}
+
+function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+</script>
+</body>
+</html>

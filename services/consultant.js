@@ -144,4 +144,87 @@ ${relevantChapters.map(c => `■ ${c.title}\n${c.content.slice(0, 600)}...`).joi
   return res.choices[0].message.content;
 }
 
-module.exports = { consultAnswer };
+const CONSULT_CATEGORIES = {
+  'general': {
+    title: '종합 운세',
+    prompt: '전반적인 인생 운세, 성격, 장단점, 앞으로의 흐름을 상담사 톤으로 정리해주세요.'
+  },
+  'love': {
+    title: '연애/결혼',
+    prompt: '연애 스타일, 이상형, 배우자 인연, 결혼 시기, 궁합을 상담사 톤으로 정리해주세요.'
+  },
+  'career': {
+    title: '직업/커리어',
+    prompt: '적성, 적합한 직업, 커리어 성장 방향, 이직/승진 시기를 상담사 톤으로 정리해주세요.'
+  },
+  'money': {
+    title: '재물/돈',
+    prompt: '재물운, 돈을 버는 방식, 투자 성향, 재테크 방향을 상담사 톤으로 정리해주세요.'
+  },
+  'health': {
+    title: '건강',
+    prompt: '건강 취약 부위, 정신 건강, 관리법, 조심해야 할 시기를 상담사 톤으로 정리해주세요.'
+  },
+  'business': {
+    title: '사업운',
+    prompt: '사업 적성, 독립 가능성, 적합한 사업 분야, 시작 시기를 상담사 톤으로 정리해주세요.'
+  }
+};
+
+async function personalConsult({ apiKey, saju, category, clientName, clientGender }) {
+  const openai = new OpenAI({ apiKey });
+  const cat = CONSULT_CATEGORIES[category] || CONSULT_CATEGORIES.general;
+
+  const sajuInfo = `[사주 정보]
+이름: ${clientName} (${clientGender})
+사주: ${saju.fullKorean} (${saju.fullHanja})
+일간: ${saju.dayMaster?.korean}(${saju.dayMaster?.element})
+오행: 목${saju.elements?.목} 화${saju.elements?.화} 토${saju.elements?.토} 금${saju.elements?.금} 수${saju.elements?.수}
+신강/신약: ${saju.strength?.label} (${saju.strength?.ratio}%)
+용신: ${saju.yongShin?.element}
+십성(천간): ${saju.shiShen?.yearGan}, ${saju.shiShen?.monthGan}, 일주, ${saju.shiShen?.hourGan}
+12운성: ${saju.diShi?.year}, ${saju.diShi?.month}, ${saju.diShi?.day}, ${saju.diShi?.hour}
+대운: ${(saju.daYun?.list || []).slice(1, 6).map(d => d.startAge + '세 ' + d.ganZhiKor).join(', ')}`;
+
+  const SYSTEM = `당신은 따뜻하고 친절한 사주 상담사입니다. 1:1 개인 상담을 진행합니다.
+
+[상담 톤]
+- 진짜 사람처럼 따뜻하고 친근한 존댓말로 대답합니다
+- 내담자의 이름을 부르며 상담합니다
+- 전문용어("갑목 일간", "편관" 등)는 절대 쓰지 않습니다
+- 마크다운 기호(#, **, -, 숫자.) 절대 사용 금지
+- 이모지 사용 금지
+- 자연스러운 문단으로 작성
+- 구체적이고 실질적인 조언 포함
+- 긍정적인 가능성 먼저, 주의점은 부드럽게
+- 단정적이지 않게 "~경향이 있어요", "~할 수 있어요"
+
+[구조]
+다음 형식으로 약 1500~2000자 내외로 작성:
+1. 인사와 전체적인 느낌 (한 문단)
+2. 핵심 상담 내용 (여러 문단, 가장 중요)
+3. 실질적인 조언 (한두 문단)
+4. 마무리 격려 (짧게)
+
+소제목은 쓰지 말고 자연스러운 문단 흐름으로 연결합니다.`;
+
+  const userMsg = `${sajuInfo}
+
+상담 주제: ${cat.title}
+${cat.prompt}
+
+위 사주를 바탕으로 ${clientName}님께 ${cat.title} 상담을 해주세요.`;
+
+  const res = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    temperature: 0.85,
+    max_tokens: 2500,
+    messages: [
+      { role: 'system', content: SYSTEM },
+      { role: 'user', content: userMsg }
+    ]
+  });
+  return { title: cat.title, content: res.choices[0].message.content };
+}
+
+module.exports = { consultAnswer, personalConsult, CONSULT_CATEGORIES };

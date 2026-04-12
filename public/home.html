@@ -128,10 +128,10 @@
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="label">오늘 리포트</div><div class="val" id="stToday">0</div></div>
-    <div class="stat"><div class="label">이번 주 리포트</div><div class="val" id="stWeek">0</div></div>
-    <div class="stat"><div class="label">총 후기</div><div class="val" id="stReviews">0</div></div>
-    <div class="stat"><div class="label">평균 별점</div><div class="val" id="stAvg">-</div></div>
+    <div class="stat"><div class="label">오늘 상담</div><div class="val" id="stToday">0</div></div>
+    <div class="stat"><div class="label">이번 주 상담</div><div class="val" id="stWeek">0</div></div>
+    <div class="stat"><div class="label">총 누적 상담</div><div class="val" id="stTotal">0</div></div>
+    <div class="stat"><div class="label">총 후기 (평점)</div><div class="val" id="stReviews" style="font-size:18px;">0</div></div>
   </div>
 
   <div class="stats">
@@ -191,21 +191,29 @@
     </div>
   </div>
 
-  <div class="menu">
+  <div class="menu" style="grid-template-columns:repeat(3,1fr);">
     <div class="menu-item" onclick="location.href='/report.html'">
       <div class="ic">🔮</div>
-      <div class="ttl">사주 리포트 만들기</div>
-      <div class="desc">AI 40챕터 · 약 120페이지<br>PDF 자동 생성</div>
+      <div class="ttl">사주 리포트</div>
+      <div class="desc">40챕터 120페이지<br>PDF 자동 생성</div>
+    </div>
+    <div class="menu-item" onclick="location.href='/consult.html'">
+      <div class="ic">📜</div>
+      <div class="ttl">개인 상담</div>
+      <div class="desc">분야별 AI 상담<br>한 번에 정리</div>
     </div>
     <div class="menu-item" onclick="location.href='/chat.html'">
       <div class="ic">💬</div>
-      <div class="ttl">AI 상담 채팅</div>
-      <div class="desc">저장된 리포트로<br>ChatGPT 스타일 상담</div>
+      <div class="ttl">AI 채팅</div>
+      <div class="desc">대화형 상담<br>이어서 질문</div>
     </div>
+  </div>
+
+  <div class="menu" style="grid-template-columns:1fr;">
     <div class="menu-item" onclick="location.href='/reviews.html'">
       <div class="ic">⭐</div>
       <div class="ttl">후기 관리</div>
-      <div class="desc">받은 후기 확인 및<br>캡처 홍보용</div>
+      <div class="desc">받은 후기 확인 및 캡처 홍보용</div>
     </div>
   </div>
 
@@ -343,12 +351,13 @@ async function showDash() {
   // 통계
   const s = await (await api('/api/stats')).json();
   if (s.stats) {
-    document.getElementById('stToday').textContent = s.stats.todayReports;
-    document.getElementById('stWeek').textContent = s.stats.weekReports;
+    document.getElementById('stToday').textContent = s.stats.todayCombined;
+    document.getElementById('stWeek').textContent = s.stats.weekCombined;
+    document.getElementById('stTotal').textContent = s.stats.totalConsults;
   }
   if (s.reviewStats) {
-    document.getElementById('stReviews').textContent = s.reviewStats.total;
-    document.getElementById('stAvg').textContent = s.reviewStats.avgRating > 0 ? s.reviewStats.avgRating + '★' : '-';
+    const avg = s.reviewStats.avgRating > 0 ? ' (' + s.reviewStats.avgRating + '★)' : '';
+    document.getElementById('stReviews').textContent = s.reviewStats.total + avg;
   }
   if (s.revenue) {
     const fmt = n => (n || 0).toLocaleString() + '원';

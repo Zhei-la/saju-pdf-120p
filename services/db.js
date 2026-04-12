@@ -267,21 +267,27 @@ function getUserStats(userId) {
   const now = Date.now();
   const oneDayAgo = now - 24 * 60 * 60 * 1000;
   const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const todayRep = db.prepare(`SELECT COUNT(*) as c FROM reports WHERE user_id = ? AND created_at >= ?`).get(userId, oneDayAgo).c;
+  const weekRep = db.prepare(`SELECT COUNT(*) as c FROM reports WHERE user_id = ? AND created_at >= ?`).get(userId, oneWeekAgo).c;
+  const totalRep = db.prepare(`SELECT COUNT(*) as c FROM reports WHERE user_id = ?`).get(userId).c;
+  const todayMsg = db.prepare(`
+    SELECT COUNT(*) as c FROM messages m JOIN chat_sessions s ON s.id = m.session_id
+    WHERE s.user_id = ? AND m.created_at >= ? AND m.role = 'assistant'
+  `).get(userId, oneDayAgo).c;
+  const weekMsg = db.prepare(`
+    SELECT COUNT(*) as c FROM messages m JOIN chat_sessions s ON s.id = m.session_id
+    WHERE s.user_id = ? AND m.created_at >= ? AND m.role = 'assistant'
+  `).get(userId, oneWeekAgo).c;
+  const totalMsg = db.prepare(`
+    SELECT COUNT(*) as c FROM messages m JOIN chat_sessions s ON s.id = m.session_id
+    WHERE s.user_id = ? AND m.role = 'assistant'
+  `).get(userId).c;
   return {
-    totalReports: db.prepare(`SELECT COUNT(*) as c FROM reports WHERE user_id = ?`).get(userId).c,
-    todayReports: db.prepare(`SELECT COUNT(*) as c FROM reports WHERE user_id = ? AND created_at >= ?`).get(userId, oneDayAgo).c,
-    weekReports: db.prepare(`SELECT COUNT(*) as c FROM reports WHERE user_id = ? AND created_at >= ?`).get(userId, oneWeekAgo).c,
-    totalSessions: db.prepare(`SELECT COUNT(*) as c FROM chat_sessions WHERE user_id = ?`).get(userId).c,
-    todayMessages: db.prepare(`
-      SELECT COUNT(*) as c FROM messages m
-      JOIN chat_sessions s ON s.id = m.session_id
-      WHERE s.user_id = ? AND m.created_at >= ? AND m.role = 'assistant'
-    `).get(userId, oneDayAgo).c,
-    weekMessages: db.prepare(`
-      SELECT COUNT(*) as c FROM messages m
-      JOIN chat_sessions s ON s.id = m.session_id
-      WHERE s.user_id = ? AND m.created_at >= ? AND m.role = 'assistant'
-    `).get(userId, oneWeekAgo).c
+    todayCombined: todayRep + todayMsg,
+    weekCombined: weekRep + weekMsg,
+    totalConsults: totalRep + totalMsg,
+    todayReports: todayRep, weekReports: weekRep, totalReports: totalRep,
+    todayMessages: todayMsg, weekMessages: weekMsg, totalMessages: totalMsg
   };
 }
 

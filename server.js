@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { calculateSaju } = require('./services/sajuCalculator');
 const { generateAllChapters, regenerateChapter } = require('./services/aiGenerator');
-const { consultAnswer } = require('./services/consultant');
+const { consultAnswer, personalConsult, CONSULT_CATEGORIES } = require('./services/consultant');
 const db = require('./services/db');
 
 const app = express();
@@ -215,6 +215,37 @@ app.post('/api/sessions/:id/chat', requireUser, async (req, res) => {
     res.json({ ok: true, answer });
   } catch (e) {
     console.error('채팅 오류:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ─── 개인 상담 ───
+app.get('/api/consult-categories', (req, res) => {
+  const cats = Object.entries(CONSULT_CATEGORIES).map(([key, v]) => ({ key, title: v.title }));
+  res.json({ categories: cats });
+});
+
+app.post('/api/personal-consult', requireUser, async (req, res) => {
+  try {
+    const { apiKey, name, gender, year, month, day, hour, minute, isLunar, category } = req.body;
+    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI API 키를 입력해주세요' });
+    if (!name || !year || !month || !day) return res.status(400).json({ error: '이름과 생년월일은 필수입니다' });
+    if (!category) return res.status(400).json({ error: '상담 분야를 선택해주세요' });
+
+    const saju = calculateSaju({
+      year: parseInt(year), month: parseInt(month), day: parseInt(day),
+      hour: hour === '' || hour == null ? 12 : parseInt(hour),
+      minute: parseInt(minute) || 0,
+      isLunar: !!isLunar, gender: gender || '남성'
+    });
+
+    const result = await personalConsult({
+      apiKey, saju, category,
+      clientName: name, clientGender: gender || '남성'
+    });
+    res.json({ ok: true, result, saju });
+  } catch (e) {
+    console.error('개인상담 오류:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
