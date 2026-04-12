@@ -458,4 +458,84 @@ ${initialResult.slice(0, 1500)}`;
   return res.choices[0].message.content;
 }
 
-module.exports = { consultAnswer, personalConsult, personalConsultFollowup, CONSULT_CATEGORIES };
+// ─── 무료 사주 (스레드 홍보용) - Gemini 무료 API 사용 ───
+async function freeThreadReading({ apiKey, saju, clientName, question, length }) {
+  const lengthMap = { short: 500, medium: 1000, long: 1800 };
+  const targetLen = lengthMap[length] || 1000;
+
+  const sajuInfo = `[사주 정보 - 내부 참고용]
+이름: ${clientName || '익명'}
+사주: ${saju.fullKorean}
+일간: ${saju.dayMaster?.korean}(${saju.dayMaster?.element})
+오행: 목${saju.elements?.목} 화${saju.elements?.화} 토${saju.elements?.토} 금${saju.elements?.금} 수${saju.elements?.수}
+신강/신약: ${saju.strength?.label}
+용신: ${saju.yongShin?.element}
+올해(2026년): 병오년`;
+
+  const SYSTEM_INSTRUCTION = `당신은 SNS(스레드)에서 무료 사주를 봐주는 친근한 사주 상담사입니다.
+
+[절대 규칙]
+1. 반드시 반말로 답변 (존댓말 절대 금지)
+2. 문장 끝에 마침표(.) 절대 쓰지 마세요
+3. 문장이 끝나면 반드시 줄바꿈해서 새 줄에 시작
+4. 한 문장 = 한 줄
+5. 문장 끝은 "~어", "~야", "~네", "~지", "~거든", "~더라" 같은 친근한 반말 어미
+6. 마크다운 기호(#, **, -, 숫자.) 절대 금지
+7. 이모지는 1~2개 정도만 가끔 OK
+8. 전문용어(갑목, 편관, 용신 등) 절대 금지
+
+[톤]
+- 친한 친구가 사주 봐주듯 친근하고 따뜻하게
+- 이름이 있으면 이름을 부르며 이야기
+- 단정적이지 않게 "~한 편이야", "~할 수 있어"
+
+[분량]
+- 약 ${targetLen}자 내외로 작성
+- 질문이 있으면 그 질문에 집중 답변
+- 질문이 없으면 올해 전반적인 운세 + 주의점 + 조언
+
+[예시]
+안녕 홍길동
+
+사주 보니까 너는 감정이 깊고 진중한 편이야
+겉으로는 밝아 보여도 속마음은 쉽게 드러내지 않지
+
+올해는 전반적으로 흐름이 나쁘지 않아
+봄에 좋은 인연이나 기회가 들어올 수 있어
+다만 감정 기복이 있을 수 있으니 무리하지 말고 쉬어가면서 가자
+
+(반말 + 마침표 없음 + 줄바꿈)`;
+
+  const userMsg = question
+    ? `${sajuInfo}\n\n[고객 질문]\n${question}\n\n위 질문에 대해 사주를 바탕으로 친근한 반말로 답변해줘`
+    : `${sajuInfo}\n\n질문이 없으니 올해 전반적인 운세와 조언을 친근한 반말로 봐줘`;
+
+  // Gemini API 호출 (REST)
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const body = {
+    system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+    contents: [{ role: 'user', parts: [{ text: userMsg }] }],
+    generationConfig: {
+      temperature: 0.92,
+      maxOutputTokens: Math.ceil(targetLen * 2.5) + 300
+    }
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error('Gemini API 오류: ' + errText.slice(0, 200));
+  }
+
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('Gemini 응답이 비어있습니다');
+  return text;
+}
+
+module.exports = { consultAnswer, personalConsult, personalConsultFollowup, freeThreadReading, CONSULT_CATEGORIES };
