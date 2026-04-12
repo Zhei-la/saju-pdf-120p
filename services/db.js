@@ -80,6 +80,15 @@ db.exec(`
     created_at INTEGER NOT NULL,
     FOREIGN KEY (consult_id) REFERENCES personal_consults(id) ON DELETE CASCADE
   );
+  CREATE TABLE IF NOT EXISTS promo_snippets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    link TEXT,
+    text TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
   CREATE INDEX IF NOT EXISTS idx_reports_user ON reports(user_id);
   CREATE INDEX IF NOT EXISTS idx_sessions_user ON chat_sessions(user_id);
   CREATE INDEX IF NOT EXISTS idx_msgs_session ON messages(session_id);
@@ -251,6 +260,20 @@ function addPersonalMessage(consultId, role, content) {
 function getPersonalMessages(consultId) {
   return db.prepare(`SELECT * FROM personal_messages WHERE consult_id = ? ORDER BY created_at ASC`).all(consultId);
 }
+
+// ─── 홍보 스니펫 ───
+function createPromoSnippet(userId, title, link, text) {
+  const info = db.prepare(`
+    INSERT INTO promo_snippets (user_id, title, link, text, created_at) VALUES (?, ?, ?, ?, ?)
+  `).run(userId, title, link || '', text, Date.now());
+  return info.lastInsertRowid;
+}
+function listPromoSnippets(userId) {
+  return db.prepare(`SELECT * FROM promo_snippets WHERE user_id = ? ORDER BY created_at DESC`).all(userId);
+}
+function deletePromoSnippet(id, userId) {
+  db.prepare(`DELETE FROM promo_snippets WHERE id = ? AND user_id = ?`).run(id, userId);
+}
 function updateUserStatus(id, status) {
   db.prepare(`UPDATE users SET status = ? WHERE id = ?`).run(status, id);
 }
@@ -368,5 +391,6 @@ module.exports = {
   getUserStats, getRevenueStats, cleanupOldReports,
   createReview, listUserReviews, deleteReview, getReviewStats,
   createPersonalConsult, listPersonalConsults, getPersonalConsult,
-  deletePersonalConsult, addPersonalMessage, getPersonalMessages
+  deletePersonalConsult, addPersonalMessage, getPersonalMessages,
+  createPromoSnippet, listPromoSnippets, deletePromoSnippet
 };

@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { calculateSaju } = require('./services/sajuCalculator');
 const { generateAllChapters, regenerateChapter } = require('./services/aiGenerator');
-const { consultAnswer, personalConsult, personalConsultFollowup, CONSULT_CATEGORIES } = require('./services/consultant');
+const { consultAnswer, personalConsult, personalConsultFollowup, freeThreadReading, CONSULT_CATEGORIES } = require('./services/consultant');
 const db = require('./services/db');
 
 const app = express();
@@ -312,6 +312,111 @@ app.post('/api/personal-consults/:id/chat', requireUser, async (req, res) => {
 // 개인상담 삭제
 app.delete('/api/personal-consults/:id', requireUser, (req, res) => {
   db.deletePersonalConsult(parseInt(req.params.id), req.userId);
+  res.json({ ok: true });
+});
+
+// ─── 무료 사주 (스레드용) ───
+// 텍스트에서 생년월일/시간/성별 파싱
+function parseTextInfo(text) {
+  if (!text) return {};
+  const result = {};
+
+  // 이름 추출 (앞쪽 짧은 단어 or "이름:" 패턴)
+  const nameMatch = text.match(/이름[:\s]*([가-힣]{2,5})/) || text.match(/^([가-힣]{2,4})(?:\s|,|입니다)/);
+  if (nameMatch) result.name = nameMatch[1];
+
+  // 성별
+  if (/여자|여성|여/.test(text) && !/남/.test(text)) result.gender = '여성';
+  else if (/남자|남성|남/.test(text) && !/여/.test(text)) result.gender = '남성';
+  else result.gender = '남성';
+
+  // 양음력
+  result.isLunar = /음력/.test(text);
+
+  // 생년월일 (여러 패턴)
+  // 2000년 5월 15일 / 2000.05.15 / 20000515 / 2000-05-15
+  let m = text.match(/(\d{4})[년.\-\/\s]+(\d{1,2})[월.\-\/\s]+(\d{1,2})/);
+  if (!m) m = text.match(/(\d{4})(\d{2})(\d{2})/);
+  if (m) {
+    result.year = parseInt(m[1]);
+    result.month = parseInt(m[2]);
+    result.day = parseInt(m[3]);
+  }
+
+  // 시간 (오전/오후 포함)
+  const timeMatch = text.match(/(오전|오후)?\s*(\d{1,2})[시:](\d{0,2})?/);
+  if (timeMatch) {
+    let h = parseInt(timeMatch[2]);
+    if (timeMatch[1] === '오후' && h < 12) h += 12;
+    if (timeMatch[1] === '오전' && h === 12) h = 0;
+    if (h >= 0 && h <= 23) {
+      result.hour = h;
+      result.minute = timeMatch[3] ? parseInt(timeMatch[3]) : 0;
+    }
+  }
+
+  // 시간모름
+  if (/시간\s*모름|시간\s*몰라|몇시|몇\s*시/.test(text)) {
+    result.timeUnknown = true;
+  }
+
+  // 질문 추출 (생년월일 다음에 나오는 긴 문장)
+  const qMatch = text.match(/[?？!]([^?？!]{10,})/) || null;
+  // 또는 전체 텍스트에서 질문스러운 부분
+  const questionKeywords = /올해|내년|언제|어떻게|어떨|결혼|연애|취업|이직|돈|재물|건강|궁금|봐줘|봐주세요|해줘/;
+  if (questionKeywords.test(text)) {
+    // 마지막 문장들 중 질문 추출
+    result.question = text.slice(-300).replace(/\d{4}[년.\-\/][^.]*/, '').trim();
+  }
+
+  return result;
+}
+
+app.post('/api/free-reading/parse', requireUser, (req, res) => {
+  const { text } = req.body;
+  res.json({ parsed: parseTextInfo(text || '') });
+});
+
+app.post('/api/free-reading/generate', requireUser, async (req, res) => {
+  try {
+    const { apiKey, name, gender, year, month, day, hour, minute, isLunar, timeUnknown, question, length } = req.body;
+    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI API 키 필요' });
+    if (!year || !month || !day) return res.status(400).json({ error: '생년월일이 필요합니다' });
+
+    const saju = calculateSaju({
+      year: parseInt(year), month: parseInt(month), day: parseInt(day),
+      hour: timeUnknown || hour === '' || hour == null ? 12 : parseInt(hour),
+      minute: parseInt(minute) || 0,
+      isLunar: !!isLunar, gender: gender || '남성'
+    });
+
+    const content = await freeThreadReading({
+      apiKey, saju,
+      clientName: name || '',
+      question: question || '',
+      length: length || 'medium'
+    });
+    res.json({ ok: true, content, saju });
+  } catch (e) {
+    console.error('무료사주 오류:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ─── 홍보 스니펫 ───
+app.get('/api/promo-snippets', requireUser, (req, res) => {
+  res.json({ snippets: db.listPromoSnippets(req.userId) });
+});
+
+app.post('/api/promo-snippets', requireUser, (req, res) => {
+  const { title, link, text } = req.body;
+  if (!title || !text) return res.status(400).json({ error: '제목과 내용은 필수입니다' });
+  const id = db.createPromoSnippet(req.userId, title, link || '', text);
+  res.json({ ok: true, id });
+});
+
+app.delete('/api/promo-snippets/:id', requireUser, (req, res) => {
+  db.deletePromoSnippet(parseInt(req.params.id), req.userId);
   res.json({ ok: true });
 });
 
