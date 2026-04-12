@@ -257,7 +257,7 @@ let selectedGender = '남성';
 let selectedCal = 'solar';
 let selectedCat = null;
 let currentResult = null;
-let currentConsultId = null;
+let currentConsultId = parseInt(localStorage.getItem('last_consult_id')) || null;
 let timeUnknownFlag = false;
 
 // 년/월/일 select 초기화
@@ -424,6 +424,7 @@ async function submitConsult() {
 
     currentResult = json.result;
     currentConsultId = json.consultId;
+    localStorage.setItem('last_consult_id', String(json.consultId));
     const saju = json.saju;
     document.getElementById('resultBox').innerHTML = `
       <h2>${escapeHtml(name)} 님 · ${escapeHtml(json.result.title)}</h2>
@@ -451,6 +452,7 @@ function copyResult() {
 function newConsult() {
   currentResult = null;
   currentConsultId = null;
+  localStorage.removeItem('last_consult_id');
   document.getElementById('resultScreen').classList.add('hidden');
   document.getElementById('formScreen').classList.remove('hidden');
   document.getElementById('chatMsgs').innerHTML = '';
@@ -459,10 +461,15 @@ function newConsult() {
 }
 
 async function sendFollowup() {
-  if (!currentConsultId) return;
   const input = document.getElementById('chatInput');
+  if (!input) { alert('입력란을 찾을 수 없어요'); return; }
   const question = input.value.trim();
-  if (!question) return;
+  if (!question) { alert('질문을 입력해주세요'); return; }
+  
+  if (!currentConsultId) {
+    alert('상담을 먼저 완료해주세요\n(currentConsultId가 없어요)');
+    return;
+  }
 
   const userName = localStorage.getItem('current_user_name') || '';
   const apiKey = localStorage.getItem('openai_api_key_' + userName);
