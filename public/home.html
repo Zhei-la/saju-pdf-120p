@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>사주 상담 시스템</title>
+<title>제일라 사주 AI 플랫폼</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root { --ink:#1a1209; --gold:#b8860b; --gold-l:#d4a843; --parchment:#f5ede0;
@@ -15,7 +15,7 @@
   .wrap { max-width: 960px; margin: 0 auto; padding: 24px 18px; }
   .hdr { text-align: center; padding: 36px 0 20px; }
   .em { font-size: 42px; color: var(--gold); margin-bottom: 10px; }
-  h1 { font-family: 'Noto Serif KR', serif; font-size: 24px; color: var(--deep); letter-spacing: 6px; }
+  h1 { font-family: 'Noto Serif KR', serif; font-size: 22px; color: var(--deep); letter-spacing: 3px; }
   .sub { font-size: 12px; color: var(--muted); letter-spacing: 3px; margin-top: 4px; }
   .card { background: rgba(255,253,248,0.85); border: 1px solid var(--parch-d); padding: 22px 26px; margin-bottom: 16px; }
   .card-t { font-size: 11px; font-weight: 600; letter-spacing: 3px; color: var(--gold); margin-bottom: 14px; }
@@ -88,7 +88,7 @@
 
 <!-- 로그인 -->
 <div id="loginPage">
-  <div class="hdr"><div class="em">☯</div><h1>사주 상담 시스템</h1><div class="sub">LOGIN</div></div>
+  <div class="hdr"><div class="em">☯</div><h1>제일라 사주 AI 플랫폼</h1><div class="sub">LOGIN</div></div>
   <div class="card" style="max-width:420px;margin:0 auto;">
     <div class="card-t">로그인</div>
     <input id="liName" placeholder="이름">
@@ -119,9 +119,10 @@
 <!-- 대시보드 (사용자) -->
 <div id="dashPage" class="hidden">
   <div class="nav">
-    <div class="left">🔮 사주 상담 시스템</div>
+    <div class="left">🔮 제일라 사주 AI 플랫폼</div>
     <div class="right">
       <span class="uname" id="navName"></span>
+      <button class="btn-ghost btn-sm hidden" id="adminBtn" onclick="location.href='/admin.html'">🛡️ 관리자 모드</button>
       <button class="btn-ghost btn-sm" onclick="doLogout()">로그아웃</button>
     </div>
   </div>
@@ -129,8 +130,19 @@
   <div class="stats">
     <div class="stat"><div class="label">오늘 리포트</div><div class="val" id="stToday">0</div></div>
     <div class="stat"><div class="label">이번 주 리포트</div><div class="val" id="stWeek">0</div></div>
-    <div class="stat"><div class="label">오늘 상담</div><div class="val" id="stMsgT">0</div></div>
-    <div class="stat"><div class="label">이번 주 상담</div><div class="val" id="stMsgW">0</div></div>
+    <div class="stat"><div class="label">총 후기</div><div class="val" id="stReviews">0</div></div>
+    <div class="stat"><div class="label">평균 별점</div><div class="val" id="stAvg">-</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-t">사주 브랜드 이름</div>
+    <div class="row">
+      <input id="brandName" placeholder="예: 제일라사주, 운명사주, ...">
+      <button class="btn-gold btn-sm" onclick="saveBrand()" style="flex:0 0 auto;">저장</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;">
+      후기 작성 페이지 상단에 "○○사주 후기 작성"으로 표시됩니다.
+    </div>
   </div>
 
   <div class="card">
@@ -150,6 +162,17 @@
     </div>
   </div>
 
+  <div class="card">
+    <div class="card-t">내 후기 작성 링크</div>
+    <div class="row">
+      <input id="reviewLink" readonly>
+      <button class="btn-gold btn-sm" onclick="copyReviewLink()" style="flex:0 0 auto;">복사</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;">
+      이 링크를 고객에게 전송하면 후기를 작성할 수 있습니다.
+    </div>
+  </div>
+
   <div class="menu">
     <div class="menu-item" onclick="location.href='/report.html'">
       <div class="ic">🔮</div>
@@ -160,6 +183,11 @@
       <div class="ic">💬</div>
       <div class="ttl">AI 상담 채팅</div>
       <div class="desc">저장된 리포트로<br>ChatGPT 스타일 상담</div>
+    </div>
+    <div class="menu-item" onclick="location.href='/reviews.html'">
+      <div class="ic">⭐</div>
+      <div class="ttl">후기 관리</div>
+      <div class="desc">받은 후기 확인 및<br>캡처 홍보용</div>
     </div>
   </div>
 
@@ -203,8 +231,7 @@ async function init() {
   if (!res.ok) { token = ''; localStorage.removeItem('auth_token'); return showLogin(); }
   const { user } = await res.json();
   currentUser = user;
-  if (user.isAdmin) showAdmin();
-  else showDash();
+  showDash();
 }
 
 function showLogin() {
@@ -244,13 +271,15 @@ async function doLogin() {
   token = json.token;
   localStorage.setItem('auth_token', token);
   currentUser = json.user;
-  if (json.user.isAdmin) showAdmin();
-  else showDash();
+  showDash();
 }
 
 async function doLogout() {
   await api('/api/logout', { method: 'POST' });
-  token = ''; localStorage.removeItem('auth_token'); currentUser = null;
+  token = ''; 
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('openai_api_key');
+  currentUser = null;
   showLogin();
 }
 
@@ -258,6 +287,20 @@ async function showDash() {
   document.querySelectorAll('#loginPage,#signupPage,#dashPage,#adminPage').forEach(e => e.classList.add('hidden'));
   document.getElementById('dashPage').classList.remove('hidden');
   document.getElementById('navName').textContent = currentUser.name + ' 님';
+
+  // 관리자면 버튼 표시
+  if (currentUser.isAdmin) {
+    document.getElementById('adminBtn').classList.remove('hidden');
+  }
+
+  // 브랜드 이름
+  document.getElementById('brandName').value = currentUser.brandName || '';
+
+  // 후기 링크
+  if (currentUser.reviewToken) {
+    const link = `${location.origin}/review.html?t=${currentUser.reviewToken}`;
+    document.getElementById('reviewLink').value = link;
+  }
 
   // 키 불러오기
   const saved = localStorage.getItem('openai_api_key');
@@ -268,8 +311,10 @@ async function showDash() {
   if (s.stats) {
     document.getElementById('stToday').textContent = s.stats.todayReports;
     document.getElementById('stWeek').textContent = s.stats.weekReports;
-    document.getElementById('stMsgT').textContent = s.stats.todayMessages;
-    document.getElementById('stMsgW').textContent = s.stats.weekMessages;
+  }
+  if (s.reviewStats) {
+    document.getElementById('stReviews').textContent = s.reviewStats.total;
+    document.getElementById('stAvg').textContent = s.reviewStats.avgRating > 0 ? s.reviewStats.avgRating + '★' : '-';
   }
 
   // 리포트 목록
@@ -290,6 +335,22 @@ async function showDash() {
       </div>`;
     }).join('');
   }
+}
+
+async function saveBrand() {
+  const brandName = document.getElementById('brandName').value.trim();
+  const res = await api('/api/me/brand', { method: 'POST', body: JSON.stringify({ brandName }) });
+  if (res.ok) {
+    currentUser.brandName = brandName;
+    alert('브랜드 이름이 저장되었습니다');
+  }
+}
+
+function copyReviewLink() {
+  const link = document.getElementById('reviewLink').value;
+  if (!link) return;
+  navigator.clipboard.writeText(link);
+  alert('링크가 복사되었습니다!\n카톡으로 고객에게 전송하세요.');
 }
 
 async function delReport(id) {

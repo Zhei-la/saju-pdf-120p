@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>후기 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1a1209; --gold:#b8860b; --parchment:#f5ede0; --parch-d:#e0ceb4;
+    --deep:#2c1810; --muted:#7a6652; --accent:#8b1a1a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 18px 60px; }
+  .nav { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;
+    background: rgba(255,253,248,0.9); border: 1px solid var(--parch-d); margin-bottom: 18px; }
+  .nav .left { font-weight: 700; color: var(--deep); letter-spacing: 2px; }
+  button { font-family: inherit; padding: 8px 14px; border: 1px solid var(--parch-d);
+    background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; }
+  button:hover { border-color: var(--gold); color: var(--deep); }
+
+  .summary { background: rgba(255,253,248,0.9); border: 1px solid var(--parch-d); padding: 30px;
+    text-align: center; margin-bottom: 20px; }
+  .summary .big-rating { font-family: 'Noto Serif KR', serif; font-size: 48px; font-weight: 700;
+    color: var(--gold); line-height: 1; margin-bottom: 8px; }
+  .summary .stars-big { font-size: 28px; color: var(--gold); margin: 10px 0; letter-spacing: 4px; }
+  .summary .count { font-size: 13px; color: var(--muted); }
+
+  .review-card { background: rgba(255,253,248,0.9); border: 1px solid var(--parch-d); padding: 22px 26px;
+    margin-bottom: 12px; position: relative; }
+  .review-card .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .review-card .writer { font-weight: 700; color: var(--deep); font-size: 15px; }
+  .review-card .rating { font-size: 18px; color: var(--gold); letter-spacing: 2px; }
+  .review-card .content { font-size: 14px; line-height: 1.9; color: var(--ink); white-space: pre-wrap; margin-bottom: 10px; }
+  .review-card .date { font-size: 11px; color: var(--muted); text-align: right; }
+  .del-btn { position: absolute; top: 14px; right: 14px; padding: 4px 10px; font-size: 11px;
+    background: transparent; border: 1px solid var(--parch-d); color: var(--muted); }
+  .del-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; line-height: 1.9; }
+</style>
+</head>
+<body>
+<script>
+if (!localStorage.getItem('auth_token')) location.href = '/';
+</script>
+<div class="wrap">
+  <div class="nav">
+    <div class="left">⭐ 후기 관리</div>
+    <button onclick="location.href='/'">← 대시보드</button>
+  </div>
+
+  <div class="summary" id="summary"></div>
+  <div id="list"></div>
+</div>
+
+<script>
+const token = localStorage.getItem('auth_token');
+function api(url, opts = {}) {
+  return fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', 'x-auth-token': token, ...(opts.headers || {}) }});
+}
+function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function load() {
+  const { reviews, stats } = await (await api('/api/my/reviews')).json();
+
+  document.getElementById('summary').innerHTML = `
+    <div class="big-rating">${stats.avgRating > 0 ? stats.avgRating.toFixed(1) : '-'}</div>
+    <div class="stars-big">${stats.avgRating > 0 ? '★'.repeat(Math.round(stats.avgRating)) + '☆'.repeat(5 - Math.round(stats.avgRating)) : '☆☆☆☆☆'}</div>
+    <div class="count">총 ${stats.total}개의 후기</div>
+  `;
+
+  const box = document.getElementById('list');
+  if (!reviews.length) {
+    box.innerHTML = '<div class="empty">아직 받은 후기가 없습니다.<br>대시보드에서 후기 링크를 고객에게 공유해보세요!</div>';
+    return;
+  }
+  box.innerHTML = reviews.map(r => {
+    const d = new Date(r.created_at).toLocaleDateString('ko-KR');
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    return `<div class="review-card">
+      <button class="del-btn" onclick="delReview(${r.id})">삭제</button>
+      <div class="top">
+        <div class="writer">${escapeHtml(r.writer_name)}</div>
+        <div class="rating">${stars}</div>
+      </div>
+      <div class="content">${escapeHtml(r.content)}</div>
+      <div class="date">${d}</div>
+    </div>`;
+  }).join('');
+}
+
+async function delReview(id) {
+  if (!confirm('이 후기를 삭제할까요?')) return;
+  await api('/api/my/reviews/' + id, { method: 'DELETE' });
+  load();
+}
+
+load();
+</script>
+</body>
+</html>

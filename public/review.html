@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>후기 작성</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1a1209; --gold:#b8860b; --gold-l:#d4a843; --parchment:#f5ede0;
+    --parch-d:#e0ceb4; --deep:#2c1810; --muted:#7a6652; --accent:#8b1a1a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh;
+    background-image: radial-gradient(ellipse at 50% 30%, rgba(184,134,11,0.1) 0%, transparent 60%); }
+  .wrap { max-width: 500px; margin: 0 auto; padding: 40px 20px 60px; }
+  .hdr { text-align: center; padding: 20px 0 30px; }
+  .em { font-size: 48px; color: var(--gold); margin-bottom: 14px; }
+  h1 { font-family: 'Noto Serif KR', serif; font-size: 26px; color: var(--deep); letter-spacing: 3px; margin-bottom: 8px; }
+  .sub { font-size: 12px; color: var(--muted); letter-spacing: 2px; }
+  .divider { height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 16px auto; max-width: 260px; }
+  .card { background: rgba(255,253,248,0.9); border: 1px solid var(--parch-d); padding: 28px 26px;
+    box-shadow: 0 4px 20px rgba(44,24,16,0.08); }
+  .field { margin-bottom: 18px; }
+  label { display: block; font-size: 12px; color: var(--muted); letter-spacing: 1px;
+    margin-bottom: 8px; font-weight: 500; }
+  input, textarea { width: 100%; border: 1px solid var(--parch-d); padding: 12px 14px;
+    font-size: 14px; font-family: inherit; background: rgba(255,255,255,0.7); outline: none; }
+  input:focus, textarea:focus { border-color: var(--gold); }
+  textarea { resize: vertical; min-height: 120px; line-height: 1.7; }
+  .stars { display: flex; gap: 6px; justify-content: center; font-size: 44px; cursor: pointer; user-select: none; }
+  .star { color: var(--parch-d); transition: all 0.15s; }
+  .star.on { color: var(--gold); transform: scale(1.05); }
+  .star:hover { transform: scale(1.1); }
+  .btn { width: 100%; padding: 16px; border: none; background: var(--deep); color: var(--gold-l);
+    font-family: 'Noto Serif KR', serif; font-size: 15px; letter-spacing: 4px; cursor: pointer;
+    font-weight: 700; transition: all 0.2s; }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .err { color: var(--accent); font-size: 13px; margin-top: 10px; text-align: center; }
+  .success { text-align: center; padding: 40px 20px; }
+  .success .ic { font-size: 64px; color: var(--gold); margin-bottom: 20px; }
+  .success h2 { font-family: 'Noto Serif KR', serif; font-size: 24px; color: var(--deep); margin-bottom: 14px; letter-spacing: 2px; }
+  .success p { font-size: 14px; color: var(--muted); line-height: 1.9; margin-bottom: 24px; }
+  .kakao-btn { display: inline-block; padding: 14px 32px;
+    background: linear-gradient(135deg, var(--gold), #a07000); color: var(--deep);
+    text-decoration: none; font-weight: 700; letter-spacing: 2px; font-size: 14px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="em">☯</div>
+    <div class="divider"></div>
+    <h1 id="pageTitle">후기 작성</h1>
+    <div class="sub">REVIEW</div>
+    <div class="divider"></div>
+  </div>
+
+  <div class="card" id="formCard">
+    <div class="field">
+      <label>이름</label>
+      <input id="writerName" placeholder="홍길동" maxlength="20">
+    </div>
+    <div class="field">
+      <label>별점</label>
+      <div class="stars" id="stars">
+        <span class="star" data-r="1">★</span>
+        <span class="star" data-r="2">★</span>
+        <span class="star" data-r="3">★</span>
+        <span class="star" data-r="4">★</span>
+        <span class="star" data-r="5">★</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>후기 내용</label>
+      <textarea id="content" placeholder="사주 리포트를 받아보신 소감을 자유롭게 작성해주세요." maxlength="1000"></textarea>
+    </div>
+    <button class="btn" id="submitBtn" onclick="submit()">후기 제출하기</button>
+    <div id="err" class="err"></div>
+  </div>
+
+  <div class="card success hidden" id="successCard">
+    <div class="ic">✨</div>
+    <h2>후기 감사합니다!</h2>
+    <p>소중한 후기를 남겨주셔서 감사합니다.<br><br>
+    리포트에 대해 궁금한 점이 있으시거나<br>
+    상담이 필요하시면<br>
+    <b>24시간 내 카카오톡으로 문의</b> 가능합니다.</p>
+    <a href="https://open.kakao.com/o/sb05ouMh" class="kakao-btn" target="_blank">💬 카톡으로 문의하기</a>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const token = params.get('t');
+let rating = 0;
+
+if (!token) {
+  document.body.innerHTML = '<div style="text-align:center;padding:60px;color:#7a6652;">유효하지 않은 링크입니다</div>';
+}
+
+// 브랜드 이름 로드
+fetch('/api/review-info/' + token).then(r => r.json()).then(d => {
+  if (d.brandName) document.getElementById('pageTitle').textContent = d.brandName + ' 후기 작성';
+}).catch(() => {});
+
+// 별점 클릭
+document.querySelectorAll('.star').forEach(s => {
+  s.addEventListener('click', () => {
+    rating = parseInt(s.dataset.r);
+    document.querySelectorAll('.star').forEach(x => {
+      x.classList.toggle('on', parseInt(x.dataset.r) <= rating);
+    });
+  });
+});
+
+async function submit() {
+  const writerName = document.getElementById('writerName').value.trim();
+  const content = document.getElementById('content').value.trim();
+  const err = document.getElementById('err');
+  err.textContent = '';
+
+  if (!writerName) { err.textContent = '이름을 입력해주세요'; return; }
+  if (!rating) { err.textContent = '별점을 선택해주세요'; return; }
+  if (!content) { err.textContent = '후기 내용을 입력해주세요'; return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '제출 중...';
+
+  const res = await fetch('/api/review-submit/' + token, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ writerName, rating, content })
+  });
+  const json = await res.json();
+  if (!res.ok) {
+    err.textContent = json.error || '오류';
+    btn.disabled = false; btn.textContent = '후기 제출하기';
+    return;
+  }
+  document.getElementById('formCard').classList.add('hidden');
+  document.getElementById('successCard').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

@@ -16,6 +16,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'home.html')));
 
+// 관리자 계정 초기화
+db.ensureAdmin(ADMIN_PASSWORD);
+
 // ─── 세션 관리 (메모리) ───
 const sessions = new Map(); // token → { userId, isAdmin }
 function makeToken() { return crypto.randomBytes(32).toString('hex'); }
@@ -50,16 +53,10 @@ app.post('/api/signup', (req, res) => {
 app.post('/api/login', (req, res) => {
   try {
     const { name, password } = req.body;
-    // 총관리자 로그인
-    if (name === 'admin' && password === ADMIN_PASSWORD) {
-      const token = makeToken();
-      sessions.set(token, { userId: 0, isAdmin: true });
-      return res.json({ ok: true, token, user: { id: 0, name: '총관리자', isAdmin: true } });
-    }
     const user = db.loginUser(name, password);
     const token = makeToken();
-    sessions.set(token, { userId: user.id, isAdmin: false });
-    res.json({ ok: true, token, user: { ...user, isAdmin: false } });
+    sessions.set(token, { userId: user.id, isAdmin: user.isAdmin });
+    res.json({ ok: true, token, user });
   } catch (e) { res.status(401).json({ error: e.message }); }
 });
 
@@ -69,15 +66,24 @@ app.post('/api/logout', requireUser, (req, res) => {
 });
 
 app.get('/api/me', requireUser, (req, res) => {
-  if (req.isAdmin) return res.json({ user: { id: 0, name: '총관리자', isAdmin: true } });
   const user = db.getUser(req.userId);
-  res.json({ user: { ...user, isAdmin: false } });
+  if (!user) return res.status(404).json({ error: '없음' });
+  res.json({ user: {
+    id: user.id, name: user.name, status: user.status,
+    isAdmin: !!user.is_admin, brandName: user.brand_name || '',
+    reviewToken: user.review_token
+  }});
+});
+
+// 브랜드 이름 저장
+app.post('/api/me/brand', requireUser, (req, res) => {
+  db.updateBrandName(req.userId, req.body.brandName || '');
+  res.json({ ok: true });
 });
 
 // ─── 대시보드 통계 ───
 app.get('/api/stats', requireUser, (req, res) => {
-  if (req.isAdmin) return res.json({ stats: { totalReports: 0, todayReports: 0, weekReports: 0, todayMessages: 0, weekMessages: 0 } });
-  res.json({ stats: db.getUserStats(req.userId) });
+  res.json({ stats: db.getUserStats(req.userId), reviewStats: db.getReviewStats(req.userId) });
 });
 
 // ─── 리포트 생성 ───
@@ -99,14 +105,12 @@ app.post('/api/generate', requireUser, async (req, res) => {
     const chapters = await generateAllChapters(apiKey, userInfo);
 
     let reportId = null;
-    if (!req.isAdmin) {
-      try {
-        reportId = db.saveReport({
-          userId: req.userId, clientName: name, clientGender: gender || '남성',
-          clientBirth: saju.solarDate, sajuData: saju, chapters
-        });
-      } catch (e) { console.error('DB 저장 실패:', e.message); }
-    }
+    try {
+      reportId = db.saveReport({
+        userId: req.userId, clientName: name, clientGender: gender || '남성',
+        clientBirth: saju.solarDate, sajuData: saju, chapters
+      });
+    } catch (e) { console.error('DB 저장 실패:', e.message); }
 
     res.json({ ok: true, userInfo, chapters, reportId });
   } catch (e) {
@@ -126,7 +130,6 @@ app.post('/api/regenerate', requireUser, async (req, res) => {
 
 // ─── 내 리포트 목록 ───
 app.get('/api/reports', requireUser, (req, res) => {
-  if (req.isAdmin) return res.json({ reports: [] });
   res.json({ reports: db.listUserReports(req.userId) });
 });
 
@@ -205,6 +208,44 @@ app.post('/api/sessions/:id/chat', requireUser, async (req, res) => {
   }
 });
 
+// ─── 후기 (공개 - 로그인 불필요) ───
+app.get('/api/review-info/:token', (req, res) => {
+  const user = db.getUserByReviewToken(req.params.token);
+  if (!user) return res.status(404).json({ error: '유효하지 않은 링크입니다' });
+  res.json({
+    brandName: user.brand_name || `${user.name}사주`,
+    ownerName: user.name
+  });
+});
+
+app.post('/api/review-submit/:token', (req, res) => {
+  try {
+    const user = db.getUserByReviewToken(req.params.token);
+    if (!user) return res.status(404).json({ error: '유효하지 않은 링크입니다' });
+    const { writerName, rating, content } = req.body;
+    if (!writerName || !writerName.trim()) return res.status(400).json({ error: '이름을 입력해주세요' });
+    if (!rating || rating < 1 || rating > 5) return res.status(400).json({ error: '별점을 선택해주세요' });
+    if (!content || !content.trim()) return res.status(400).json({ error: '후기 내용을 입력해주세요' });
+    if (writerName.length > 20) return res.status(400).json({ error: '이름은 20자 이내로 입력해주세요' });
+    if (content.length > 1000) return res.status(400).json({ error: '후기는 1000자 이내로 입력해주세요' });
+    db.createReview(user.id, writerName.trim(), parseInt(rating), content.trim());
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── 내 후기 관리 ───
+app.get('/api/my/reviews', requireUser, (req, res) => {
+  res.json({
+    reviews: db.listUserReviews(req.userId),
+    stats: db.getReviewStats(req.userId)
+  });
+});
+
+app.delete('/api/my/reviews/:id', requireUser, (req, res) => {
+  db.deleteReview(parseInt(req.params.id), req.userId);
+  res.json({ ok: true });
+});
+
 // ─── 총관리자 ───
 app.get('/api/admin/users', requireAdmin, (req, res) => {
   res.json({ users: db.listAllUsers() });
@@ -233,6 +274,6 @@ app.delete('/api/admin/users/:id', requireAdmin, (req, res) => {
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 app.listen(PORT, () => {
-  console.log(`🔮 사주 서버: http://localhost:${PORT}`);
-  console.log(`👤 총관리자 로그인: name=admin, pw=${ADMIN_PASSWORD}`);
+  console.log(`🔮 제일라 사주 AI 플랫폼: http://localhost:${PORT}`);
+  console.log(`👤 총관리자 로그인: name=김가영, pw=${ADMIN_PASSWORD}`);
 });

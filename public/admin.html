@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 - 사용자 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1a1209; --gold:#b8860b; --parchment:#f5ede0; --parch-d:#e0ceb4;
+    --deep:#2c1810; --muted:#7a6652; --accent:#8b1a1a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 18px; }
+  .nav { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;
+    background: rgba(255,253,248,0.9); border: 1px solid var(--parch-d); margin-bottom: 18px; }
+  .nav .left { font-weight: 700; color: var(--deep); letter-spacing: 2px; }
+  .nav .right { display: flex; gap: 8px; }
+  .card { background: rgba(255,253,248,0.85); border: 1px solid var(--parch-d); padding: 22px 26px; }
+  .card-t { font-size: 11px; font-weight: 600; letter-spacing: 3px; color: var(--gold); margin-bottom: 14px; }
+  button { font-family: inherit; font-size: 14px; padding: 10px 18px; border: none;
+    background: var(--deep); color: #d4a843; cursor: pointer; letter-spacing: 1px; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-gold { background: linear-gradient(135deg, var(--gold), #a07000); color: var(--deep); font-weight: 700; }
+  .btn-ghost { background: transparent; border: 1px solid var(--parch-d); color: var(--muted); }
+  .btn-danger { background: var(--accent); color: #fff; }
+  .user-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; align-items: center;
+    padding: 10px 14px; border: 1px solid var(--parch-d); margin-bottom: 6px; background: rgba(255,253,248,0.6); }
+  .badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge.pending { background: #fef3c7; color: #92400e; }
+  .badge.active { background: #d1fae5; color: #065f46; }
+  .badge.rejected, .badge.disabled { background: #fee2e2; color: #991b1b; }
+  .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<script>
+if (!localStorage.getItem('auth_token')) location.href = '/';
+</script>
+<div class="wrap">
+  <div class="nav">
+    <div class="left">🛡️ 사용자 관리</div>
+    <div class="right">
+      <button class="btn-ghost btn-sm" onclick="location.href='/'">← 대시보드</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-t">가입 신청 대기 / 활성 사용자</div>
+    <div id="userList"></div>
+  </div>
+</div>
+<script>
+const token = localStorage.getItem('auth_token');
+function api(url, opts = {}) {
+  return fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', 'x-auth-token': token, ...(opts.headers || {}) }});
+}
+function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function load() {
+  const res = await api('/api/admin/users');
+  if (res.status === 403) { alert('관리자 권한이 필요합니다'); location.href = '/'; return; }
+  const { users } = await res.json();
+  const box = document.getElementById('userList');
+  if (!users.length) { box.innerHTML = '<div class="empty">가입자가 없습니다.</div>'; return; }
+  box.innerHTML = users.map(u => {
+    const created = new Date(u.created_at).toLocaleDateString('ko-KR');
+    const lastLogin = u.last_login_at ? new Date(u.last_login_at).toLocaleDateString('ko-KR') : '-';
+    let actions = '';
+    if (u.status === 'pending') {
+      actions = `<button class="btn-gold btn-sm" onclick="act(${u.id},'approve')">승인</button>
+                 <button class="btn-danger btn-sm" onclick="act(${u.id},'reject')">거부</button>`;
+    } else if (u.status === 'active') {
+      actions = `<button class="btn-ghost btn-sm" onclick="act(${u.id},'disable')">비활성화</button>
+                 <button class="btn-danger btn-sm" onclick="delUser(${u.id})">삭제</button>`;
+    } else {
+      actions = `<button class="btn-gold btn-sm" onclick="act(${u.id},'approve')">재활성화</button>
+                 <button class="btn-danger btn-sm" onclick="delUser(${u.id})">삭제</button>`;
+    }
+    return `<div class="user-row">
+      <div>
+        <div style="font-weight:600;color:var(--deep);">${escapeHtml(u.name)}</div>
+        <div style="font-size:11px;color:var(--muted);">가입 ${created} · 마지막 ${lastLogin} · 리포트 ${u.report_count} · 상담 ${u.chat_count}</div>
+      </div>
+      <span class="badge ${u.status}">${u.status}</span>
+      ${actions}
+    </div>`;
+  }).join('');
+}
+async function act(id, action) { await api(`/api/admin/users/${id}/${action}`, { method: 'POST' }); load(); }
+async function delUser(id) {
+  if (!confirm('정말 삭제할까요? 모든 데이터가 삭제됩니다.')) return;
+  await api('/api/admin/users/' + id, { method: 'DELETE' }); load();
+}
+load();
+</script>
+</body>
+</html>

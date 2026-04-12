@@ -14,6 +14,9 @@ db.exec(`
     name TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'pending',
+    is_admin INTEGER NOT NULL DEFAULT 0,
+    brand_name TEXT DEFAULT '',
+    review_token TEXT UNIQUE,
     created_at INTEGER NOT NULL,
     last_login_at INTEGER
   );
@@ -48,19 +51,58 @@ db.exec(`
     created_at INTEGER NOT NULL,
     FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
   );
+  CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    writer_name TEXT NOT NULL,
+    rating INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
   CREATE INDEX IF NOT EXISTS idx_reports_user ON reports(user_id);
   CREATE INDEX IF NOT EXISTS idx_sessions_user ON chat_sessions(user_id);
   CREATE INDEX IF NOT EXISTS idx_msgs_session ON messages(session_id);
+  CREATE INDEX IF NOT EXISTS idx_reviews_user ON reviews(user_id);
 `);
 
+// 기존 DB 마이그레이션 (컬럼 추가)
+try { db.exec(`ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0`); } catch(e) {}
+try { db.exec(`ALTER TABLE users ADD COLUMN brand_name TEXT DEFAULT ''`); } catch(e) {}
+try { db.exec(`ALTER TABLE users ADD COLUMN review_token TEXT`); } catch(e) {}
+
 function hash(pw) { return crypto.createHash('sha256').update(pw + 'saju_salt_9923').digest('hex'); }
+
+// 관리자 계정 초기화 (김가영) — 서버 시작 시 자동 실행
+function ensureAdmin(adminPassword) {
+  const existing = db.prepare(`SELECT * FROM users WHERE name = ?`).get('김가영');
+  if (!existing) {
+    const token = crypto.randomBytes(16).toString('hex');
+    db.prepare(`
+      INSERT INTO users (name, password_hash, status, is_admin, review_token, created_at)
+      VALUES (?, ?, 'active', 1, ?, ?)
+    `).run('김가영', hash(adminPassword), token, Date.now());
+    console.log('[관리자 계정 생성] 김가영');
+  } else {
+    // 비밀번호 동기화 (환경변수 바꾸면 자동 반영)
+    db.prepare(`UPDATE users SET password_hash = ?, is_admin = 1, status = 'active' WHERE name = ?`)
+      .run(hash(adminPassword), '김가영');
+    if (!existing.review_token) {
+      const token = crypto.randomBytes(16).toString('hex');
+      db.prepare(`UPDATE users SET review_token = ? WHERE id = ?`).run(token, existing.id);
+    }
+  }
+}
 
 // ─── Users ───
 function createUser(name, password) {
   const now = Date.now();
+  const reviewToken = crypto.randomBytes(16).toString('hex');
   try {
-    const info = db.prepare(`INSERT INTO users (name, password_hash, status, created_at) VALUES (?, ?, 'pending', ?)`)
-      .run(name, hash(password), now);
+    const info = db.prepare(`
+      INSERT INTO users (name, password_hash, status, review_token, created_at)
+      VALUES (?, ?, 'pending', ?, ?)
+    `).run(name, hash(password), reviewToken, now);
     return { id: info.lastInsertRowid, status: 'pending' };
   } catch (e) {
     if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') throw new Error('이미 사용 중인 이름입니다');
@@ -75,16 +117,51 @@ function loginUser(name, password) {
   if (row.status === 'rejected') throw new Error('가입이 거부되었습니다');
   if (row.status === 'disabled') throw new Error('비활성화된 계정입니다');
   db.prepare(`UPDATE users SET last_login_at = ? WHERE id = ?`).run(Date.now(), row.id);
-  return { id: row.id, name: row.name, status: row.status };
+  return { id: row.id, name: row.name, status: row.status, isAdmin: !!row.is_admin, brandName: row.brand_name || '', reviewToken: row.review_token };
 }
-function getUser(id) { return db.prepare(`SELECT id, name, status, created_at, last_login_at FROM users WHERE id = ?`).get(id); }
+function getUser(id) {
+  return db.prepare(`SELECT id, name, status, is_admin, brand_name, review_token, created_at, last_login_at FROM users WHERE id = ?`).get(id);
+}
+function getUserByReviewToken(token) {
+  return db.prepare(`SELECT id, name, brand_name FROM users WHERE review_token = ?`).get(token);
+}
+function updateBrandName(id, brandName) {
+  db.prepare(`UPDATE users SET brand_name = ? WHERE id = ?`).run(brandName || '', id);
+}
 function listAllUsers() {
   return db.prepare(`
     SELECT u.id, u.name, u.status, u.created_at, u.last_login_at,
       (SELECT COUNT(*) FROM reports WHERE user_id = u.id) as report_count,
       (SELECT COUNT(*) FROM chat_sessions WHERE user_id = u.id) as chat_count
-    FROM users u ORDER BY u.created_at DESC
+    FROM users u
+    WHERE u.is_admin = 0
+    ORDER BY u.created_at DESC
   `).all();
+}
+
+// ─── Reviews ───
+function createReview(userId, writerName, rating, content) {
+  const info = db.prepare(`
+    INSERT INTO reviews (user_id, writer_name, rating, content, created_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(userId, writerName, rating, content, Date.now());
+  return info.lastInsertRowid;
+}
+function listUserReviews(userId) {
+  return db.prepare(`SELECT * FROM reviews WHERE user_id = ? ORDER BY created_at DESC`).all(userId);
+}
+function deleteReview(id, userId) {
+  db.prepare(`DELETE FROM reviews WHERE id = ? AND user_id = ?`).run(id, userId);
+}
+function getReviewStats(userId) {
+  const row = db.prepare(`
+    SELECT COUNT(*) as total, AVG(rating) as avg_rating
+    FROM reviews WHERE user_id = ?
+  `).get(userId);
+  return {
+    total: row.total || 0,
+    avgRating: row.avg_rating ? Math.round(row.avg_rating * 10) / 10 : 0
+  };
 }
 function updateUserStatus(id, status) {
   db.prepare(`UPDATE users SET status = ? WHERE id = ?`).run(status, id);
@@ -187,9 +264,12 @@ cleanupOldReports();
 setInterval(cleanupOldReports, 24 * 60 * 60 * 1000);
 
 module.exports = {
-  createUser, loginUser, getUser, listAllUsers, updateUserStatus, deleteUser,
+  ensureAdmin,
+  createUser, loginUser, getUser, getUserByReviewToken, listAllUsers, updateUserStatus, deleteUser,
+  updateBrandName,
   saveReport, listUserReports, getReport, deleteReport, updateMemo,
   createChatSession, listUserSessions, getChatSession, deleteChatSession,
   addMessage, getMessages,
-  getUserStats, cleanupOldReports
+  getUserStats, cleanupOldReports,
+  createReview, listUserReviews, deleteReview, getReviewStats
 };
