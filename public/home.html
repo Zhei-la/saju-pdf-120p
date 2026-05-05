@@ -165,12 +165,23 @@
 
   <div class="card">
     <div class="card-t">사주 리포트 가격 (원)</div>
-    <div class="row">
-      <input id="reportPrice" type="number" placeholder="예: 30000" min="0">
-      <button class="btn-gold btn-sm" onclick="savePrice()" style="flex:0 0 auto;">저장</button>
+    <div style="display:grid;gap:10px;">
+      <div>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">120p 풀리포트 가격</label>
+        <div class="row">
+          <input id="reportPrice" type="number" placeholder="예: 100000" min="0">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">60p 라이트 가격</label>
+        <div class="row">
+          <input id="reportPriceHalf" type="number" placeholder="예: 50000" min="0">
+          <button class="btn-gold btn-sm" onclick="savePrice()" style="flex:0 0 auto;">전체 저장</button>
+        </div>
+      </div>
     </div>
     <div style="font-size:11px;color:var(--muted);margin-top:6px;">
-      리포트 1개당 가격입니다. 수익 통계 계산에 사용됩니다.
+      각 리포트 1개당 가격입니다. 수익 통계 계산에 사용됩니다.
     </div>
   </div>
 
@@ -186,7 +197,7 @@
   </div>
 
   <div class="card">
-    <div class="card-t">OpenAI API 키</div>
+    <div class="card-t">OpenAI API 키 (리포트·개인상담 첫답변용 - 유료)</div>
     <div id="keyExpanded">
       <div class="row">
         <input type="password" id="apiKey" placeholder="sk-proj-...">
@@ -199,6 +210,23 @@
     <div id="keyCollapsed" class="key-col hidden">
       <div><span class="key-dot"></span>API 키 저장됨 (<span id="keyPrev"></span>)</div>
       <button class="btn-ghost btn-sm" onclick="editKey()">수정</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-t">Gemini API 키 (AI채팅·추가질문용 - 무료)</div>
+    <div id="geminiKeyExpanded">
+      <div class="row">
+        <input type="password" id="geminiKey" placeholder="AIza...">
+        <button class="btn-gold btn-sm" onclick="saveGeminiKey()" style="flex:0 0 auto;">저장</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">
+        키는 브라우저에만 저장됩니다. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--gold);">키 발급 페이지 (무료)</a>
+      </div>
+    </div>
+    <div id="geminiKeyCollapsed" class="key-col hidden">
+      <div><span class="key-dot"></span>Gemini 키 저장됨 (<span id="geminiKeyPrev"></span>)</div>
+      <button class="btn-ghost btn-sm" onclick="editGeminiKey()">수정</button>
     </div>
   </div>
 
@@ -217,7 +245,7 @@
     <div class="menu-item" onclick="location.href='/report.html'">
       <div class="ic">🔮</div>
       <div class="ttl">사주 리포트</div>
-      <div class="desc">40챕터 120페이지<br>PDF 자동 생성</div>
+      <div class="desc">60p / 120p 선택<br>PDF 자동 생성</div>
     </div>
     <div class="menu-item" onclick="location.href='/consult.html'">
       <div class="ic">📜</div>
@@ -363,6 +391,7 @@ async function showDash() {
 
   // 리포트 가격
   document.getElementById('reportPrice').value = currentUser.reportPrice || '';
+  document.getElementById('reportPriceHalf').value = currentUser.reportPriceHalf || '';
 
   // 후기 링크
   if (currentUser.reviewToken) {
@@ -374,6 +403,11 @@ async function showDash() {
   const keyName = 'openai_api_key_' + currentUser.name;
   const saved = localStorage.getItem(keyName);
   if (saved) { document.getElementById('apiKey').value = saved; collapseKey(saved); }
+
+  // Gemini 키 불러오기
+  const geminiKeyName = 'gemini_api_key_' + currentUser.name;
+  const savedGemini = localStorage.getItem(geminiKeyName);
+  if (savedGemini) { document.getElementById('geminiKey').value = savedGemini; collapseGeminiKey(savedGemini); }
 
   // 통계
   const s = await (await api('/api/stats')).json();
@@ -428,9 +462,10 @@ async function saveBrand() {
 
 async function savePrice() {
   const price = parseInt(document.getElementById('reportPrice').value) || 0;
-  const res = await api('/api/me/price', { method: 'POST', body: JSON.stringify({ price }) });
+  const priceHalf = parseInt(document.getElementById('reportPriceHalf').value) || 0;
+  const res = await api('/api/me/price', { method: 'POST', body: JSON.stringify({ price, priceHalf }) });
   if (res.ok) {
-    alert('리포트 가격이 ' + price.toLocaleString() + '원으로 저장되었습니다');
+    alert('가격이 저장되었습니다\n· 120p 풀: ' + price.toLocaleString() + '원\n· 60p 라이트: ' + priceHalf.toLocaleString() + '원');
     location.reload();
   } else {
     alert('저장 실패');
@@ -462,7 +497,7 @@ async function goChatNew(reportId) {
 // 키 관리
 function saveKey() {
   const key = document.getElementById('apiKey').value.trim();
-  if (!key || !key.startsWith('sk-')) { alert('올바른 키를 입력해주세요'); return; }
+  if (!key || !key.startsWith('sk-')) { alert('올바른 OpenAI 키를 입력해주세요'); return; }
   localStorage.setItem('openai_api_key_' + currentUser.name, key);
   // 기존 공용 키는 삭제
   localStorage.removeItem('openai_api_key');
@@ -476,6 +511,23 @@ function collapseKey(key) {
 function editKey() {
   document.getElementById('keyExpanded').classList.remove('hidden');
   document.getElementById('keyCollapsed').classList.add('hidden');
+}
+
+// Gemini 키 관리
+function saveGeminiKey() {
+  const key = document.getElementById('geminiKey').value.trim();
+  if (!key || !key.startsWith('AIza')) { alert('올바른 Gemini 키를 입력해주세요 (AIza로 시작)'); return; }
+  localStorage.setItem('gemini_api_key_' + currentUser.name, key);
+  collapseGeminiKey(key);
+}
+function collapseGeminiKey(key) {
+  document.getElementById('geminiKeyExpanded').classList.add('hidden');
+  document.getElementById('geminiKeyCollapsed').classList.remove('hidden');
+  document.getElementById('geminiKeyPrev').textContent = key.slice(0, 8) + '...' + key.slice(-4);
+}
+function editGeminiKey() {
+  document.getElementById('geminiKeyExpanded').classList.remove('hidden');
+  document.getElementById('geminiKeyCollapsed').classList.add('hidden');
 }
 
 // 관리자

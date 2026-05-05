@@ -472,8 +472,8 @@ async function sendFollowup() {
   }
 
   const userName = localStorage.getItem('current_user_name') || '';
-  const apiKey = localStorage.getItem('openai_api_key_' + userName);
-  if (!apiKey) { alert('OpenAI API 키가 없습니다'); return; }
+  const apiKey = localStorage.getItem('gemini_api_key_' + userName);
+  if (!apiKey) { alert('대시보드에서 Gemini API 키를 먼저 저장해주세요\n(추가 질문은 무료 Gemini를 사용합니다)'); return; }
 
   const btn = document.getElementById('chatSendBtn');
   btn.disabled = true; btn.textContent = '...';

@@ -234,7 +234,7 @@
     <div class="emblem">☯</div>
     <div class="divider"></div>
     <h1>사주팔자 리포트</h1>
-    <div class="subtitle">AI 40챕터 분석 · 편집 · PDF 저장</div>
+    <div class="subtitle">AI 사주 분석 · 60p / 120p · 편집 · PDF 저장</div>
     <div class="divider"></div>
   </div>
 
@@ -326,6 +326,18 @@
           <option value="chuncheon">춘천</option>
           <option value="gangneung">강릉</option>
         </select>
+      </div>
+
+      <div class="field">
+        <label>리포트 분량</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn active" data-rtype="full" onclick="selectReportType('full')">120p 풀버전 (40챕터)</button>
+          <button type="button" class="toggle-btn" data-rtype="half" onclick="selectReportType('half')">60p 라이트 (20챕터)</button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:'Noto Sans KR',sans-serif;line-height:1.7;">
+          · <b>120p 풀</b>: 본성·커리어·관계·건강·인생·12개월 운세 (약 3~5분, 비용 ↑)<br>
+          · <b>60p 라이트</b>: 본성·커리어·관계 핵심 20챕터 (약 2~3분, 비용 ↓)
+        </div>
       </div>
     </div>
 
@@ -423,6 +435,7 @@ let currentUserInfo = null;
 let currentChapters = [];
 let selectedGender = '남성';
 let selectedCalendar = 'solar';
+let selectedReportType = 'full'; // 'full' | 'half'
 
 // ── 초기화 ──
 window.addEventListener('DOMContentLoaded', () => {
@@ -462,6 +475,11 @@ function selectCalendar(c) {
   selectedCalendar = c;
   document.querySelectorAll('[data-cal]').forEach(b =>
     b.classList.toggle('active', b.dataset.cal === c));
+}
+function selectReportType(t) {
+  selectedReportType = t;
+  document.querySelectorAll('[data-rtype]').forEach(b =>
+    b.classList.toggle('active', b.dataset.rtype === t));
 }
 
 // ── 시간 모름 체크박스 ──
@@ -573,12 +591,15 @@ async function generateReport() {
     hour: hourVal, minute: minuteVal,
     timeUnknown: isTimeUnknown,
     city: cityKey,
-    isLunar: selectedCalendar === 'lunar'
+    isLunar: selectedCalendar === 'lunar',
+    reportType: selectedReportType
   };
 
   const btn = document.getElementById('genBtn');
   btn.disabled = true; btn.textContent = '생성 중...';
-  showStatus('genStatus', '<span class="loader"></span>40챕터 분석 중... 약 3~5분 소요됩니다. 잠시만 기다려주세요.', 'loading');
+  const chapCount = selectedReportType === 'half' ? 20 : 40;
+  const timeEst = selectedReportType === 'half' ? '약 2~3분' : '약 3~5분';
+  showStatus('genStatus', `<span class="loader"></span>${chapCount}챕터 분석 중... ${timeEst} 소요됩니다. 잠시만 기다려주세요.`, 'loading');
 
   try {
     const res = await fetch('/api/generate', {
@@ -591,6 +612,7 @@ async function generateReport() {
 
     currentUserInfo = json.userInfo;
     currentUserInfo.cityName = document.getElementById('city').selectedOptions[0].textContent;
+    currentUserInfo.reportType = json.reportType || selectedReportType;
     currentChapters = json.chapters;
     renderPreview();
   } catch (e) {
@@ -718,6 +740,105 @@ function backToInput() {
 }
 
 // ── PDF ──
+// 한 페이지에 들어갈 본문 글자 수 추정 (Noto Sans KR 15px / line-height 2.1 / A4 본문 영역)
+const PDF_CHARS_PER_PAGE = 1100; // 보수적으로 잡아 안전하게
+
+// 챕터 본문을 페이지 단위로 분할 (단락 경계에서 끊기)
+function splitContentIntoPages(content, maxCharsPerPage) {
+  const paragraphs = String(content || '').split(/\n\s*\n/);
+  const pages = [];
+  let buf = '';
+  for (const p of paragraphs) {
+    if (!p.trim()) continue;
+    // 현재 버퍼에 단락 추가했을 때 페이지 한계를 넘으면 페이지 닫고 새 페이지
+    if (buf && (buf.length + p.length + 2) > maxCharsPerPage) {
+      pages.push(buf);
+      buf = p;
+    } else {
+      buf = buf ? buf + '\n\n' + p : p;
+    }
+    // 한 단락이 너무 길어서 한 페이지에 안 들어갈 때
+    while (buf.length > maxCharsPerPage * 1.3) {
+      // 문장 단위 끊기 시도
+      let cutAt = buf.lastIndexOf('. ', maxCharsPerPage);
+      if (cutAt < maxCharsPerPage * 0.5) cutAt = buf.lastIndexOf('\n', maxCharsPerPage);
+      if (cutAt < maxCharsPerPage * 0.5) cutAt = maxCharsPerPage;
+      pages.push(buf.slice(0, cutAt + 1).trim());
+      buf = buf.slice(cutAt + 1).trim();
+    }
+  }
+  if (buf.trim()) pages.push(buf.trim());
+  return pages.length ? pages : [''];
+}
+
+// 오행 막대그래프 SVG 생성
+function buildElementBarSVG(elements) {
+  const items = [
+    { key: '목', color: '#3a8c3a', label: '목 (木)' },
+    { key: '화', color: '#c93838', label: '화 (火)' },
+    { key: '토', color: '#a87b3a', label: '토 (土)' },
+    { key: '금', color: '#9a9a9a', label: '금 (金)' },
+    { key: '수', color: '#2c5d8a', label: '수 (水)' }
+  ];
+  const max = Math.max(...items.map(it => elements[it.key] || 0), 1);
+  const W = 600, H = 320, leftPad = 80, topPad = 30, barW = 70, gap = 28;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" style="width:100%;max-width:600px;display:block;margin:0 auto;">`;
+  // Y축 (격자)
+  for (let i = 0; i <= 4; i++) {
+    const y = topPad + (H - topPad - 60) * (i / 4);
+    svg += `<line x1="${leftPad}" y1="${y}" x2="${W - 20}" y2="${y}" stroke="#e0ceb4" stroke-width="1" stroke-dasharray="3,3"/>`;
+  }
+  // 막대
+  items.forEach((it, idx) => {
+    const v = elements[it.key] || 0;
+    const barH = (H - topPad - 60) * (v / max);
+    const x = leftPad + 20 + idx * (barW + gap);
+    const y = H - 60 - barH;
+    svg += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" fill="${it.color}" opacity="0.85" rx="2"/>`;
+    svg += `<text x="${x + barW / 2}" y="${y - 8}" text-anchor="middle" font-family="Noto Sans KR" font-size="16" font-weight="700" fill="#2c1810">${v}</text>`;
+    svg += `<text x="${x + barW / 2}" y="${H - 30}" text-anchor="middle" font-family="Noto Sans KR" font-size="14" fill="#1a1209">${it.label}</text>`;
+  });
+  svg += `</svg>`;
+  return svg;
+}
+
+// 사주팔자 4×2 표 (천간 위, 지지 아래)
+function buildSajuTable(s) {
+  // s.fullKorean이 "정해 임자 갑오 병인" 같은 형식 가정 → 분리
+  const parts = (s.fullKorean || '').trim().split(/\s+/);
+  // 한자 형식도 분리
+  const partsHan = (s.fullHanja || '').trim().split(/\s+/);
+  const labels = ['시주(時柱)', '일주(日柱)', '월주(月柱)', '연주(年柱)'];
+  // 일반적으로 fullKorean은 연월일시 순서. 표는 시→일→월→연 (오른쪽이 과거) 명리학 관습
+  // 여기서는 안전하게 연월일시 순으로 표시
+  const orderLabels = ['연주(年柱)', '월주(月柱)', '일주(日柱)', '시주(時柱)'];
+  let html = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid #b8860b;background:#fff;">`;
+  // 첫 줄: 라벨
+  for (let i = 0; i < 4; i++) {
+    html += `<div style="padding:12px 8px;text-align:center;font-family:'Noto Sans KR',sans-serif;font-size:12px;color:#7a6652;background:rgba(184,134,11,0.12);border-right:1px solid #e0ceb4;border-bottom:1px solid #b8860b;${i===3?'border-right:none;':''}">${orderLabels[i]}</div>`;
+  }
+  // 둘째 줄: 천간 (한글 + 한자)
+  for (let i = 0; i < 4; i++) {
+    const kor = (parts[i] || '·').charAt(0);
+    const han = (partsHan[i] || '·').charAt(0);
+    html += `<div style="padding:30px 10px;text-align:center;border-right:1px solid #e0ceb4;border-bottom:2px solid #b8860b;${i===3?'border-right:none;':''}">
+      <div style="font-size:42px;color:#2c1810;font-weight:700;line-height:1;">${han}</div>
+      <div style="font-size:14px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:6px;">${kor}</div>
+    </div>`;
+  }
+  // 셋째 줄: 지지 (한글 + 한자)
+  for (let i = 0; i < 4; i++) {
+    const kor = (parts[i] || '··').charAt(1) || '·';
+    const han = (partsHan[i] || '··').charAt(1) || '·';
+    html += `<div style="padding:30px 10px;text-align:center;border-right:1px solid #e0ceb4;${i===3?'border-right:none;':''}">
+      <div style="font-size:42px;color:#2c1810;font-weight:700;line-height:1;">${han}</div>
+      <div style="font-size:14px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:6px;">${kor}</div>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
 async function downloadPDF() {
   if (!currentChapters.length) return;
   const btn = document.getElementById('dlBtn');
@@ -726,21 +847,46 @@ async function downloadPDF() {
 
   const s = currentUserInfo.saju;
   const render = document.getElementById('pdfRender');
+  const isHalf = currentUserInfo.reportType === 'half' || currentChapters.length <= 20;
+  // 브랜드명 (저장된 것 있으면 사용, 없으면 기본값)
+  const userName = localStorage.getItem('current_user_name') || '';
+  let brandName = '';
+  try {
+    const meRes = await fetch('/api/me', { headers: { 'x-auth-token': localStorage.getItem('auth_token') || '' } });
+    if (meRes.ok) {
+      const meData = await meRes.json();
+      brandName = (meData.user && meData.user.brandName) || '';
+    }
+  } catch (e) {}
+  if (!brandName) brandName = userName ? `${userName} 사주` : '제일라 사주';
 
-  // 6부 구성 메타데이터
-  const PARTS = [
-    { title: 'PART 1. 본성과 성격', range: [0, 5] },
-    { title: 'PART 2. 커리어와 재물', range: [5, 11] },
-    { title: 'PART 3. 인간관계와 인연', range: [11, 17] },
-    { title: 'PART 4. 건강과 인생', range: [17, 22] },
-    { title: 'PART 5. 인생 굴곡과 운명', range: [22, 28] },
-    { title: 'PART 6. 2025년 월별 상세 운세', range: [28, 40] }
+  // PARTS 동적 생성 (현재 연도 반영, half면 PART 1~3만)
+  const currYear = new Date().getFullYear();
+  const ALL_PARTS = [
+    { title: 'PART 1. 본성과 성격', sub: 'Nature & Personality', range: [0, 5] },
+    { title: 'PART 2. 커리어와 재물', sub: 'Career & Wealth', range: [5, 11] },
+    { title: 'PART 3. 인간관계와 인연', sub: 'Relationships', range: [11, 17] },
+    { title: 'PART 4. 건강과 인생', sub: 'Health & Life', range: [17, 22] },
+    { title: 'PART 5. 인생 굴곡과 운명', sub: 'Destiny & Trials', range: [22, 28] },
+    { title: `PART 6. ${currYear}년 월별 상세 운세`, sub: 'Monthly Fortune', range: [28, 40] }
   ];
-  const KAKAO_LINK = 'https://open.kakao.com/o/sb05ouMh';
+  // half는 챕터 0~19까지만 있음 → PART 1, 2, 3 (0~5, 5~11, 11~17) + 그 이후 18~19는 PART 4 일부
+  const PARTS = isHalf
+    ? [
+        { title: 'PART 1. 본성과 성격', sub: 'Nature & Personality', range: [0, 5] },
+        { title: 'PART 2. 커리어와 재물', sub: 'Career & Wealth', range: [5, 11] },
+        { title: 'PART 3. 인간관계와 인연', sub: 'Relationships', range: [11, 17] },
+        { title: 'PART 4. 건강의 시작', sub: 'Health Basics', range: [17, 20] }
+      ]
+    : ALL_PARTS;
+
+  const totalChapters = currentChapters.length;
+  const estPages = isHalf ? 60 : 120;
 
   // === 표지 ===
   let html = `
     <div class="pdf-page pdf-cover">
+      <div style="font-size:11px;color:#b8860b;letter-spacing:6px;font-family:'Noto Sans KR',sans-serif;margin-bottom:24px;">${escapeHtml(brandName)}</div>
       <div class="em">☯</div>
       <h1>사주팔자</h1>
       <div class="sub">SAJU PALGWAE REPORT</div>
@@ -754,7 +900,46 @@ async function downloadPDF() {
       </div>
       <div class="ln"></div>
       <div style="font-size:13px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:30px;letter-spacing:2px;">
-        AI 종합 분석 · 40챕터 · 약 120페이지
+        AI 종합 분석 · ${totalChapters}챕터 · 약 ${estPages}페이지
+      </div>
+    </div>`;
+
+  // === 사주팔자 표 페이지 ===
+  html += `
+    <div class="pdf-page">
+      <div class="pdf-toc-title" style="font-size:26px;letter-spacing:6px;">사주팔자</div>
+      <div class="pdf-toc-sub">FOUR PILLARS</div>
+      <div class="pdf-toc-divider"></div>
+      <div style="margin:30px 0 20px;text-align:center;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:#7a6652;line-height:2;">
+        ${escapeHtml(currentUserInfo.name)} 님의 사주는 다음과 같이 구성됩니다.<br>
+        위는 <b style="color:#2c1810;">천간(天干)</b>, 아래는 <b style="color:#2c1810;">지지(地支)</b>입니다.
+      </div>
+      ${buildSajuTable(s)}
+      <div style="margin-top:40px;padding:20px 24px;background:rgba(184,134,11,0.08);border:1px solid #e0ceb4;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.95;color:#1a1209;">
+        <div style="font-weight:700;color:#2c1810;margin-bottom:10px;font-size:14px;">기본 정보</div>
+        · 일간(나 자신): <b>${s.dayMaster.korean}(${s.dayMaster.hanja}) · ${s.dayMaster.element}</b><br>
+        · 신강/신약: <b>${s.strength.label}</b> (${s.strength.ratio}%)<br>
+        · 용신(가장 필요한 기운): <b>${s.yongShin.element}</b><br>
+        · 띠: <b>${s.zodiac}</b>
+      </div>
+    </div>`;
+
+  // === 오행 막대그래프 페이지 ===
+  html += `
+    <div class="pdf-page">
+      <div class="pdf-toc-title" style="font-size:26px;letter-spacing:6px;">오행의 균형</div>
+      <div class="pdf-toc-sub">FIVE ELEMENTS BALANCE</div>
+      <div class="pdf-toc-divider"></div>
+      <div style="margin:30px 0;text-align:center;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:#7a6652;line-height:2;">
+        목·화·토·금·수 다섯 가지 기운의 분포를 보여줍니다.<br>
+        균형 잡힌 오행이 가장 좋고, 부족한 기운은 보충하는 것이 좋습니다.
+      </div>
+      <div style="margin:30px 0;">
+        ${buildElementBarSVG(s.elements)}
+      </div>
+      <div style="margin-top:30px;padding:18px 22px;background:rgba(184,134,11,0.08);border:1px solid #e0ceb4;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.95;color:#1a1209;">
+        <div style="font-weight:700;color:#2c1810;margin-bottom:8px;">분포 (개수 / 비율)</div>
+        목 ${s.elements.목}개 (${s.elementPercent.목}%) · 화 ${s.elements.화}개 (${s.elementPercent.화}%) · 토 ${s.elements.토}개 (${s.elementPercent.토}%) · 금 ${s.elements.금}개 (${s.elementPercent.금}%) · 수 ${s.elements.수}개 (${s.elementPercent.수}%)
       </div>
     </div>`;
 
@@ -775,44 +960,54 @@ async function downloadPDF() {
   tocHtml += `</div>`;
   html += tocHtml;
 
-  // === 챕터들 (중간 배너 포함) ===
-  const BANNER_AFTER = [9, 19, 29]; // 10, 20, 30번 챕터 뒤
-  currentChapters.forEach((c, i) => {
+  // === 챕터들 (PART 간지 + 자동 페이지 분할) ===
+  PARTS.forEach((part, partIdx) => {
+    // PART 간지 페이지
     html += `
-      <div class="pdf-page">
-        <div class="pdf-cnum">CHAPTER ${String(i+1).padStart(2,'0')}</div>
-        <div class="pdf-ctitle">${escapeHtml(c.title)}</div>
-        <div class="pdf-cline"></div>
-        <div class="pdf-cbody">${escapeHtml(c.content)}</div>
+      <div class="pdf-page" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+        <div style="font-size:80px;color:#b8860b;margin-bottom:30px;line-height:1;">☯</div>
+        <div style="font-size:18px;color:#b8860b;letter-spacing:8px;font-family:'Noto Sans KR',sans-serif;margin-bottom:20px;">PART ${partIdx + 1}</div>
+        <div class="pdf-toc-divider" style="width:140px;margin:10px auto 30px;"></div>
+        <div style="font-size:34px;color:#2c1810;font-weight:700;letter-spacing:6px;margin-bottom:14px;">
+          ${escapeHtml(part.title.replace(/^PART\s*\d+\.\s*/, ''))}
+        </div>
+        <div style="font-size:13px;color:#7a6652;letter-spacing:4px;font-family:'Noto Sans KR',sans-serif;">
+          ${escapeHtml(part.sub)}
+        </div>
+        <div class="pdf-toc-divider" style="width:140px;margin:30px auto 0;"></div>
       </div>`;
 
-    // 중간 배너
-    if (BANNER_AFTER.includes(i)) {
-      html += `
-        <div class="pdf-page">
-          <div style="padding-top:120px;text-align:center;">
-            <div style="font-size:60px;color:#b8860b;margin-bottom:24px;">☯</div>
-            <div class="pdf-toc-title" style="font-size:26px;letter-spacing:6px;">잠시, 쉬어가기</div>
-            <div class="pdf-toc-divider" style="margin:24px auto;"></div>
-          </div>
-          <div class="pdf-banner">
-            <h4>직접 상담받으러 가기</h4>
-            <p>사주에 대해 궁금한 점이 있으신가요?<br>
-            리포트를 읽다가 더 깊이 알고 싶은 부분이 있다면<br>
-            언제든 카카오 오픈채팅으로 문의해주세요.</p>
-            <div class="link">${KAKAO_LINK}</div>
-          </div>
-          <div style="font-size:12px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;text-align:center;margin-top:30px;line-height:1.9;">
-            다음 페이지부터 챕터 ${i+2}번이 이어집니다.
-          </div>
-        </div>`;
+    // PART 내 챕터들
+    for (let i = part.range[0]; i < part.range[1]; i++) {
+      const c = currentChapters[i];
+      if (!c) continue;
+      // 본문을 페이지 단위로 분할
+      const contentPages = splitContentIntoPages(c.content, PDF_CHARS_PER_PAGE);
+      contentPages.forEach((pageContent, pageIdx) => {
+        const isFirst = pageIdx === 0;
+        const isLast = pageIdx === contentPages.length - 1;
+        const continuedMark = !isFirst ? ' <span style="font-size:11px;color:#7a6652;">(이어서)</span>' : '';
+        html += `
+          <div class="pdf-page">
+            ${isFirst ? `
+              <div class="pdf-cnum">CHAPTER ${String(i+1).padStart(2,'0')}</div>
+              <div class="pdf-ctitle">${escapeHtml(c.title)}</div>
+              <div class="pdf-cline"></div>
+            ` : `
+              <div class="pdf-cnum">CHAPTER ${String(i+1).padStart(2,'0')}${continuedMark}</div>
+              <div style="font-size:18px;color:#7a6652;font-weight:600;margin-bottom:14px;">${escapeHtml(c.title)}</div>
+              <div class="pdf-cline"></div>
+            `}
+            <div class="pdf-cbody">${escapeHtml(pageContent)}</div>
+          </div>`;
+      });
     }
   });
 
   // === 엔딩 페이지 ===
   html += `
     <div class="pdf-page">
-      <div style="text-align:center;padding-top:50px;">
+      <div style="text-align:center;padding-top:60px;">
         <div style="font-size:50px;color:#b8860b;margin-bottom:20px;">☯</div>
         <div class="pdf-toc-title" style="font-size:26px;">리포트를 마치며</div>
         <div class="pdf-toc-divider" style="margin-top:20px;"></div>
@@ -824,18 +1019,14 @@ async function downloadPDF() {
         <br><br>
         사주는 타고난 기운의 지도와 같습니다. 같은 지도를 가지고도 어떻게 걸어가느냐에 따라 도착지는 달라집니다. 이 리포트를 참고 자료로 활용하시되, 결국 인생의 주인공은 본인임을 잊지 마시기 바랍니다.
       </div>
-      <div class="pdf-info-box">
-        <h3>💬 더 궁금한 점이 있으신가요?</h3>
-        <p>리포트를 읽고 궁금한 점이나 추가 상담이 필요하시면<br>카카오 오픈채팅으로 편하게 문의해주세요.</p>
-        <div class="link">${KAKAO_LINK}</div>
-      </div>
-      <div style="font-size:11px;color:#b8860b;font-family:'Noto Sans KR',sans-serif;text-align:center;margin-top:30px;letter-spacing:2px;">
-        — 이 리포트는 전통 명리학 + AI 기술로 제작되었습니다 —
+      <div style="margin-top:50px;padding:24px 28px;background:rgba(184,134,11,0.08);border:1px solid #b8860b;text-align:center;font-family:'Noto Sans KR',sans-serif;">
+        <div style="font-size:14px;color:#2c1810;font-weight:700;letter-spacing:3px;margin-bottom:10px;">${escapeHtml(brandName)}</div>
+        <div style="font-size:12px;color:#7a6652;line-height:1.9;">전통 명리학 + AI 기술로 제작된 프리미엄 사주 리포트</div>
       </div>
     </div>`;
 
   render.innerHTML = html;
-  await new Promise(r => setTimeout(r, 400));
+  await new Promise(r => setTimeout(r, 600));
 
   try {
     const { jsPDF } = window.jspdf;
@@ -843,15 +1034,40 @@ async function downloadPDF() {
     const pages = render.querySelectorAll('.pdf-page');
     for (let i = 0; i < pages.length; i++) {
       showStatus('dlStatus', `<span class="loader"></span>PDF ${i+1}/${pages.length} 페이지 생성 중...`, 'loading');
-      const canvas = await html2canvas(pages[i], { scale: 2, backgroundColor: '#f5ede0', useCORS: true });
+      // 실제 렌더된 사이즈 캡처 (잘림 방지)
+      const pageEl = pages[i];
+      const realW = pageEl.offsetWidth;
+      const realH = pageEl.scrollHeight;
+      const canvas = await html2canvas(pageEl, {
+        scale: 2,
+        backgroundColor: '#f5ede0',
+        useCORS: true,
+        width: realW,
+        height: realH,
+        windowWidth: realW,
+        windowHeight: realH
+      });
       const imgData = canvas.toDataURL('image/jpeg', 0.85);
       if (i > 0) pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+      // A4 비율 유지하면서 너비에 맞춰 꽉 채움
+      const pdfW = 210;
+      const pdfH = (canvas.height / canvas.width) * pdfW;
+      // 한 페이지에 다 안 들어가는 경우 (chapter 본문이 너무 길 때) - 자르거나 비례 축소
+      if (pdfH > 297) {
+        // 297mm에 맞춰 비율 축소 (이미 splitContentIntoPages로 잘랐기 때문에 거의 발생 안 함)
+        const scale = 297 / pdfH;
+        const adjW = pdfW * scale;
+        const adjH = 297;
+        pdf.addImage(imgData, 'JPEG', (210 - adjW) / 2, 0, adjW, adjH);
+      } else {
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+      }
     }
-    pdf.save(`사주분석_${currentUserInfo.name}.pdf`);
+    pdf.save(`사주분석_${currentUserInfo.name}_${isHalf ? '60p' : '120p'}.pdf`);
     showStatus('dlStatus', '✅ PDF 저장 완료!', 'ok');
   } catch (e) {
     showStatus('dlStatus', '❌ PDF 생성 실패: ' + e.message, 'err');
+    console.error(e);
   } finally {
     render.innerHTML = '';
     btn.disabled = false; btn.textContent = '↓ PDF 저장';

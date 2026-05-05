@@ -72,7 +72,9 @@ app.get('/api/me', requireUser, (req, res) => {
   res.json({ user: {
     id: user.id, name: user.name, status: user.status,
     isAdmin: !!user.is_admin, brandName: user.brand_name || '',
-    reviewToken: user.review_token, reportPrice: user.report_price || 0
+    reviewToken: user.review_token,
+    reportPrice: user.report_price || 0,
+    reportPriceHalf: user.report_price_half || 0
   }});
 });
 
@@ -84,7 +86,7 @@ app.post('/api/me/brand', requireUser, (req, res) => {
 
 // 리포트 가격 저장
 app.post('/api/me/price', requireUser, (req, res) => {
-  db.updateReportPrice(req.userId, req.body.price || 0);
+  db.updateReportPrice(req.userId, req.body.price || 0, req.body.priceHalf || 0);
   res.json({ ok: true });
 });
 
@@ -100,7 +102,7 @@ app.get('/api/stats', requireUser, (req, res) => {
 // ─── 리포트 생성 ───
 app.post('/api/generate', requireUser, async (req, res) => {
   try {
-    const { apiKey, name, gender, year, month, day, hour, minute, isLunar, timeUnknown, city } = req.body;
+    const { apiKey, name, gender, year, month, day, hour, minute, isLunar, timeUnknown, city, reportType } = req.body;
     if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: '올바른 OpenAI API 키를 입력해주세요' });
     if (!name || !year || !month || !day) return res.status(400).json({ error: '이름과 생년월일은 필수입니다' });
 
@@ -112,18 +114,20 @@ app.post('/api/generate', requireUser, async (req, res) => {
     });
 
     const userInfo = { name, gender: gender || '남성', saju, timeUnknown: !!timeUnknown, city: city || 'seoul' };
-    console.log(`[생성] user=${req.userId} ${name}`);
-    const chapters = await generateAllChapters(apiKey, userInfo);
+    const validType = (reportType === 'half') ? 'half' : 'full';
+    console.log(`[생성] user=${req.userId} ${name} type=${validType}`);
+    const chapters = await generateAllChapters(apiKey, userInfo, validType);
 
     let reportId = null;
     try {
       reportId = db.saveReport({
         userId: req.userId, clientName: name, clientGender: gender || '남성',
-        clientBirth: saju.solarDate, sajuData: saju, chapters
+        clientBirth: saju.solarDate, sajuData: saju, chapters,
+        reportType: validType
       });
     } catch (e) { console.error('DB 저장 실패:', e.message); }
 
-    res.json({ ok: true, userInfo, chapters, reportId });
+    res.json({ ok: true, userInfo, chapters, reportId, reportType: validType });
   } catch (e) {
     console.error('생성 오류:', e.message);
     res.status(500).json({ error: e.message });
@@ -193,7 +197,7 @@ app.post('/api/sessions/:id/chat', requireUser, async (req, res) => {
     const sessionId = parseInt(req.params.id);
     const { question, apiKey } = req.body;
     if (!question) return res.status(400).json({ error: '질문 비어있음' });
-    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI 키 필요' });
+    if (!apiKey) return res.status(400).json({ error: 'Gemini API 키가 필요합니다' });
 
     const session = db.getChatSession(sessionId, req.userId);
     if (!session) return res.status(404).json({ error: '세션 없음' });
@@ -283,7 +287,7 @@ app.post('/api/personal-consults/:id/chat', requireUser, async (req, res) => {
     const id = parseInt(req.params.id);
     const { question, apiKey } = req.body;
     if (!question) return res.status(400).json({ error: '질문이 비어있습니다' });
-    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI 키 필요' });
+    if (!apiKey) return res.status(400).json({ error: 'Gemini API 키가 필요합니다' });
 
     const consult = db.getPersonalConsult(id, req.userId);
     if (!consult) return res.status(404).json({ error: '없음' });
