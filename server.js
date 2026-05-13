@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
@@ -16,18 +16,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'home.html')));
 
-// 관리자 계정 초기화
+// 愿由ъ옄 怨꾩젙 珥덇린??
 db.ensureAdmin(ADMIN_PASSWORD);
 db.ensureReviewTokens();
 
-// ─── 세션 관리 (메모리) ───
-const sessions = new Map(); // token → { userId, isAdmin }
+// ??? ?몄뀡 愿由?(硫붾え由? ???
+const sessions = new Map(); // token ??{ userId, isAdmin }
 function makeToken() { return crypto.randomBytes(32).toString('hex'); }
 
 function requireUser(req, res, next) {
   const token = req.headers['x-auth-token'];
   const s = sessions.get(token);
-  if (!s || !s.userId) return res.status(401).json({ error: '로그인이 필요합니다' });
+  if (!s || !s.userId) return res.status(401).json({ error: '濡쒓렇?몄씠 ?꾩슂?⑸땲?? });
   req.userId = s.userId;
   req.isAdmin = s.isAdmin;
   next();
@@ -35,19 +35,19 @@ function requireUser(req, res, next) {
 function requireAdmin(req, res, next) {
   const token = req.headers['x-auth-token'];
   const s = sessions.get(token);
-  if (!s || !s.isAdmin) return res.status(403).json({ error: '관리자 권한 필요' });
+  if (!s || !s.isAdmin) return res.status(403).json({ error: '愿由ъ옄 沅뚰븳 ?꾩슂' });
   next();
 }
 
-// ─── 인증 ───
+// ??? ?몄쬆 ???
 app.post('/api/signup', (req, res) => {
   try {
     const { name, password, passwordConfirm } = req.body;
-    if (!name || !password) return res.status(400).json({ error: '이름과 비밀번호를 입력해주세요' });
-    if (password.length < 4) return res.status(400).json({ error: '비밀번호는 4자 이상이어야 합니다' });
-    if (password !== passwordConfirm) return res.status(400).json({ error: '비밀번호가 일치하지 않습니다' });
+    if (!name || !password) return res.status(400).json({ error: '?대쫫怨?鍮꾨?踰덊샇瑜??낅젰?댁＜?몄슂' });
+    if (password.length < 4) return res.status(400).json({ error: '鍮꾨?踰덊샇??4???댁긽?댁뼱???⑸땲?? });
+    if (password !== passwordConfirm) return res.status(400).json({ error: '鍮꾨?踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎' });
     const user = db.createUser(name, password);
-    res.json({ ok: true, message: '가입 신청이 완료되었습니다. 관리자 승인 후 이용 가능합니다.' });
+    res.json({ ok: true, message: '媛???좎껌???꾨즺?섏뿀?듬땲?? 愿由ъ옄 ?뱀씤 ???댁슜 媛?ν빀?덈떎.' });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
@@ -68,7 +68,7 @@ app.post('/api/logout', requireUser, (req, res) => {
 
 app.get('/api/me', requireUser, (req, res) => {
   const user = db.getUser(req.userId);
-  if (!user) return res.status(404).json({ error: '없음' });
+  if (!user) return res.status(404).json({ error: '?놁쓬' });
   res.json({ user: {
     id: user.id, name: user.name, status: user.status,
     isAdmin: !!user.is_admin, brandName: user.brand_name || '',
@@ -78,19 +78,19 @@ app.get('/api/me', requireUser, (req, res) => {
   }});
 });
 
-// 브랜드 이름 저장
+// 釉뚮옖???대쫫 ???
 app.post('/api/me/brand', requireUser, (req, res) => {
   db.updateBrandName(req.userId, req.body.brandName || '');
   res.json({ ok: true });
 });
 
-// 리포트 가격 저장
+// 由ы룷??媛寃????
 app.post('/api/me/price', requireUser, (req, res) => {
   db.updateReportPrice(req.userId, req.body.price || 0, req.body.priceHalf || 0);
   res.json({ ok: true });
 });
 
-// ─── 대시보드 통계 ───
+// ??? ??쒕낫???듦퀎 ???
 app.get('/api/stats', requireUser, (req, res) => {
   res.json({
     stats: db.getUserStats(req.userId),
@@ -99,37 +99,38 @@ app.get('/api/stats', requireUser, (req, res) => {
   });
 });
 
-// ─── 리포트 생성 ───
+// ??? 由ы룷???앹꽦 ???
 app.post('/api/generate', requireUser, async (req, res) => {
   try {
     const { apiKey, name, gender, year, month, day, hour, minute, isLunar, timeUnknown, city, reportType } = req.body;
-    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: '올바른 OpenAI API 키를 입력해주세요' });
-    if (!name || !year || !month || !day) return res.status(400).json({ error: '이름과 생년월일은 필수입니다' });
+    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: '?щ컮瑜?OpenAI API ?ㅻ? ?낅젰?댁＜?몄슂' });
+    if (!name || !year || !month || !day) return res.status(400).json({ error: '?대쫫怨??앸뀈?붿씪? ?꾩닔?낅땲?? });
 
     const saju = calculateSaju({
       year: parseInt(year), month: parseInt(month), day: parseInt(day),
       hour: hour === '' || hour == null ? 12 : parseInt(hour),
       minute: parseInt(minute) || 0,
-      isLunar: !!isLunar, gender: gender || '남성'
+      isLunar: !!isLunar, gender: gender || '?⑥꽦'
     });
 
-    const userInfo = { name, gender: gender || '남성', saju, timeUnknown: !!timeUnknown, city: city || 'seoul' };
-    const validType = (reportType === 'half') ? 'half' : 'full';
-    console.log(`[생성] user=${req.userId} ${name} type=${validType}`);
+    const userInfo = { name, gender: gender || '?⑥꽦', saju, timeUnknown: !!timeUnknown, city: city || 'seoul' };
+    const allowedReportTypes = ['yearly','deep','couple','love','marriage','money','full','half'];
+const validType = allowedReportTypes.includes(reportType) ? reportType : 'yearly';
+    console.log(`[?앹꽦] user=${req.userId} ${name} type=${validType}`);
     const chapters = await generateAllChapters(apiKey, userInfo, validType);
 
     let reportId = null;
     try {
       reportId = db.saveReport({
-        userId: req.userId, clientName: name, clientGender: gender || '남성',
+        userId: req.userId, clientName: name, clientGender: gender || '?⑥꽦',
         clientBirth: saju.solarDate, sajuData: saju, chapters,
         reportType: validType
       });
-    } catch (e) { console.error('DB 저장 실패:', e.message); }
+    } catch (e) { console.error('DB ????ㅽ뙣:', e.message); }
 
     res.json({ ok: true, userInfo, chapters, reportId, reportType: validType });
   } catch (e) {
-    console.error('생성 오류:', e.message);
+    console.error('?앹꽦 ?ㅻ쪟:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
@@ -137,20 +138,20 @@ app.post('/api/generate', requireUser, async (req, res) => {
 app.post('/api/regenerate', requireUser, async (req, res) => {
   try {
     const { apiKey, userInfo, index, instruction } = req.body;
-    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'API 키가 없습니다' });
+    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'API ?ㅺ? ?놁뒿?덈떎' });
     const chapter = await regenerateChapter(apiKey, userInfo, parseInt(index), instruction || '');
     res.json({ ok: true, chapter });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─── 내 리포트 목록 ───
+// ??? ??由ы룷??紐⑸줉 ???
 app.get('/api/reports', requireUser, (req, res) => {
   res.json({ reports: db.listUserReports(req.userId) });
 });
 
 app.get('/api/reports/:id', requireUser, (req, res) => {
   const report = db.getReport(parseInt(req.params.id), req.userId);
-  if (!report) return res.status(404).json({ error: '없음' });
+  if (!report) return res.status(404).json({ error: '?놁쓬' });
   res.json({ report });
 });
 
@@ -164,24 +165,24 @@ app.post('/api/reports/:id/memo', requireUser, (req, res) => {
   res.json({ ok: true });
 });
 
-// ─── 채팅 세션 ───
+// ??? 梨꾪똿 ?몄뀡 ???
 app.get('/api/sessions', requireUser, (req, res) => {
   res.json({ sessions: db.listUserSessions(req.userId) });
 });
 
 app.post('/api/sessions', requireUser, (req, res) => {
   const { reportId, title } = req.body;
-  if (!reportId) return res.status(400).json({ error: 'reportId 필요' });
+  if (!reportId) return res.status(400).json({ error: 'reportId ?꾩슂' });
   const report = db.getReport(parseInt(reportId), req.userId);
-  if (!report) return res.status(404).json({ error: '리포트 없음' });
+  if (!report) return res.status(404).json({ error: '由ы룷???놁쓬' });
   const sessionId = db.createChatSession(req.userId, parseInt(reportId),
-    title || `${report.client_name} 상담`);
+    title || `${report.client_name} ?곷떞`);
   res.json({ ok: true, sessionId });
 });
 
 app.get('/api/sessions/:id/messages', requireUser, (req, res) => {
   const session = db.getChatSession(parseInt(req.params.id), req.userId);
-  if (!session) return res.status(404).json({ error: '세션 없음' });
+  if (!session) return res.status(404).json({ error: '?몄뀡 ?놁쓬' });
   const messages = db.getMessages(session.id);
   const report = db.getReport(session.report_id, req.userId);
   res.json({ session, messages, report });
@@ -196,15 +197,15 @@ app.post('/api/sessions/:id/chat', requireUser, async (req, res) => {
   try {
     const sessionId = parseInt(req.params.id);
     const { question, apiKey } = req.body;
-    if (!question) return res.status(400).json({ error: '질문 비어있음' });
-    if (!apiKey) return res.status(400).json({ error: 'Gemini API 키가 필요합니다' });
+    if (!question) return res.status(400).json({ error: '吏덈Ц 鍮꾩뼱?덉쓬' });
+    if (!apiKey) return res.status(400).json({ error: 'Gemini API ?ㅺ? ?꾩슂?⑸땲?? });
 
     const session = db.getChatSession(sessionId, req.userId);
-    if (!session) return res.status(404).json({ error: '세션 없음' });
+    if (!session) return res.status(404).json({ error: '?몄뀡 ?놁쓬' });
     const report = db.getReport(session.report_id, req.userId);
-    if (!report) return res.status(404).json({ error: '리포트 없음' });
+    if (!report) return res.status(404).json({ error: '由ы룷???놁쓬' });
 
-    // 이전 메시지를 히스토리로 구성
+    // ?댁쟾 硫붿떆吏瑜??덉뒪?좊━濡?援ъ꽦
     const prevMessages = db.getMessages(sessionId);
     const history = [];
     for (let i = 0; i < prevMessages.length - 1; i += 2) {
@@ -218,12 +219,12 @@ app.post('/api/sessions/:id/chat', requireUser, async (req, res) => {
     db.addMessage(sessionId, 'assistant', answer);
     res.json({ ok: true, answer });
   } catch (e) {
-    console.error('채팅 오류:', e.message);
+    console.error('梨꾪똿 ?ㅻ쪟:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// ─── 개인 상담 ───
+// ??? 媛쒖씤 ?곷떞 ???
 app.get('/api/consult-categories', (req, res) => {
   const cats = Object.entries(CONSULT_CATEGORIES).map(([key, v]) => ({ key, title: v.title }));
   res.json({ categories: cats });
@@ -232,65 +233,65 @@ app.get('/api/consult-categories', (req, res) => {
 app.post('/api/personal-consult', requireUser, async (req, res) => {
   try {
     const { apiKey, name, gender, year, month, day, hour, minute, isLunar, category, length } = req.body;
-    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI API 키를 입력해주세요' });
-    if (!name || !year || !month || !day) return res.status(400).json({ error: '이름과 생년월일은 필수입니다' });
-    if (!category) return res.status(400).json({ error: '상담 분야를 선택해주세요' });
+    if (!apiKey || !apiKey.startsWith('sk-')) return res.status(400).json({ error: 'OpenAI API ?ㅻ? ?낅젰?댁＜?몄슂' });
+    if (!name || !year || !month || !day) return res.status(400).json({ error: '?대쫫怨??앸뀈?붿씪? ?꾩닔?낅땲?? });
+    if (!category) return res.status(400).json({ error: '?곷떞 遺꾩빞瑜??좏깮?댁＜?몄슂' });
 
     const saju = calculateSaju({
       year: parseInt(year), month: parseInt(month), day: parseInt(day),
       hour: hour === '' || hour == null ? 12 : parseInt(hour),
       minute: parseInt(minute) || 0,
-      isLunar: !!isLunar, gender: gender || '남성'
+      isLunar: !!isLunar, gender: gender || '?⑥꽦'
     });
 
     const result = await personalConsult({
       apiKey, saju, category,
-      clientName: name, clientGender: gender || '남성',
+      clientName: name, clientGender: gender || '?⑥꽦',
       length
     });
 
-    // DB 저장
+    // DB ???
     const consultId = db.createPersonalConsult({
       userId: req.userId,
       clientName: name,
-      clientGender: gender || '남성',
+      clientGender: gender || '?⑥꽦',
       sajuData: saju,
       category,
       initialResult: result.content
     });
-    // 첫 메시지로 초기 결과 저장
+    // 泥?硫붿떆吏濡?珥덇린 寃곌낵 ???
     db.addPersonalMessage(consultId, 'assistant', result.content);
 
     res.json({ ok: true, result, saju, consultId });
   } catch (e) {
-    console.error('개인상담 오류:', e.message);
+    console.error('媛쒖씤?곷떞 ?ㅻ쪟:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// 개인상담 목록
+// 媛쒖씤?곷떞 紐⑸줉
 app.get('/api/personal-consults', requireUser, (req, res) => {
   res.json({ consults: db.listPersonalConsults(req.userId) });
 });
 
-// 개인상담 불러오기 (이전 대화 포함)
+// 媛쒖씤?곷떞 遺덈윭?ㅺ린 (?댁쟾 ????ы븿)
 app.get('/api/personal-consults/:id', requireUser, (req, res) => {
   const consult = db.getPersonalConsult(parseInt(req.params.id), req.userId);
-  if (!consult) return res.status(404).json({ error: '없음' });
+  if (!consult) return res.status(404).json({ error: '?놁쓬' });
   const messages = db.getPersonalMessages(consult.id);
   res.json({ consult, messages });
 });
 
-// 개인상담 후속 질문
+// 媛쒖씤?곷떞 ?꾩냽 吏덈Ц
 app.post('/api/personal-consults/:id/chat', requireUser, async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { question, apiKey } = req.body;
-    if (!question) return res.status(400).json({ error: '질문이 비어있습니다' });
-    if (!apiKey) return res.status(400).json({ error: 'Gemini API 키가 필요합니다' });
+    if (!question) return res.status(400).json({ error: '吏덈Ц??鍮꾩뼱?덉뒿?덈떎' });
+    if (!apiKey) return res.status(400).json({ error: 'Gemini API ?ㅺ? ?꾩슂?⑸땲?? });
 
     const consult = db.getPersonalConsult(id, req.userId);
-    if (!consult) return res.status(404).json({ error: '없음' });
+    if (!consult) return res.status(404).json({ error: '?놁쓬' });
     const history = db.getPersonalMessages(id);
 
     const answer = await personalConsultFollowup({
@@ -308,38 +309,38 @@ app.post('/api/personal-consults/:id/chat', requireUser, async (req, res) => {
     db.addPersonalMessage(id, 'assistant', answer);
     res.json({ ok: true, answer });
   } catch (e) {
-    console.error('후속 상담 오류:', e.message);
+    console.error('?꾩냽 ?곷떞 ?ㅻ쪟:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// 개인상담 삭제
+// 媛쒖씤?곷떞 ??젣
 app.delete('/api/personal-consults/:id', requireUser, (req, res) => {
   db.deletePersonalConsult(parseInt(req.params.id), req.userId);
   res.json({ ok: true });
 });
 
-// ─── 무료 사주 (스레드용) ───
-// 텍스트에서 생년월일/시간/성별 파싱
+// ??? 臾대즺 ?ъ＜ (?ㅻ젅?쒖슜) ???
+// ?띿뒪?몄뿉???앸뀈?붿씪/?쒓컙/?깅퀎 ?뚯떛
 function parseTextInfo(text) {
   if (!text) return {};
   const result = {};
 
-  // 이름 추출 (앞쪽 짧은 단어 or "이름:" 패턴)
-  const nameMatch = text.match(/이름[:\s]*([가-힣]{2,5})/) || text.match(/^([가-힣]{2,4})(?:\s|,|입니다)/);
+  // ?대쫫 異붿텧 (?욎そ 吏㏃? ?⑥뼱 or "?대쫫:" ?⑦꽩)
+  const nameMatch = text.match(/?대쫫[:\s]*([媛-??{2,5})/) || text.match(/^([媛-??{2,4})(?:\s|,|?낅땲??/);
   if (nameMatch) result.name = nameMatch[1];
 
-  // 성별
-  if (/여자|여성|여/.test(text) && !/남/.test(text)) result.gender = '여성';
-  else if (/남자|남성|남/.test(text) && !/여/.test(text)) result.gender = '남성';
-  else result.gender = '남성';
+  // ?깅퀎
+  if (/?ъ옄|?ъ꽦|??.test(text) && !/??.test(text)) result.gender = '?ъ꽦';
+  else if (/?⑥옄|?⑥꽦|??.test(text) && !/??.test(text)) result.gender = '?⑥꽦';
+  else result.gender = '?⑥꽦';
 
-  // 양음력
-  result.isLunar = /음력/.test(text);
+  // ?묒쓬??
+  result.isLunar = /?뚮젰/.test(text);
 
-  // 생년월일 (여러 패턴)
-  // 2000년 5월 15일 / 2000.05.15 / 20000515 / 2000-05-15
-  let m = text.match(/(\d{4})[년.\-\/\s]+(\d{1,2})[월.\-\/\s]+(\d{1,2})/);
+  // ?앸뀈?붿씪 (?щ윭 ?⑦꽩)
+  // 2000??5??15??/ 2000.05.15 / 20000515 / 2000-05-15
+  let m = text.match(/(\d{4})[??\-\/\s]+(\d{1,2})[??\-\/\s]+(\d{1,2})/);
   if (!m) m = text.match(/(\d{4})(\d{2})(\d{2})/);
   if (m) {
     result.year = parseInt(m[1]);
@@ -347,30 +348,30 @@ function parseTextInfo(text) {
     result.day = parseInt(m[3]);
   }
 
-  // 시간 (오전/오후 포함)
-  const timeMatch = text.match(/(오전|오후)?\s*(\d{1,2})[시:](\d{0,2})?/);
+  // ?쒓컙 (?ㅼ쟾/?ㅽ썑 ?ы븿)
+  const timeMatch = text.match(/(?ㅼ쟾|?ㅽ썑)?\s*(\d{1,2})[??](\d{0,2})?/);
   if (timeMatch) {
     let h = parseInt(timeMatch[2]);
-    if (timeMatch[1] === '오후' && h < 12) h += 12;
-    if (timeMatch[1] === '오전' && h === 12) h = 0;
+    if (timeMatch[1] === '?ㅽ썑' && h < 12) h += 12;
+    if (timeMatch[1] === '?ㅼ쟾' && h === 12) h = 0;
     if (h >= 0 && h <= 23) {
       result.hour = h;
       result.minute = timeMatch[3] ? parseInt(timeMatch[3]) : 0;
     }
   }
 
-  // 시간모름
-  if (/시간\s*모름|시간\s*몰라|몇시|몇\s*시/.test(text)) {
+  // ?쒓컙紐⑤쫫
+  if (/?쒓컙\s*紐⑤쫫|?쒓컙\s*紐곕씪|紐뉗떆|紐?s*??.test(text)) {
     result.timeUnknown = true;
   }
 
-  // 질문 추출 (생년월일 다음에 나오는 긴 문장)
-  const qMatch = text.match(/[?？!]([^?？!]{10,})/) || null;
-  // 또는 전체 텍스트에서 질문스러운 부분
-  const questionKeywords = /올해|내년|언제|어떻게|어떨|결혼|연애|취업|이직|돈|재물|건강|궁금|봐줘|봐주세요|해줘/;
+  // 吏덈Ц 異붿텧 (?앸뀈?붿씪 ?ㅼ쓬???섏삤??湲?臾몄옣)
+  const qMatch = text.match(/[?竊?]([^?竊?]{10,})/) || null;
+  // ?먮뒗 ?꾩껜 ?띿뒪?몄뿉??吏덈Ц?ㅻ윭??遺遺?
+  const questionKeywords = /?ы빐|?대뀈|?몄젣|?대뼸寃??대뼥|寃고샎|?곗븷|痍⑥뾽|?댁쭅|???щЪ|嫄닿컯|沅곴툑|遊먯쨾|遊먯＜?몄슂|?댁쨾/;
   if (questionKeywords.test(text)) {
-    // 마지막 문장들 중 질문 추출
-    result.question = text.slice(-300).replace(/\d{4}[년.\-\/][^.]*/, '').trim();
+    // 留덉?留?臾몄옣??以?吏덈Ц 異붿텧
+    result.question = text.slice(-300).replace(/\d{4}[??\-\/][^.]*/, '').trim();
   }
 
   return result;
@@ -384,14 +385,14 @@ app.post('/api/free-reading/parse', requireUser, (req, res) => {
 app.post('/api/free-reading/generate', requireUser, async (req, res) => {
   try {
     const { apiKey, name, gender, year, month, day, hour, minute, isLunar, timeUnknown, question, length } = req.body;
-    if (!apiKey) return res.status(400).json({ error: 'Gemini API 키 필요' });
-    if (!year || !month || !day) return res.status(400).json({ error: '생년월일이 필요합니다' });
+    if (!apiKey) return res.status(400).json({ error: 'Gemini API ???꾩슂' });
+    if (!year || !month || !day) return res.status(400).json({ error: '?앸뀈?붿씪???꾩슂?⑸땲?? });
 
     const saju = calculateSaju({
       year: parseInt(year), month: parseInt(month), day: parseInt(day),
       hour: timeUnknown || hour === '' || hour == null ? 12 : parseInt(hour),
       minute: parseInt(minute) || 0,
-      isLunar: !!isLunar, gender: gender || '남성'
+      isLunar: !!isLunar, gender: gender || '?⑥꽦'
     });
 
     const content = await freeThreadReading({
@@ -402,26 +403,26 @@ app.post('/api/free-reading/generate', requireUser, async (req, res) => {
     });
     res.json({ ok: true, content, saju });
   } catch (e) {
-    console.error('무료사주 오류:', e.message);
+    console.error('臾대즺?ъ＜ ?ㅻ쪟:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// ─── 홍보 스니펫 ───
+// ??? ?띾낫 ?ㅻ땲?????
 app.get('/api/promo-snippets', requireUser, (req, res) => {
   res.json({ snippets: db.listPromoSnippets(req.userId) });
 });
 
 app.post('/api/promo-snippets', requireUser, (req, res) => {
   const { title, link, text, linkPosition } = req.body;
-  if (!title || !text) return res.status(400).json({ error: '제목과 내용은 필수입니다' });
+  if (!title || !text) return res.status(400).json({ error: '?쒕ぉ怨??댁슜? ?꾩닔?낅땲?? });
   const id = db.createPromoSnippet(req.userId, title, link || '', text, linkPosition || 'below');
   res.json({ ok: true, id });
 });
 
 app.put('/api/promo-snippets/:id', requireUser, (req, res) => {
   const { title, link, text, linkPosition } = req.body;
-  if (!title || !text) return res.status(400).json({ error: '제목과 내용은 필수입니다' });
+  if (!title || !text) return res.status(400).json({ error: '?쒕ぉ怨??댁슜? ?꾩닔?낅땲?? });
   db.updatePromoSnippet(parseInt(req.params.id), req.userId, title, link || '', text, linkPosition || 'below');
   res.json({ ok: true });
 });
@@ -431,12 +432,12 @@ app.delete('/api/promo-snippets/:id', requireUser, (req, res) => {
   res.json({ ok: true });
 });
 
-// ─── 후기 (공개 - 로그인 불필요) ───
+// ??? ?꾧린 (怨듦컻 - 濡쒓렇??遺덊븘?? ???
 app.get('/api/review-info/:token', (req, res) => {
   const user = db.getUserByReviewToken(req.params.token);
-  if (!user) return res.status(404).json({ error: '유효하지 않은 링크입니다' });
+  if (!user) return res.status(404).json({ error: '?좏슚?섏? ?딆? 留곹겕?낅땲?? });
   res.json({
-    brandName: user.brand_name || `${user.name}사주`,
+    brandName: user.brand_name || `${user.name}?ъ＜`,
     ownerName: user.name
   });
 });
@@ -444,19 +445,19 @@ app.get('/api/review-info/:token', (req, res) => {
 app.post('/api/review-submit/:token', (req, res) => {
   try {
     const user = db.getUserByReviewToken(req.params.token);
-    if (!user) return res.status(404).json({ error: '유효하지 않은 링크입니다' });
+    if (!user) return res.status(404).json({ error: '?좏슚?섏? ?딆? 留곹겕?낅땲?? });
     const { writerName, rating, content } = req.body;
-    if (!writerName || !writerName.trim()) return res.status(400).json({ error: '이름을 입력해주세요' });
-    if (!rating || rating < 1 || rating > 5) return res.status(400).json({ error: '별점을 선택해주세요' });
-    if (!content || !content.trim()) return res.status(400).json({ error: '후기 내용을 입력해주세요' });
-    if (writerName.length > 20) return res.status(400).json({ error: '이름은 20자 이내로 입력해주세요' });
-    if (content.length > 1000) return res.status(400).json({ error: '후기는 1000자 이내로 입력해주세요' });
+    if (!writerName || !writerName.trim()) return res.status(400).json({ error: '?대쫫???낅젰?댁＜?몄슂' });
+    if (!rating || rating < 1 || rating > 5) return res.status(400).json({ error: '蹂꾩젏???좏깮?댁＜?몄슂' });
+    if (!content || !content.trim()) return res.status(400).json({ error: '?꾧린 ?댁슜???낅젰?댁＜?몄슂' });
+    if (writerName.length > 20) return res.status(400).json({ error: '?대쫫? 20???대궡濡??낅젰?댁＜?몄슂' });
+    if (content.length > 1000) return res.status(400).json({ error: '?꾧린??1000???대궡濡??낅젰?댁＜?몄슂' });
     db.createReview(user.id, writerName.trim(), parseInt(rating), content.trim());
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─── 내 후기 관리 ───
+// ??? ???꾧린 愿由????
 app.get('/api/my/reviews', requireUser, (req, res) => {
   res.json({
     reviews: db.listUserReviews(req.userId),
@@ -469,7 +470,7 @@ app.delete('/api/my/reviews/:id', requireUser, (req, res) => {
   res.json({ ok: true });
 });
 
-// ─── 총관리자 ───
+// ??? 珥앷?由ъ옄 ???
 app.get('/api/admin/users', requireAdmin, (req, res) => {
   res.json({ users: db.listAllUsers() });
 });
@@ -497,6 +498,7 @@ app.delete('/api/admin/users/:id', requireAdmin, (req, res) => {
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 app.listen(PORT, () => {
-  console.log(`🔮 제일라 사주 AI 플랫폼: http://localhost:${PORT}`);
-  console.log(`👤 총관리자: 김가영 (비밀번호는 Railway Variables에서 관리)`);
+  console.log(`?뵰 ?쒖씪???ъ＜ AI ?뚮옯?? http://localhost:${PORT}`);
+  console.log(`?뫀 珥앷?由ъ옄: 源媛??(鍮꾨?踰덊샇??Railway Variables?먯꽌 愿由?`);
 });
+
