@@ -1,7 +1,7 @@
-{
+﻿{
   "name": "saju-v2",
   "version": "2.0.0",
-  "description": "사주 리포트 + 상담 관리",
+  "description": "?ъ＜ 由ы룷??+ ?곷떞 愿由?,
   "main": "server.js",
   "scripts": { "start": "node server.js" },
   "dependencies": {
@@ -11,5 +11,6 @@
     "better-sqlite3": "^11.3.0",
     "dotenv": "^16.4.5"
   },
-  "engines": { "node": ">=18" }
+  "engines": { "node": "20.x" }
 }
+
