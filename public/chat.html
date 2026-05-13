@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI ?곷떞 梨꾪똿</title>
+<title>AI 상담 채팅</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root { --ink:#1a1209; --gold:#b8860b; --gold-l:#d4a843; --parchment:#f5ede0;
@@ -12,7 +12,7 @@
   html, body { height: 100%; font-family: 'Noto Sans KR', sans-serif; background: var(--parchment); color: var(--ink); }
   body { display: flex; flex-direction: column; }
 
-  /* ?곷떒 ?ㅻ뜑 */
+  /* 상단 헤더 */
   .hdr { display: flex; justify-content: space-between; align-items: center;
     padding: 12px 20px; background: rgba(255,253,248,0.95); border-bottom: 1px solid var(--parch-d); }
   .hdr .ttl { font-weight: 700; color: var(--deep); letter-spacing: 2px; }
@@ -20,10 +20,10 @@
     padding: 6px 12px; font-size: 12px; font-family: inherit; cursor: pointer; }
   .menu-btn { display: none; }
 
-  /* 硫붿씤 ?덉씠?꾩썐 */
+  /* 메인 레이아웃 */
   .main { flex: 1; display: grid; grid-template-columns: 280px 1fr; min-height: 0; }
 
-  /* ?ъ씠?쒕컮 */
+  /* 사이드바 */
   .side { background: rgba(255,253,248,0.7); border-right: 1px solid var(--parch-d);
     display: flex; flex-direction: column; min-height: 0; }
   .side-top { padding: 14px; border-bottom: 1px solid var(--parch-d); }
@@ -42,10 +42,10 @@
   .session-item .del:hover { color: var(--accent); }
   .side-empty { text-align: center; padding: 30px 20px; color: var(--muted); font-size: 12px; line-height: 1.7; }
 
-  /* 梨꾪똿 硫붿씤 而⑦뀒?대꼫 (outer) */
+  /* 채팅 메인 컨테이너 (outer) */
   .chat-main { display: flex; flex-direction: column; min-height: 0; position: relative; }
 
-  /* 梨꾪똿 ?붾㈃ (inner - chatView) */
+  /* 채팅 화면 (inner - chatView) */
   .chat { display: flex; flex-direction: column; min-height: 0; flex: 1; height: 100%; }
   .chat-info { padding: 12px 20px; background: rgba(255,253,248,0.5); border-bottom: 1px solid var(--parch-d);
     font-size: 12px; color: var(--muted); }
@@ -63,7 +63,7 @@
     color: var(--muted); padding: 3px 10px; font-size: 11px; font-family: inherit; cursor: pointer; }
   .msg .copy:hover { border-color: var(--gold); color: var(--deep); }
 
-  /* ?낅젰李?*/
+  /* 입력창 */
   .input-box { padding: 16px 20px; background: rgba(255,253,248,0.9); border-top: 1px solid var(--parch-d); }
   .input-row { display: flex; gap: 10px; align-items: flex-end; }
   textarea { flex: 1; border: 1px solid var(--parch-d); background: rgba(255,255,255,0.8);
@@ -75,7 +75,7 @@
     letter-spacing: 1px; font-size: 13px; }
   .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* 由ы룷???좏깮 ?붾㈃ */
+  /* 리포트 선택 화면 */
   .picker { flex: 1; overflow-y: auto; padding: 30px; }
   .picker h2 { font-family: 'Noto Serif KR', serif; font-size: 20px; color: var(--deep);
     text-align: center; margin-bottom: 8px; letter-spacing: 2px; }
@@ -89,7 +89,7 @@
   .report-card .arrow { color: var(--gold); font-size: 20px; }
   .empty-msg { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; line-height: 1.9; }
 
-  /* ?곗뺨 */
+  /* 웰컴 */
   .welcome { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column;
     color: var(--muted); text-align: center; padding: 40px; }
   .welcome .big { font-size: 48px; color: var(--gold); margin-bottom: 16px; }
@@ -159,7 +159,7 @@
     .hdr button { font-size: 11px; padding: 5px 10px; }
     .report-card { padding: 14px 16px; }
     .picker h2 { font-size: 17px; }
-    /* ?ъ씠?쒕컮 ?몃? ?대┃ ???リ린 ?꾪븳 ?ㅻ쾭?덉씠 */
+    /* 사이드바 외부 클릭 시 닫기 위한 오버레이 */
     .side.open::before {
       content: '';
       position: fixed;
@@ -179,46 +179,46 @@ if (!localStorage.getItem('auth_token')) location.href = '/';
 </script>
 
 <div class="hdr">
-  <div class="ttl">?뮠 AI ?곷떞 梨꾪똿</div>
+  <div class="ttl">💬 AI 상담 채팅</div>
   <div>
-    <button class="menu-btn" onclick="toggleSide()">??/button>
-    <button onclick="location.href='/'">????쒕낫??/button>
+    <button class="menu-btn" onclick="toggleSide()">☰</button>
+    <button onclick="location.href='/'">← 대시보드</button>
   </div>
 </div>
 
 <div class="main">
-  <!-- ?ъ씠?쒕컮 -->
+  <!-- 사이드바 -->
   <div class="side" id="side">
     <div class="side-top">
-      <button class="new-btn" onclick="showPicker()">+ ?????/button>
+      <button class="new-btn" onclick="showPicker()">+ 새 대화</button>
     </div>
     <div class="session-list" id="sessionList"></div>
   </div>
 
-  <!-- 硫붿씤 -->
+  <!-- 메인 -->
   <div class="chat-main">
-    <!-- 由ы룷???좏깮 -->
+    <!-- 리포트 선택 -->
     <div class="picker hidden" id="pickerView">
-      <h2>?곷떞???ъ＜ ?좏깮</h2>
-      <div class="sub">?대? ?앹꽦??由ы룷?몃? ?좏깮?섎㈃ AI媛 洹??ъ＜濡??곷떞??吏꾪뻾?⑸땲??/div>
+      <h2>상담할 사주 선택</h2>
+      <div class="sub">이미 생성한 리포트를 선택하면 AI가 그 사주로 상담을 진행합니다</div>
       <div class="reports" id="reportList"></div>
     </div>
 
-    <!-- ?곗뺨 -->
+    <!-- 웰컴 -->
     <div class="welcome" id="welcomeView">
-      <div class="big">??/div>
-      <h3>AI ?곷떞 梨꾪똿</h3>
-      <p>醫뚯륫?먯꽌 ??붾? ?좏깮?섍굅??br>"+ ?????瑜??뚮윭 ?쒖옉?섏꽭??/p>
+      <div class="big">☯</div>
+      <h3>AI 상담 채팅</h3>
+      <p>좌측에서 대화를 선택하거나<br>"+ 새 대화"를 눌러 시작하세요</p>
     </div>
 
-    <!-- 梨꾪똿 ?붾㈃ -->
+    <!-- 채팅 화면 -->
     <div class="chat hidden" id="chatView">
       <div class="chat-info" id="chatInfo"></div>
       <div class="msgs" id="msgsBox"></div>
       <div class="input-box">
         <div class="input-row">
-          <textarea id="msgInput" placeholder="吏덈Ц???낅젰?섏꽭??.." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
-          <button class="send-btn" id="sendBtn" onclick="sendMsg()">?꾩넚</button>
+          <textarea id="msgInput" placeholder="질문을 입력하세요..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMsg()">전송</button>
         </div>
       </div>
     </div>
@@ -242,15 +242,15 @@ async function loadSessions() {
   const { sessions } = await res.json();
   const box = document.getElementById('sessionList');
   if (!sessions.length) {
-    box.innerHTML = '<div class="side-empty">?꾩쭅 ??붽? ?놁뒿?덈떎<br>+ ????붾? ?뚮윭 ?쒖옉?섏꽭??/div>';
+    box.innerHTML = '<div class="side-empty">아직 대화가 없습니다<br>+ 새 대화를 눌러 시작하세요</div>';
     return;
   }
   box.innerHTML = sessions.map(s => {
     const d = new Date(s.updated_at).toLocaleDateString('ko-KR');
     return `<div class="session-item ${s.id === currentSessionId ? 'active' : ''}" onclick="openSession(${s.id})">
-      <button class="del" onclick="event.stopPropagation();delSession(${s.id})">횞</button>
+      <button class="del" onclick="event.stopPropagation();delSession(${s.id})">×</button>
       <div class="st">${escapeHtml(s.title)}</div>
-      <div class="sm">${s.msg_count || 0}媛?쨌 ${d}</div>
+      <div class="sm">${s.msg_count || 0}개 · ${d}</div>
     </div>`;
   }).join('');
 }
@@ -267,7 +267,7 @@ async function showPicker() {
   const { reports } = await res.json();
   const box = document.getElementById('reportList');
   if (!reports.length) {
-    box.innerHTML = '<div class="empty-msg">?앹꽦??由ы룷?멸? ?놁뒿?덈떎<br>癒쇱? <b>?ъ＜ 由ы룷??留뚮뱾湲?/b>?먯꽌 由ы룷?몃? ?앹꽦?댁＜?몄슂</div>';
+    box.innerHTML = '<div class="empty-msg">생성된 리포트가 없습니다<br>먼저 <b>사주 리포트 만들기</b>에서 리포트를 생성해주세요</div>';
     return;
   }
   box.innerHTML = reports.map(r => {
@@ -275,9 +275,9 @@ async function showPicker() {
     return `<div class="report-card" onclick="createSession(${r.id})">
       <div>
         <div class="nm">${escapeHtml(r.client_name)} (${escapeHtml(r.client_gender || '')})</div>
-        <div class="mt">${escapeHtml(r.client_birth || '')} 쨌 ${d}</div>
+        <div class="mt">${escapeHtml(r.client_birth || '')} · ${d}</div>
       </div>
-      <div class="arrow">??/div>
+      <div class="arrow">→</div>
     </div>`;
   }).join('');
   loadSessions();
@@ -305,7 +305,7 @@ async function openSession(sessionId) {
 
   const s = report.saju_data;
   document.getElementById('chatInfo').innerHTML =
-    `?뱥 <b>${escapeHtml(report.client_name)}</b> (${escapeHtml(report.client_gender || '')}) 쨌 ${escapeHtml(s.fullKorean || '')} 쨌 ?쇨컙 ${s.dayMaster?.korean || ''}`;
+    `📋 <b>${escapeHtml(report.client_name)}</b> (${escapeHtml(report.client_gender || '')}) · ${escapeHtml(s.fullKorean || '')} · 일간 ${s.dayMaster?.korean || ''}`;
 
   renderMessages(messages);
   loadSessions();
@@ -315,7 +315,7 @@ async function openSession(sessionId) {
 function renderMessages(messages) {
   const box = document.getElementById('msgsBox');
   if (!messages.length) {
-    box.innerHTML = '<div class="welcome" style="height:100%;"><div class="big">?뮠</div><h3>???곷떞 ?쒖옉</h3><p>?꾨옒??吏덈Ц???낅젰???곷떞???쒖옉?섏꽭??/p></div>';
+    box.innerHTML = '<div class="welcome" style="height:100%;"><div class="big">💬</div><h3>새 상담 시작</h3><p>아래에 질문을 입력해 상담을 시작하세요</p></div>';
     return;
   }
   box.innerHTML = messages.map(m => {
@@ -323,7 +323,7 @@ function renderMessages(messages) {
     if (m.role === 'user') {
       return `<div class="msg user"><div class="bub">${escapeHtml(m.content)}</div><div class="time">${t}</div></div>`;
     } else {
-      return `<div class="msg ai"><div class="bub">${escapeHtml(m.content)}</div><div class="time">${t} <button class="copy" onclick="copyText(\`${m.content.replace(/`/g,'\\`').replace(/\$/g,'\\$')}\`)">蹂듭궗</button></div></div>`;
+      return `<div class="msg ai"><div class="bub">${escapeHtml(m.content)}</div><div class="time">${t} <button class="copy" onclick="copyText(\`${m.content.replace(/`/g,'\\`').replace(/\$/g,'\\$')}\`)">복사</button></div></div>`;
     }
   }).join('');
   box.scrollTop = box.scrollHeight;
@@ -331,27 +331,27 @@ function renderMessages(messages) {
 
 function copyText(text) {
   navigator.clipboard.writeText(text);
-  alert('蹂듭궗?섏뿀?듬땲??);
+  alert('복사되었습니다');
 }
 
 async function sendMsg() {
-  if (!currentSessionId) { alert('먼저 대화를 선택하세요'); return; }
+  if (!currentSessionId) return;
   const input = document.getElementById('msgInput');
   const question = input.value.trim();
   if (!question) return;
 
   const apiKey = localStorage.getItem('gemini_api_key_' + userName);
-  if (!apiKey) { alert('??쒕낫?쒖뿉??Gemini API ?ㅻ? 癒쇱? ??ν빐二쇱꽭??n(梨꾪똿? 臾대즺 Gemini瑜??ъ슜?⑸땲??'); return; }
+  if (!apiKey) { alert('대시보드에서 Gemini API 키를 먼저 저장해주세요\n(채팅은 무료 Gemini를 사용합니다)'); return; }
 
   const btn = document.getElementById('sendBtn');
-  btn.disabled = true; btn.textContent = '?꾩넚 以?;
+  btn.disabled = true; btn.textContent = '전송 중';
   input.value = '';
 
-  // 利됱떆 ?좎? 硫붿떆吏 ?쒖떆
+  // 즉시 유저 메시지 표시
   const box = document.getElementById('msgsBox');
   const now = new Date().toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'});
   box.insertAdjacentHTML('beforeend', `<div class="msg user"><div class="bub">${escapeHtml(question)}</div><div class="time">${now}</div></div>`);
-  box.insertAdjacentHTML('beforeend', `<div class="msg ai" id="loadingMsg"><div class="bub"><span class="loading-dots">?듬? ?앹꽦 以?/span></div></div>`);
+  box.insertAdjacentHTML('beforeend', `<div class="msg ai" id="loadingMsg"><div class="bub"><span class="loading-dots">답변 생성 중</span></div></div>`);
   box.scrollTop = box.scrollHeight;
 
   try {
@@ -359,23 +359,23 @@ async function sendMsg() {
       method: 'POST', body: JSON.stringify({ question, apiKey })
     });
     const json = await res.json();
-    if (!res.ok) throw new Error(json.error || '?ㅻ쪟');
+    if (!res.ok) throw new Error(json.error || '오류');
 
-    // 濡쒕뵫 硫붿떆吏 ?쒓굅 ???덈줈 ?뚮뜑
+    // 로딩 메시지 제거 후 새로 렌더
     const msgRes = await api('/api/sessions/' + currentSessionId + '/messages');
     const { messages } = await msgRes.json();
     renderMessages(messages);
     loadSessions();
   } catch (e) {
     document.getElementById('loadingMsg')?.remove();
-    alert('?ㅻ쪟: ' + e.message);
+    alert('오류: ' + e.message);
   } finally {
-    btn.disabled = false; btn.textContent = '?꾩넚';
+    btn.disabled = false; btn.textContent = '전송';
   }
 }
 
 async function delSession(id) {
-  if (!confirm('????붾? ??젣?좉퉴??')) return;
+  if (!confirm('이 대화를 삭제할까요?')) return;
   await api('/api/sessions/' + id, { method: 'DELETE' });
   if (currentSessionId === id) {
     currentSessionId = null;
@@ -386,10 +386,10 @@ async function delSession(id) {
   loadSessions();
 }
 
-// 珥덇린??
+// 초기화
 loadSessions();
 
-// URL ?뚮씪誘명꽣濡??몄뀡 吏??(??쒕낫?쒖뿉??諛붾줈 ?대룞)
+// URL 파라미터로 세션 지정 (대시보드에서 바로 이동)
 const params = new URLSearchParams(location.search);
 const sessionParam = params.get('session');
 if (sessionParam) {
@@ -399,4 +399,3 @@ if (sessionParam) {
 <style>.hidden { display: none !important; }</style>
 </body>
 </html>
-
