@@ -114,7 +114,8 @@ app.post('/api/generate', requireUser, async (req, res) => {
     });
 
     const userInfo = { name, gender: gender || '남성', saju, timeUnknown: !!timeUnknown, city: city || 'seoul' };
-    const validType = (reportType === 'half') ? 'half' : 'full';
+    const allowedReportTypes = ['yearly','deep','love','marriage','money','couple','full','half'];
+    const validType = allowedReportTypes.includes(reportType) ? reportType : 'deep';
     console.log(`[생성] user=${req.userId} ${name} type=${validType}`);
     const chapters = await generateAllChapters(apiKey, userInfo, validType);
 
