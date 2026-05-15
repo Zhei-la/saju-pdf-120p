@@ -460,20 +460,8 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
       });
       let content = res.choices[0].message.content || '';
       content = content
-        .replace(/그녀는/g, '본인은')
-        .replace(/그녀의/g, '본인의')
-        .replace(/그녀가/g, '본인이')
-        .replace(/그녀를/g, '본인을')
-        .replace(/그녀와/g, '본인과')
-        .replace(/그녀에게/g, '본인에게')
-        .replace(/그녀/g, '본인')
         .replace(/\*\*/g, '')
         
-        .replace(/본인은/g, shortName + '님은')
-        .replace(/본인의/g, shortName + '님의')
-        .replace(/본인에게/g, shortName + '님에게')
-        .replace(/본인을/g, shortName + '님을')
-        .replace(/본인과/g, shortName + '님과')
         .replace(/결론적으로,?/g, '')
         .replace(/AI/g, '')
         .replace(/자동 생성/g, '')
@@ -523,9 +511,6 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
         .replace(/상대방/g, '상대')
 
 .replace(/상대이/g, '상대가')
-        .replace(/ 의 /g, ' 본인의 ')
-        .replace(/ 에게는/g, ' 본인에게는')
-        .replace(/ 에게 /g, ' 본인에게 ')
         .replace(/호흡를/g, '조화를')
         .replace(/흐름잡힌/g, '안정된')
         .replace(/\n{3,}/g, '\n\n')
