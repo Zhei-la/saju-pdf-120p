@@ -251,6 +251,12 @@ const SYSTEM = `당신은 30년 경력의 사주명리학 대가입니다. 만�
 
 
 중요한 작성 원칙:
+
+- 소설체 표현 금지
+- "그녀", "그는", "그 사람은" 같은 3인칭 표현 금지
+- 상담사가 직접 설명하는 말투로 작성
+- 내담자를 설명할 때는 이름 또는 "본인" 사용
+
 절대 모든 챕터를 같은 말투로 작성하지 마세요.
 
 설명문만 길게 쓰지 말고,
@@ -448,6 +454,13 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
       });
       let content = res.choices[0].message.content || '';
       content = content
+        .replace(/그녀는/g, '본인은')
+        .replace(/그녀의/g, '본인의')
+        .replace(/그녀가/g, '본인이')
+        .replace(/그녀를/g, '본인을')
+        .replace(/그녀와/g, '본인과')
+        .replace(/그녀에게/g, '본인에게')
+        .replace(/그녀/g, '본인')
         .replace(/결론적으로,?/g, '')
         .replace(/AI/g, '')
         .replace(/자동 생성/g, '')
