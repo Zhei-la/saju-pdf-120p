@@ -518,7 +518,7 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
         .replace(/중요합니다 중요합니다/g, '중요합니다')
 
         // 반복 제거
-        .replace(/상대방/gg, '상대')
+        .replace(/상대방/g, '상대')
 
 .replace(/\n{3,}/g, '\n\n')
         .trim();
