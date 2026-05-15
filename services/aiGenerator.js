@@ -387,7 +387,11 @@ async function generateChapter(openai, userInfo, title, prompt, index, extraInst
 ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction : ''}
 
 작성 지침:
-- 사주 원국 정보는 초반 요약에서만 충분히 설명하고, 각 챕터에서는 필요한 경우에만 짧게 언급
+- 사주 원국 설명은 PART 1 초반에만 사용
+- 이후 챕터에서는 행동/심리/관계 흐름 중심으로 작성
+- 같은 오행 설명 반복 금지
+- 갑목/수기운/신약/식신/편재 반복 금지
+- 이론보다 실제 연애 상황을 우선 작성
 - "일반적으로 이런 사주는..." 같은 일반론 금지
 - 이 사주의 고유한 특징을 정확히 짚어내기
 - 1500~2000자 내외, 10만원 퀄리티에 걸맞는 깊이
