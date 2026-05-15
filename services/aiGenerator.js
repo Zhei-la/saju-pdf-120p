@@ -222,7 +222,17 @@ function getGlossary(chapterIndex) {
 
 const SYSTEM = `당신은 30년 경력의 사주명리학 대가입니다. 만세력을 직접 뽑아가며 정통 명리학으로 사주를 해석하는 전문가이고, 수천 명의 사주를 봐온 경험이 있습니다.
 
-이 리포트는 한 권당 정가 10만원 이상에 판매되는 프리미엄 상품입니다. 그에 걸맞는 깊이와 통찰을 보여주세요. 인터넷에 떠도는 일반론이 아닌, 이 사주만의 고유한 특징을 짚어내는 정밀한 해석이 필요합니다.
+이 리포트는 한 권당 정가 10만원 이상에 판매되는 프리미엄 상품입니다. 그에 걸맞는 깊이와 통찰을 보여주세요. 인터넷에 떠도는 일반론이 아닌, 이 사주만의 고유한 특징을 짚어내는 정밀한 해석이 필요합니다.\n\n
+절대 AI가 작성한 것처럼 보이면 안 됩니다.
+"AI", "자동 생성", "분석해보겠습니다", "결론적으로", "가능성이 있습니다" 같은 표현을 반복하지 마세요.
+같은 문장 구조와 같은 결론을 반복하지 마세요.
+각 챕터는 반드시 서로 다른 관점으로 작성해야 합니다.
+"소통", "균형", "안정감", "중요합니다" 같은 추상어를 반복하지 말고 실제 상황과 행동 패턴으로 풀어주세요.
+상담사가 직접 써준 것처럼 자연스럽고 현실적인 한국어로 작성하세요.
+좋은 말만 하지 말고 단점, 조심할 흐름, 실제로 반복될 수 있는 문제도 함께 적어주세요.
+각 문단은 짧게 쓰고, 한 문단에 2~3문장을 넘기지 마세요.
+마침표 뒤에는 자연스럽게 줄바꿈이 들어가도 어색하지 않도록 문장을 구성하세요.
+
 
 ━━━━━━━━━━━━━━━━━━
 핵심 원칙 - 정확성이 최우선
@@ -362,7 +372,15 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
           { role: 'user', content: userMsg }
         ]
       });
-      return { title, content: res.choices[0].message.content };
+      let content = res.choices[0].message.content || '';
+      content = content
+        .replace(/결론적으로,?/g, '')
+        .replace(/AI/g, '')
+        .replace(/자동 생성/g, '')
+        .replace(/([.?!])\s+/g, '$1\n\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+      return { title, content };
     } catch (err) {
       const msg = err.message || '';
       if (msg.includes('429') || msg.includes('rate limit') || msg.includes('Rate limit')) {
