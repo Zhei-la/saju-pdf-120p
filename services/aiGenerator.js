@@ -494,12 +494,6 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
         .replace(/^가영 씨는\s/gm, '')
 
         // 이름 과다 반복 축소
-        .replace(/김가영 님/g, '')
-        .replace(/김가영님/g, '')
-        .replace(/김가영 씨/g, '')
-        .replace(/가영 님/g, '')
-        .replace(/가영 씨/g, '')
-
         // 어색한 표현 제거
         .replace(/성장 기질/g, '갑목')
         .replace(/흐름 있는/g, '안정적인')
@@ -520,7 +514,14 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
         // 반복 제거
         .replace(/상대방/g, '상대')
 
-.replace(/\n{3,}/g, '\n\n')
+.replace(/에게 이는/g, '에게는')
+        .replace(/상대이/g, '상대가')
+        .replace(/ 의 /g, ' 본인의 ')
+        .replace(/ 에게는/g, ' 본인에게는')
+        .replace(/ 에게 /g, ' 본인에게 ')
+        .replace(/호흡를/g, '조화를')
+        .replace(/흐름잡힌/g, '안정된')
+        .replace(/\n{3,}/g, '\n\n')
         .trim();
       
       content = content
