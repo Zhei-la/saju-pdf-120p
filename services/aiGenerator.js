@@ -462,6 +462,8 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
       content = content
         .replace(/\*\*/g, '')
         
+        .replace(/본인은/g, shortName + '님은')
+        .replace(/본인의/g, shortName + '님의')
         .replace(/결론적으로,?/g, '')
         .replace(/AI/g, '')
         .replace(/자동 생성/g, '')
