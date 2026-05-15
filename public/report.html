@@ -867,9 +867,9 @@ async function downloadPDF() {
   // PARTS 동적 생성 (현재 연도 반영, half면 PART 1~3만)
   const currYear = new Date().getFullYear();
   const ALL_PARTS = [
-    { title: 'PART 1. 본성과 성격', sub: 'Nature & Personality', range: [0, 5] },
-    { title: 'PART 2. 커리어와 재물', sub: 'Career & Wealth', range: [5, 11] },
-    { title: 'PART 3. 인간관계와 인연', sub: 'Relationships', range: [11, 17] },
+    { title: 'PART 1. 타고난 연애 성향', sub: 'Love Nature', range: [0, 5] },
+    { title: 'PART 2. 관계 속 감정 흐름', sub: 'Emotional Flow', range: [5, 11] },
+    { title: 'PART 3. 인연과 현실 연애운', sub: 'Love Timing', range: [11, 17] },
     { title: 'PART 4. 건강과 인생', sub: 'Health & Life', range: [17, 22] },
     { title: 'PART 5. 인생 굴곡과 운명', sub: 'Destiny & Trials', range: [22, 28] },
     { title: `PART 6. ${currYear}년 월별 상세 운세`, sub: 'Monthly Fortune', range: [28, 40] }
@@ -877,10 +877,10 @@ async function downloadPDF() {
   // half는 챕터 0~19까지만 있음 → PART 1, 2, 3 (0~5, 5~11, 11~17) + 그 이후 18~19는 PART 4 일부
   const PARTS = isHalf
     ? [
-        { title: 'PART 1. 본성과 성격', sub: 'Nature & Personality', range: [0, 5] },
-        { title: 'PART 2. 커리어와 재물', sub: 'Career & Wealth', range: [5, 11] },
-        { title: 'PART 3. 인간관계와 인연', sub: 'Relationships', range: [11, 17] },
-        { title: 'PART 4. 건강의 시작', sub: 'Health Basics', range: [17, 20] }
+        { title: 'PART 1. 타고난 연애 성향', sub: 'Love Nature', range: [0, 5] },
+        { title: 'PART 2. 관계 속 감정 흐름', sub: 'Emotional Flow', range: [5, 11] },
+        { title: 'PART 3. 인연과 현실 연애운', sub: 'Love Timing', range: [11, 17] },
+        { title: 'PART 4. 연애 흐름 총정리', sub: 'Love Summary', range: [17, 20] }
       ]
     : ALL_PARTS;
 
@@ -892,8 +892,8 @@ async function downloadPDF() {
     <div class="pdf-page pdf-cover">
       <div style="font-size:11px;color:#b8860b;letter-spacing:6px;font-family:'Noto Sans KR',sans-serif;margin-bottom:24px;">${escapeHtml(brandName)}</div>
       <div class="em">☯</div>
-      <h1>사주팔자</h1>
-      <div class="sub">SAJU PALGWAE REPORT</div>
+      <h1>연애운 분석서</h1>
+      <div class="sub">LOVE FORTUNE REPORT</div>
       <div class="ln"></div>
       <div class="nm">${escapeHtml(currentUserInfo.name)} (${escapeHtml(currentUserInfo.gender)})</div>
       <div class="if">
