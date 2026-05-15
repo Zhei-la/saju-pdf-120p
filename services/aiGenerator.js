@@ -453,15 +453,6 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
         .replace(/자동 생성/g, '')
 
         // 고객을 제3자처럼 부르는 표현 제거
-        .replace(/그녀에게는/g, '김가영 님에게는')
-        .replace(/그녀는/g, '김가영 님은')
-        .replace(/그녀의/g, '김가영 님의')
-        .replace(/그녀가/g, '김가영 님이')
-        .replace(/그녀를/g, '김가영 님을')
-        .replace(/그녀와/g, '김가영 님과')
-        .replace(/그녀에게/g, '김가영 님에게')
-        .replace(/그녀/g, '김가영 님')
-
         // 용어해설 반복 제거
         .replace(/\[용어 해설\][\s\S]*$/g, '')
 
@@ -483,16 +474,7 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
         
 
         // 이름 반복 제거
-        .replace(/김가영 님은 김가영 님은/g, '김가영 님은')
-        .replace(/김가영 씨는 김가영 씨는/g, '김가영 씨는')
-
         // 문단 시작 이름 제거
-        .replace(/^김가영 님은\s/gm, '')
-        .replace(/^김가영님은\s/gm, '')
-        .replace(/^김가영 씨는\s/gm, '')
-        .replace(/^가영 님은\s/gm, '')
-        .replace(/^가영 씨는\s/gm, '')
-
         // 이름 과다 반복 축소
         // 어색한 표현 제거
         .replace(/성장 기질/g, '갑목')
@@ -514,8 +496,7 @@ ${prompt}${extraInstruction ? '\n\n[추가 요청사항]\n' + extraInstruction :
         // 반복 제거
         .replace(/상대방/g, '상대')
 
-.replace(/에게 이는/g, '에게는')
-        .replace(/상대이/g, '상대가')
+.replace(/상대이/g, '상대가')
         .replace(/ 의 /g, ' 본인의 ')
         .replace(/ 에게는/g, ' 본인에게는')
         .replace(/ 에게 /g, ' 본인에게 ')
