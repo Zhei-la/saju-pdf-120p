@@ -871,8 +871,6 @@ async function downloadPDF() {
     { title: 'PART 2. 관계 속 감정 흐름', sub: 'Emotional Flow', range: [5, 11] },
     { title: 'PART 3. 인연과 현실 연애운', sub: 'Love Timing', range: [11, 17] },
     { title: 'PART 4. 건강과 인생', sub: 'Health & Life', range: [17, 22] },
-    { title: 'PART 5. 인생 굴곡과 운명', sub: 'Life Turning Point', range: [22, 28] },
-    { title: `PART 6. ${currYear}년 월별 핵심 운세`, sub: 'Monthly Summary', range: [28, 40] }
   ];
   // half는 챕터 0~19까지만 있음 → PART 1, 2, 3 (0~5, 5~11, 11~17) + 그 이후 18~19는 PART 4 일부
   const PARTS = currentUserInfo.reportType === 'yearly'
