@@ -851,6 +851,22 @@ function buildSajuTable(s) {
   return html;
 }
 
+
+function normalizeReportHtmlByType(html) {
+  const type = currentUserInfo?.reportType || '';
+  const y = currentUserInfo?.year || currentUserInfo?.targetYear || 2026;
+
+  if (type === 'yearly') {
+    html = html
+      .replace(/연\s*애\s*운\s*분\s*석\s*서/g, '신 년 운 세 분 석 서')
+      .replace(/LOVE FORTUNE REPORT/g, 'YEARLY FORTUNE REPORT')
+      .replace(/2024년/g, y + '년')
+      .replace(/2025년/g, y + '년');
+  }
+
+  return html;
+}
+
 async function downloadPDF() {
   if (!currentChapters.length) return;
   const btn = document.getElementById('dlBtn');
@@ -915,8 +931,8 @@ async function downloadPDF() {
     <div class="pdf-page pdf-cover">
       <div style="font-size:11px;color:#b8860b;letter-spacing:6px;font-family:'Noto Sans KR',sans-serif;margin-bottom:24px;">${escapeHtml(brandName)}</div>
       <div class="em">☯</div>
-      <h1>연애운 분석서</h1>
-      <div class="sub">LOVE FORTUNE REPORT</div>
+      <h1>${currentUserInfo.reportType === 'yearly' ? '신년운세 분석서' : '연애운 분석서'}</h1>
+      <div class="sub">${currentUserInfo.reportType === 'yearly' ? 'YEARLY FORTUNE REPORT' : 'LOVE FORTUNE REPORT'}</div>
       <div class="ln"></div>
       <div class="nm">${escapeHtml(currentUserInfo.name)} (${escapeHtml(currentUserInfo.gender)})</div>
       <div class="if">
@@ -971,21 +987,47 @@ async function downloadPDF() {
     </div>`;
 
   // === 목차 페이지 ===
-  let tocHtml = `
+  const tocPages = [];
+  let tocPage = `
     <div class="pdf-page">
       <div class="pdf-toc-title">목 차</div>
       <div class="pdf-toc-sub">CONTENTS</div>
       <div class="pdf-toc-divider"></div>`;
+
+  let tocLineCount = 0;
+  const maxTocLines = currentUserInfo.reportType === 'yearly' ? 28 : 34;
+
+  function pushTocPage() {
+    tocPage += `</div>`;
+    tocPages.push(tocPage);
+    tocPage = `
+    <div class="pdf-page">
+      <div class="pdf-toc-title">목 차</div>
+      <div class="pdf-toc-sub">CONTENTS</div>
+      <div class="pdf-toc-divider"></div>`;
+    tocLineCount = 0;
+  }
+
   PARTS.forEach(part => {
-    tocHtml += `<div class="pdf-toc-part">${part.title}</div>`;
+    const partItems = [];
     for (let i = part.range[0]; i < part.range[1]; i++) {
       if (currentChapters[i]) {
-        tocHtml += `<div class="pdf-toc-item"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="title">${escapeHtml(currentChapters[i].title)}</span></div>`;
+        partItems.push(`<div class="pdf-toc-item"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="title">${escapeHtml(currentChapters[i].title)}</span></div>`);
       }
     }
+
+    const needLines = 2 + partItems.length;
+    if (tocLineCount > 0 && tocLineCount + needLines > maxTocLines) {
+      pushTocPage();
+    }
+
+    tocPage += `<div class="pdf-toc-part">${part.title}</div>`;
+    partItems.forEach(item => tocPage += item);
+    tocLineCount += needLines;
   });
-  tocHtml += `</div>`;
-  html += tocHtml;
+
+  pushTocPage();
+  html += tocPages.join('');
 
   // === 챕터들 (PART 간지 + 자동 페이지 분할) ===
   PARTS.forEach((part, partIdx) => {
@@ -1052,6 +1094,7 @@ async function downloadPDF() {
       </div>
     </div>`;
 
+  html = normalizeReportHtmlByType(html);
   render.innerHTML = html;
   await new Promise(r => setTimeout(r, 600));
 
