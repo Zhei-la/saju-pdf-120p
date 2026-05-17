@@ -1430,6 +1430,8 @@ async function downloadPDF() {
     }
 
     if (currentUserInfo.reportType === 'yearly' && partIdx === 0) {
+      const cleanText = (txt) => (txt || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
       const scoreSource = [
         currentUserInfo.name,
         currentUserInfo.gender,
@@ -1731,6 +1733,8 @@ async function downloadPDF() {
 </script>
 </body>
 </html>
+
+
 
 
 
