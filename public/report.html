@@ -1222,9 +1222,11 @@ async function downloadPDF() {
       { title: 'PART 3. 사업·투자·재테크', sub: 'Business & Investment', range: [4, 6] }
     ],
     couple: [
-      { title: 'PART 1. 두 사람의 기본 궁합', sub: 'Basic Match', range: [0, 2] },
-      { title: 'PART 2. 감정과 현실 궁합', sub: 'Emotion & Reality', range: [2, 4] },
-      { title: 'PART 3. 결혼 가능성과 유지 전략', sub: 'Long-term Match', range: [4, 6] }
+      { title: 'PART 1. 두 사람 기본 궁합', sub: 'Basic Match', range: [0, 3] },
+      { title: 'PART 2. 연애 스타일 궁합', sub: 'Love Style Match', range: [3, 8] },
+      { title: 'PART 3. 현실 궁합', sub: 'Reality Match', range: [8, 13] },
+      { title: 'PART 4. 감정·집착·이별 흐름', sub: 'Emotion Breakup Reunion', range: [13, 17] },
+      { title: 'PART 5. 미래 흐름', sub: 'Future Flow', range: [17, 18] }
     ]
   };
   const PARTS = currentUserInfo.reportType === 'yearly'
