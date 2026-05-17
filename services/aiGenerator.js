@@ -735,6 +735,17 @@ const DEEP_SECTIONS_OVERRIDE = [
 
 REPORT_SECTIONS.deep = DEEP_SECTIONS_OVERRIDE;
 REPORT_SECTIONS.full = DEEP_SECTIONS_OVERRIDE;
+const STRICT_REPORT_RULES = `
+[필수 작성 규칙]
+- 좋은 말, 안전한 조언, 일반론 반복 금지.
+- "신중하세요", "소통이 중요합니다", "감정 관리가 필요합니다" 같은 상담문 문장 금지.
+- 반드시 사건 중심으로 작성: 갑작스러운 연락, 관계 정리, 지출 증가, 선택 압박, 갈등 발생, 기회 유입, 책임 증가처럼 실제 흐름으로 쓰세요.
+- 모든 해석은 명리 근거를 붙이세요: 일간, 월령, 일지, 배우자궁, 관성, 재성, 식상, 인성, 비겁, 합, 충, 대운, 세운 중 최소 2개 이상을 문단 안에 자연스럽게 포함하세요.
+- 모든 사람에게 적용 가능한 문장 금지.
+- 같은 표현 반복 금지: 신중, 안정, 현실적, 감정 숨김, 소통, 배려 같은 단어를 반복하지 마세요.
+- 사주 구조가 다르면 키워드, 사건, 조언도 완전히 달라져야 합니다.
+- 시간 미상인 경우 시주, 시지, 자녀운, 말년운 단정 금지. 반드시 "출생시간 미상 기준"이라고 표시하세요.
+`;
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 // type: 'full' (40챕터, 120p) | 'half' (앞 20챕터, 60p)
@@ -747,7 +758,7 @@ async function generateAllChapters(apiKey, userInfo, type = 'full') {
   for (let i = 0; i < sectionsToUse.length; i += BATCH) {
     const batch = sectionsToUse.slice(i, i + BATCH);
     const promises = batch.map(([t, p], j) =>
-      generateChapter(openai, userInfo, t, p, i + j).then(r => { results[i + j] = r; })
+      generateChapter(openai, userInfo, t, ${p} + '\n\n' + STRICT_REPORT_RULES, i + j).then(r => { results[i + j] = r; })
     );
     await Promise.all(promises);
     if (i + BATCH < sectionsToUse.length) {
@@ -762,7 +773,7 @@ async function regenerateChapter(apiKey, userInfo, index, extraInstruction) {
   const openai = new OpenAI({ apiKey });
   const sections = REPORT_SECTIONS[userInfo?.reportType || 'deep'] || REPORT_SECTIONS.deep;
   const [title, prompt] = sections[index] || SECTIONS[index];
-  return await generateChapter(openai, userInfo, title, prompt, index, extraInstruction);
+  return await generateChapter(openai, userInfo, title, ${prompt} + '\n\n' + STRICT_REPORT_RULES, index, extraInstruction);
 }
 
 module.exports = { generateAllChapters, regenerateChapter, SECTIONS };
