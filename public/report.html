@@ -1136,9 +1136,18 @@ function pickYearlyKeywordTitle(text, fallback) {
   return found ? found[1] : fallback;
 }
 
+const usedYearlyTitles = new Set();
+
 function yearlyKeywordTitle(idx, fallback) {
   const ch = currentChapters[idx] || {};
-  return pickYearlyKeywordTitle(ch.body || ch.content || '', fallback);
+  let title = pickYearlyKeywordTitle(ch.body || ch.content || '', fallback);
+
+  if (usedYearlyTitles.has(title)) {
+    title = fallback;
+  }
+
+  usedYearlyTitles.add(title);
+  return title;
 }
 
 async function downloadPDF() {
