@@ -823,7 +823,7 @@ async function generateReport() {
 
   let hourVal, minuteVal;
   if (isTimeUnknown) {
-    hourVal = null; minuteVal = 0;
+    hourVal = null; minuteVal = null;
   } else {
     const hv = document.getElementById('hour').value;
     if (hv === '') return showStatus('genStatus', '태어난 시간을 선택하거나 "시간을 모름"을 체크해주세요.', 'err');
@@ -1741,6 +1741,7 @@ async function downloadPDF() {
 </script>
 </body>
 </html>
+
 
 
 

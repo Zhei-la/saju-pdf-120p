@@ -108,7 +108,7 @@ app.post('/api/generate', requireUser, async (req, res) => {
 
     const saju = calculateSaju({
       year: parseInt(year), month: parseInt(month), day: parseInt(day),
-      hour: hour === '' || hour == null ? 12 : parseInt(hour),
+      hour: timeUnknown || hour === '' || hour == null ? null : parseInt(hour),
       minute: parseInt(minute) || 0,
       isLunar: !!isLunar, gender: gender || '남성'
     });
@@ -239,7 +239,7 @@ app.post('/api/personal-consult', requireUser, async (req, res) => {
 
     const saju = calculateSaju({
       year: parseInt(year), month: parseInt(month), day: parseInt(day),
-      hour: hour === '' || hour == null ? 12 : parseInt(hour),
+      hour: timeUnknown || hour === '' || hour == null ? null : parseInt(hour),
       minute: parseInt(minute) || 0,
       isLunar: !!isLunar, gender: gender || '남성'
     });
@@ -390,7 +390,7 @@ app.post('/api/free-reading/generate', requireUser, async (req, res) => {
 
     const saju = calculateSaju({
       year: parseInt(year), month: parseInt(month), day: parseInt(day),
-      hour: timeUnknown || hour === '' || hour == null ? 12 : parseInt(hour),
+      hour: timeUnknown || hour === '' || hour == null ? null : parseInt(hour),
       minute: parseInt(minute) || 0,
       isLunar: !!isLunar, gender: gender || '남성'
     });
