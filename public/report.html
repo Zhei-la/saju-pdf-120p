@@ -1158,7 +1158,7 @@ async function downloadPDF() {
 
   const s = currentUserInfo.saju;
   const render = document.getElementById('pdfRender');
-  const isHalf = currentUserInfo.reportType === 'half' || currentChapters.length <= 20;
+  const isHalf = currentUserInfo.reportType === 'half';
   // 브랜드명 (저장된 것 있으면 사용, 없으면 기본값)
   const userName = localStorage.getItem('current_user_name') || '';
   let brandName = '';
@@ -1221,10 +1221,10 @@ async function downloadPDF() {
       { title: 'PART 3. 연애운 종합 조언', sub: 'Love Summary', range: [5, 6] }
     ],
     marriage: [
-      { title: 'PART 1. 타고난 결혼 성향', sub: 'Marriage Nature', range: [0, 2] },
-      { title: 'PART 2. 배우자운과 결혼 시기', sub: 'Spouse & Timing', range: [2, 4] },
-      { title: 'PART 3. 결혼 후 현실 흐름', sub: 'Marriage Life', range: [4, 5] },
-      { title: 'PART 4. 결혼 종합 조언', sub: 'Marriage Guidance', range: [5, 6] }
+      { title: 'PART 1. 결혼 흐름 총론', sub: 'Marriage Overview', range: [0, 5] },
+      { title: 'PART 2. 연애에서 결혼으로', sub: 'Love to Marriage', range: [5, 10] },
+      { title: 'PART 3. 현실 결혼운', sub: 'Marriage Reality', range: [10, 15] },
+      { title: 'PART 4. 결혼 시기 분석', sub: 'Marriage Timing', range: [15, 20] }
     ],
     money: [
       { title: 'PART 1. 타고난 재물 구조', sub: 'Money Structure', range: [0, 2] },
