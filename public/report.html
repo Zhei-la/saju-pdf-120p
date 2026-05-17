@@ -1237,8 +1237,6 @@ async function downloadPDF() {
       { title: 'PART 3. 결혼 가능성과 유지 전략', sub: 'Long-term Match', range: [4, 6] }
     ]
   };
-  const PARTS = PARTS_BY_TYPE[currentUserInfo.reportType] || PARTS_BY_TYPE.deep;
-
   const totalChapters = currentChapters.length;
   const estPages = isHalf ? 60 : 120;
 
