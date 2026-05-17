@@ -414,6 +414,34 @@
   font-weight: 800;
   text-align: right;
 }
+
+.visual-summary-page,
+.visual-month-card,
+.yearly-visual-page {
+  background: #f4ecdd !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.visual-card-grid {
+  background: transparent !important;
+}
+
+.yearly-visual-card,
+.visual-month-card,
+.yearly-compare-table td {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.yearly-visual-card .desc,
+.visual-month-card .desc,
+.yearly-compare-table td {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
 </style>
 </head>
 <body>
@@ -1239,7 +1267,7 @@ async function downloadPDF() {
       `;
 
       monthChapters.forEach((ch, idx) => {
-        const month = String(idx + 1).padStart(2, '0') + '월';
+        const month = `${idx + 1}월`;
         const rawTitle = (ch?.title || '').replace(/핵심 운세/g, '').trim();
         const bodyText = (ch?.body || ch?.content || '')
           .replace(/<[^>]*>/g, ' ')
@@ -1251,13 +1279,20 @@ async function downloadPDF() {
           .map(v => v.trim())
           .filter(Boolean)[0] || '이 달의 흐름은 본문에서 자세히 확인할 수 있습니다.';
 
-        if (desc.length > 62) desc = desc.slice(0, 62) + '...';
+        desc = desc
+          .replace(/^0?\d{1,2}월은\s*/g, '')
+          .replace(/^0?\d{1,2}월\s*/g, '')
+          .trim();
+
+        if (!desc.endsWith('.')) {
+          desc += '.';
+        }
 
         html += `
           <div class="visual-month-card">
             <div class="month">${month}</div>
             <div class="theme">${escapeHtml(rawTitle || month + ' 운세')}</div>
-            <div class="desc">${escapeHtml(desc)}</div>
+            <div class="desc">${escapeHtml(month + '은 ' + desc)}</div>
           </div>
         `;
       });
@@ -1277,7 +1312,7 @@ async function downloadPDF() {
       const cleanText = (txt) => (txt || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
       const getDesc = (idx, fallback) => {
         const t = cleanText(currentChapters[idx]?.body || currentChapters[idx]?.content || '');
-        return t ? (t.length > 72 ? t.slice(0, 72) + '...' : t) : fallback;
+        return t ? (t.length > 180 ? t.slice(0, 180) : t) : fallback;
       };
 
       html += `
@@ -1343,7 +1378,7 @@ async function downloadPDF() {
       `;
     }
 
-    if (currentUserInfo.reportType === 'yearly' && partIdx === 2) {
+    if (currentUserInfo.reportType === 'yearly' && partIdx === 1) {
       const scoreSeed = (currentUserInfo.name || '').length;
       const scores = [
         ['연애운', 68 + (scoreSeed % 10)],
@@ -1385,7 +1420,7 @@ async function downloadPDF() {
       const cleanText = (txt) => (txt || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
       const getDesc = (idx, fallback) => {
         const t = cleanText(currentChapters[idx]?.body || currentChapters[idx]?.content || '');
-        return t ? (t.length > 72 ? t.slice(0, 72) + '...' : t) : fallback;
+        return t ? (t.length > 180 ? t.slice(0, 180) : t) : fallback;
       };
 
       html += `
@@ -1600,4 +1635,8 @@ async function downloadPDF() {
 </script>
 </body>
 </html>
+
+
+
+
 
