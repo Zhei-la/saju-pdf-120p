@@ -589,12 +589,12 @@
       <div class="field">
         <label>PDF 상담 메뉴</label>
         <select id="reportMenuSelect" onchange="selectReportType(this.value)" style="width:100%;padding:14px;border:1px solid var(--parch-d);background:rgba(255,255,255,0.7);font-family:inherit;font-size:15px;color:var(--ink);outline:none;">
-          <option value="yearly">올해 신년운세 PDF · 50P 이상</option>
-          <option value="deep" selected>인생 사주 심층분석 PDF · 120P 이상</option>
-          <option value="love">연애운 PDF · 50P 이상</option>
-          <option value="marriage">결혼운 PDF · 50P 이상</option>
-          <option value="money">사업·직장·재물·금전운 PDF · 50P 이상</option>
-          <option value="couple">연인 궁합 PDF · 50P 이상</option>
+          <option value="yearly">올해 신년운세 PDF</option>
+          <option value="deep" selected>인생 사주 심층분석 PDF</option>
+          <option value="love">연애운 PDF</option>
+          <option value="marriage">결혼운 PDF</option>
+          <option value="money">사업·직장·재물·금전운 PDF</option>
+          <option value="couple">연인 궁합 PDF</option>
         </select>
         <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:'Noto Sans KR',sans-serif;line-height:1.7;">
           · 선택한 메뉴에 맞춰 PDF 주제와 챕터가 달라집니다.<br>
@@ -1168,13 +1168,18 @@ async function downloadPDF() {
   const totalChapters = currentChapters.length;
   const estPages = isHalf ? 60 : 120;
 
-  const reportLabel = currentUserInfo.reportType === 'love'
-    ? '연애운 집중 분석'
-    : '프리미엄 사주 분석';
+  const REPORT_META = {
+    yearly: { title: '신년운세 분석서' },
+    deep: { title: '인생 사주 심층분석' },
+    love: { title: '연애운 분석서' },
+    marriage: { title: '결혼운 분석서' },
+    money: { title: '사업·직장·재물·금전운 분석서' },
+    couple: { title: '연인 궁합 분석서' },
+    half: { title: '사주 분석서' }
+  };
 
-  const pageLabel = currentUserInfo.reportType === 'love'
-    ? '30페이지 내외'
-    : (isHalf ? '30페이지 내외' : '120페이지 내외');
+  const reportMeta = REPORT_META[currentUserInfo.reportType] || { title: '사주 분석서' };
+  const reportLabel = reportMeta.title;
 
   // === 표지 ===
   let html = `
@@ -1193,7 +1198,7 @@ async function downloadPDF() {
       </div>
       <div class="ln"></div>
       <div style="font-size:13px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:30px;letter-spacing:2px;">
-        ${reportLabel} · ${totalChapters}챕터 · ${pageLabel}
+        ${reportLabel}
       </div>
     </div>`;
 
@@ -1733,6 +1738,9 @@ async function downloadPDF() {
 </script>
 </body>
 </html>
+
+
+
 
 
 
