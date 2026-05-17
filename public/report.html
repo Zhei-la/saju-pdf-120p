@@ -1198,6 +1198,47 @@ async function downloadPDF() {
       ]
     : ALL_PARTS;
 
+  const PARTS_BY_TYPE = {
+    deep: [
+      { title: 'PART 1. 사주 원국 분석', sub: 'Core Saju Structure', range: [0, 4] },
+      { title: 'PART 2. 오행과 십성 구조', sub: 'Elements & Ten Gods', range: [4, 8] },
+      { title: 'PART 3. 인생 흐름과 대운', sub: 'Life Cycle', range: [8, 11] },
+      { title: 'PART 4. 종합 조언과 방향성', sub: 'Life Guidance', range: [11, 12] }
+    ],
+    full: [
+      { title: 'PART 1. 사주 원국 분석', sub: 'Core Saju Structure', range: [0, 4] },
+      { title: 'PART 2. 오행과 십성 구조', sub: 'Elements & Ten Gods', range: [4, 8] },
+      { title: 'PART 3. 인생 흐름과 대운', sub: 'Life Cycle', range: [8, 11] },
+      { title: 'PART 4. 종합 조언과 방향성', sub: 'Life Guidance', range: [11, 12] }
+    ],
+    half: [
+      { title: 'PART 1. 사주 핵심 분석', sub: 'Core Saju', range: [0, 4] },
+      { title: 'PART 2. 현실 조언과 방향성', sub: 'Life Guidance', range: [4, 8] }
+    ],
+    love: [
+      { title: 'PART 1. 타고난 연애 성향', sub: 'Love Nature', range: [0, 3] },
+      { title: 'PART 2. 관계 속 감정 흐름', sub: 'Emotional Flow', range: [3, 5] },
+      { title: 'PART 3. 연애운 종합 조언', sub: 'Love Summary', range: [5, 6] }
+    ],
+    marriage: [
+      { title: 'PART 1. 타고난 결혼 성향', sub: 'Marriage Nature', range: [0, 2] },
+      { title: 'PART 2. 배우자운과 결혼 시기', sub: 'Spouse & Timing', range: [2, 4] },
+      { title: 'PART 3. 결혼 후 현실 흐름', sub: 'Marriage Life', range: [4, 5] },
+      { title: 'PART 4. 결혼 종합 조언', sub: 'Marriage Guidance', range: [5, 6] }
+    ],
+    money: [
+      { title: 'PART 1. 타고난 재물 구조', sub: 'Money Structure', range: [0, 2] },
+      { title: 'PART 2. 직업과 커리어 흐름', sub: 'Career Flow', range: [2, 4] },
+      { title: 'PART 3. 사업·투자·재테크', sub: 'Business & Investment', range: [4, 6] }
+    ],
+    couple: [
+      { title: 'PART 1. 두 사람의 기본 궁합', sub: 'Basic Match', range: [0, 2] },
+      { title: 'PART 2. 감정과 현실 궁합', sub: 'Emotion & Reality', range: [2, 4] },
+      { title: 'PART 3. 결혼 가능성과 유지 전략', sub: 'Long-term Match', range: [4, 6] }
+    ]
+  };
+  const PARTS = PARTS_BY_TYPE[currentUserInfo.reportType] || PARTS_BY_TYPE.deep;
+
   const totalChapters = currentChapters.length;
   const estPages = isHalf ? 60 : 120;
 
