@@ -823,7 +823,7 @@ async function generateReport() {
 
   let hourVal, minuteVal;
   if (isTimeUnknown) {
-    hourVal = 12; minuteVal = 0;
+    hourVal = null; minuteVal = 0;
   } else {
     const hv = document.getElementById('hour').value;
     if (hv === '') return showStatus('genStatus', '태어난 시간을 선택하거나 "시간을 모름"을 체크해주세요.', 'err');
@@ -1071,6 +1071,7 @@ function buildSajuTable(s) {
   // 한자 형식도 분리
   const partsHan = (s.fullHanja || '').trim().split(/\s+/);
   const labels = ['시주(時柱)', '일주(日柱)', '월주(月柱)', '연주(年柱)'];
+  const isTimeUnknown = !!currentUserInfo?.timeUnknown;
   // 일반적으로 fullKorean은 연월일시 순서. 표는 시→일→월→연 (오른쪽이 과거) 명리학 관습
   // 여기서는 안전하게 연월일시 순으로 표시
   const orderLabels = ['연주(年柱)', '월주(月柱)', '일주(日柱)', '시주(時柱)'];
@@ -1081,8 +1082,9 @@ function buildSajuTable(s) {
   }
   // 둘째 줄: 천간 (한글 + 한자)
   for (let i = 0; i < 4; i++) {
-    const kor = (parts[i] || '·').charAt(0);
-    const han = (partsHan[i] || '·').charAt(0);
+    const isUnknownHour = isTimeUnknown && i === 3;
+    const kor = isUnknownHour ? 'X' : (parts[i] || '·').charAt(0);
+    const han = isUnknownHour ? 'X' : (partsHan[i] || '·').charAt(0);
     html += `<div style="padding:30px 10px;text-align:center;border-right:1px solid #e0ceb4;border-bottom:2px solid #b8860b;${i===3?'border-right:none;':''}">
       <div style="font-size:42px;color:#2c1810;font-weight:700;line-height:1;">${han}</div>
       <div style="font-size:14px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:6px;">${kor}</div>
@@ -1090,8 +1092,9 @@ function buildSajuTable(s) {
   }
   // 셋째 줄: 지지 (한글 + 한자)
   for (let i = 0; i < 4; i++) {
-    const kor = (parts[i] || '··').charAt(1) || '·';
-    const han = (partsHan[i] || '··').charAt(1) || '·';
+    const isUnknownHour = isTimeUnknown && i === 3;
+    const kor = isUnknownHour ? 'X' : ((parts[i] || '··').charAt(1) || '·');
+    const han = isUnknownHour ? 'X' : ((partsHan[i] || '··').charAt(1) || '·');
     html += `<div style="padding:30px 10px;text-align:center;border-right:1px solid #e0ceb4;${i===3?'border-right:none;':''}">
       <div style="font-size:42px;color:#2c1810;font-weight:700;line-height:1;">${han}</div>
       <div style="font-size:14px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:6px;">${kor}</div>
@@ -1738,6 +1741,7 @@ async function downloadPDF() {
 </script>
 </body>
 </html>
+
 
 
 
