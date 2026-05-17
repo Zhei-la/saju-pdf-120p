@@ -1430,13 +1430,49 @@ async function downloadPDF() {
     }
 
     if (currentUserInfo.reportType === 'yearly' && partIdx === 0) {
-      const scoreSeed = (currentUserInfo.name || '').length;
+      const scoreSource = [
+        currentUserInfo.name,
+        currentUserInfo.gender,
+        currentUserInfo.birthDate,
+        currentUserInfo.birthTime,
+        currentUserInfo.calendarType,
+        currentUserInfo.dayMaster,
+        currentUserInfo.yearPillar,
+        currentUserInfo.monthPillar,
+        currentUserInfo.dayPillar,
+        currentUserInfo.hourPillar,
+        cleanText(currentChapters[0]?.body || currentChapters[0]?.content || ''),
+        cleanText(currentChapters[5]?.body || currentChapters[5]?.content || ''),
+        cleanText(currentChapters[10]?.body || currentChapters[10]?.content || ''),
+        cleanText(currentChapters[13]?.body || currentChapters[13]?.content || '')
+      ].filter(Boolean).join('|');
+
+      const hashScore = (salt, min = 56, max = 88) => {
+        const str = scoreSource + '|' + salt;
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          hash = ((hash << 5) - hash) + str.charCodeAt(i);
+          hash |= 0;
+        }
+        return min + (Math.abs(hash) % (max - min + 1));
+      };
+
+      const bodyAll = cleanText(currentChapters.map(ch => ch?.body || ch?.content || '').join(' '));
+      const countWord = (words) => words.reduce((sum, word) => sum + ((bodyAll.match(new RegExp(word, 'g')) || []).length), 0);
+      const clampScore = (n) => Math.max(45, Math.min(95, Math.round(n)));
+
+      const relationBoost = countWord(['관계', '인연', '연애', '감정', '소통']);
+      const moneyBoost = countWord(['재물', '금전', '돈', '수입', '지출', '투자']);
+      const careerBoost = countWord(['직업', '일', '사업', '성과', '프로젝트', '기회']);
+      const healthBoost = countWord(['건강', '체력', '피로', '스트레스', '휴식']);
+      const cautionBoost = countWord(['주의', '갈등', '충돌', '무리', '불안']);
+
       const scores = [
-        ['연애운', 68 + (scoreSeed % 10)],
-        ['재물운', 64 + (scoreSeed % 12)],
-        ['직업운', 72 + (scoreSeed % 9)],
-        ['인간관계', 66 + (scoreSeed % 11)],
-        ['건강운', 58 + (scoreSeed % 13)]
+        ['연애운', clampScore(hashScore('love') + Math.min(relationBoost, 8) - Math.min(cautionBoost, 5))],
+        ['재물운', clampScore(hashScore('money') + Math.min(moneyBoost, 8) - Math.min(cautionBoost, 4))],
+        ['직업운', clampScore(hashScore('career') + Math.min(careerBoost, 8) - Math.min(cautionBoost, 3))],
+        ['인간관계', clampScore(hashScore('relation') + Math.min(relationBoost, 9) - Math.min(cautionBoost, 6))],
+        ['건강운', clampScore(hashScore('health') + Math.min(healthBoost, 6) - Math.min(cautionBoost, 7))]
       ];
 
       html += `
@@ -1695,6 +1731,7 @@ async function downloadPDF() {
 </script>
 </body>
 </html>
+
 
 
 
