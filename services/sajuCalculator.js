@@ -16,13 +16,20 @@ const diShiKor = ds => DISHI_KOR[ds] || ds || '';
 const arrShiShen = arr => (Array.isArray(arr) ? arr : [arr]).map(s => shiShenKor(s));
 
 function calculateSaju({ year, month, day, hour, minute, isLunar, gender }) {
+
+  const isTimeUnknown =
+    hour === null ||
+    hour === undefined ||
+    hour === '';
+
+  const calcHour = isTimeUnknown ? 12 : hour;
   // 1. 기본 만세력 계산
   let solar;
   if (isLunar) {
-    const lunar = Lunar.fromYmdHms(year, month, day, hour, minute, 0);
+    const lunar = Lunar.fromYmdHms(year, month, day, calcHour, minute, 0);
     solar = lunar.getSolar();
   } else {
-    solar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
+    solar = Solar.fromYmdHms(year, month, day, calcHour, minute, 0);
   }
   const lunar = solar.getLunar();
   const ec = lunar.getEightChar();
