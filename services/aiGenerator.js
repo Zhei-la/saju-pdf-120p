@@ -664,7 +664,8 @@ async function generateAllChapters(apiKey, userInfo, type = 'full') {
 
 async function regenerateChapter(apiKey, userInfo, index, extraInstruction) {
   const openai = new OpenAI({ apiKey });
-  const [title, prompt] = SECTIONS[index];
+  const sections = REPORT_SECTIONS[userInfo?.reportType || 'deep'] || REPORT_SECTIONS.deep;
+  const [title, prompt] = sections[index] || SECTIONS[index];
   return await generateChapter(openai, userInfo, title, prompt, index, extraInstruction);
 }
 

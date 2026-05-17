@@ -1201,26 +1201,29 @@ async function downloadPDF() {
   const totalChapters = currentChapters.length;
   const estPages = isHalf ? 60 : 120;
 
+
   const REPORT_META = {
-    yearly: { title: '신년운세 분석서' },
-    deep: { title: '인생 사주 심층분석' },
-    love: { title: '연애운 분석서' },
-    marriage: { title: '결혼운 분석서' },
-    money: { title: '사업·직장·재물·금전운 분석서' },
-    couple: { title: '연인 궁합 분석서' },
-    half: { title: '사주 분석서' }
+    yearly: { title: '신년운세 분석서', sub: 'YEARLY FORTUNE REPORT', label: '신년운세 분석서' },
+    deep: { title: '사주 심층 분석서', sub: 'DEEP SAJU REPORT', label: '사주 심층 분석서' },
+    full: { title: '사주 심층 분석서', sub: 'DEEP SAJU REPORT', label: '사주 심층 분석서' },
+    half: { title: '사주 분석서', sub: 'SAJU REPORT', label: '사주 분석서' },
+    love: { title: '연애운 분석서', sub: 'LOVE FORTUNE REPORT', label: '연애운 분석서' },
+    marriage: { title: '결혼운 분석서', sub: 'MARRIAGE FORTUNE REPORT', label: '결혼운 분석서' },
+    money: { title: '사업·직장·재물·금전운 분석서', sub: 'MONEY CAREER REPORT', label: '사업·직장·재물·금전운 분석서' },
+    couple: { title: '연인 궁합 분석서', sub: 'COUPLE MATCH REPORT', label: '연인 궁합 분석서' }
   };
 
+
   const reportMeta = REPORT_META[currentUserInfo.reportType] || { title: '사주 분석서' };
-  const reportLabel = reportMeta.title;
+  const reportLabel = reportMeta.label || reportMeta.title;
 
   // === 표지 ===
   let html = `
     <div class="pdf-page pdf-cover">
       <div style="font-size:11px;color:#b8860b;letter-spacing:6px;font-family:'Noto Sans KR',sans-serif;margin-bottom:24px;">${escapeHtml(brandName)}</div>
       <div class="em">☯</div>
-      <h1>${currentUserInfo.reportType === 'yearly' ? '신년운세 분석서' : '연애운 분석서'}</h1>
-      <div class="sub">${currentUserInfo.reportType === 'yearly' ? 'YEARLY FORTUNE REPORT' : 'LOVE FORTUNE REPORT'}</div>
+      <h1>${escapeHtml(reportMeta.title)}</h1>
+      <div class="sub">${escapeHtml(reportMeta.sub)}</div>
       <div class="ln"></div>
       <div class="nm">${escapeHtml(currentUserInfo.name)} (${escapeHtml(currentUserInfo.gender)})</div>
       <div class="if">
