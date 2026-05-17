@@ -36,12 +36,15 @@ function calculateSaju({ year, month, day, hour, minute, isLunar, gender }) {
   const genderNum = (gender === '여성' || gender === '여') ? 1 : 0;
 
   // 2. 사주 4기둥
-  const pillars = { year: ec.getYear(), month: ec.getMonth(), day: ec.getDay(), hour: ec.getTime() };
+  const pillars = { year: ec.getYear(), month: ec.getMonth(), day: ec.getDay(), hour: isTimeUnknown ? null : ec.getTime() };
+  const pillarsForCalc = isTimeUnknown
+    ? [pillars.year, pillars.month, pillars.day]
+    : Object.values(pillars);
   const dayGan = pillars.day[0]; // 일간 천간
 
   // 3. 오행 카운트
   const elements = { 목:0, 화:0, 토:0, 금:0, 수:0 };
-  Object.values(pillars).forEach(p => p.split('').forEach(c => { if(FIVE[c]) elements[FIVE[c]]++; }));
+  pillarsForCalc.forEach(p => p.split('').forEach(c => { if(FIVE[c]) elements[FIVE[c]]++; }));
   const total = Object.values(elements).reduce((a,b) => a+b, 0);
   const elementPercent = {};
   for (const [k, v] of Object.entries(elements)) {
@@ -53,11 +56,11 @@ function calculateSaju({ year, month, day, hour, minute, isLunar, gender }) {
     yearGan: shiShenKor(ec.getYearShiShenGan()),
     monthGan: shiShenKor(ec.getMonthShiShenGan()),
     dayGan: '일주',
-    hourGan: shiShenKor(ec.getTimeShiShenGan()),
+    hourGan: isTimeUnknown ? null : shiShenKor(ec.getTimeShiShenGan()),
     yearZhi: arrShiShen(ec.getYearShiShenZhi()),
     monthZhi: arrShiShen(ec.getMonthShiShenZhi()),
     dayZhi: arrShiShen(ec.getDayShiShenZhi()),
-    hourZhi: arrShiShen(ec.getTimeShiShenZhi())
+    hourZhi: isTimeUnknown ? [] : arrShiShen(ec.getTimeShiShenZhi())
   };
 
   // 5. 지장간
@@ -65,7 +68,7 @@ function calculateSaju({ year, month, day, hour, minute, isLunar, gender }) {
     year: ec.getYearHideGan().map(g => `${toKor(g)}(${FIVE[g]})`),
     month: ec.getMonthHideGan().map(g => `${toKor(g)}(${FIVE[g]})`),
     day: ec.getDayHideGan().map(g => `${toKor(g)}(${FIVE[g]})`),
-    hour: ec.getTimeHideGan().map(g => `${toKor(g)}(${FIVE[g]})`)
+    hour: isTimeUnknown ? [] : ec.getTimeHideGan().map(g => `${toKor(g)}(${FIVE[g]})`)
   };
 
   // 6. 12운성
@@ -73,7 +76,7 @@ function calculateSaju({ year, month, day, hour, minute, isLunar, gender }) {
     year: diShiKor(ec.getYearDiShi()),
     month: diShiKor(ec.getMonthDiShi()),
     day: diShiKor(ec.getDayDiShi()),
-    hour: diShiKor(ec.getTimeDiShi())
+    hour: isTimeUnknown ? null : diShiKor(ec.getTimeDiShi())
   };
 
   // 7. 신강/신약 판정 (간이 계산)
@@ -81,7 +84,7 @@ function calculateSaju({ year, month, day, hour, minute, isLunar, gender }) {
   const sameElements = { '목':['목'], '화':['화','목'], '토':['토','화'], '금':['금','토'], '수':['수','금'] };
   const helpElements = sameElements[dayElement] || [dayElement];
   let helpScore = 0, totalScore = 0;
-  Object.values(pillars).forEach(p => {
+  pillarsForCalc.forEach(p => {
     p.split('').forEach(c => {
       if (FIVE[c]) {
         totalScore++;
@@ -165,8 +168,8 @@ function calculateSaju({ year, month, day, hour, minute, isLunar, gender }) {
     pillars, elements, elementPercent,
     dayMaster: { hanja: dayGan, korean: HAN_TO_KOR[dayGan], element: FIVE[dayGan] },
     zodiac: lunar.getYearShengXiao(),
-    fullHanja: `${pillars.year}년 ${pillars.month}월 ${pillars.day}일 ${pillars.hour}시`,
-    fullKorean: `${toKor(pillars.year)}년 ${toKor(pillars.month)}월 ${toKor(pillars.day)}일 ${toKor(pillars.hour)}시`,
+    fullHanja: isTimeUnknown ? `${pillars.year}년 ${pillars.month}월 ${pillars.day}일 시간미상` : `${pillars.year}년 ${pillars.month}월 ${pillars.day}일 ${pillars.hour}시`,
+    fullKorean: isTimeUnknown ? `${toKor(pillars.year)}년 ${toKor(pillars.month)}월 ${toKor(pillars.day)}일 시간미상` : `${toKor(pillars.year)}년 ${toKor(pillars.month)}월 ${toKor(pillars.day)}일 ${toKor(pillars.hour)}시`,
     shiShen,
     hideGan,
     diShi,
