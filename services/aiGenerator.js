@@ -758,7 +758,7 @@ async function generateAllChapters(apiKey, userInfo, type = 'full') {
   for (let i = 0; i < sectionsToUse.length; i += BATCH) {
     const batch = sectionsToUse.slice(i, i + BATCH);
     const promises = batch.map(([t, p], j) =>
-      generateChapter(openai, userInfo, t, ${p} + '\n\n' + STRICT_REPORT_RULES, i + j).then(r => { results[i + j] = r; })
+      generateChapter(openai, userInfo, t, p + '\n\n' + STRICT_REPORT_RULES, i + j).then(r => { results[i + j] = r; })
     );
     await Promise.all(promises);
     if (i + BATCH < sectionsToUse.length) {
@@ -773,7 +773,7 @@ async function regenerateChapter(apiKey, userInfo, index, extraInstruction) {
   const openai = new OpenAI({ apiKey });
   const sections = REPORT_SECTIONS[userInfo?.reportType || 'deep'] || REPORT_SECTIONS.deep;
   const [title, prompt] = sections[index] || SECTIONS[index];
-  return await generateChapter(openai, userInfo, title, ${prompt} + '\n\n' + STRICT_REPORT_RULES, index, extraInstruction);
+  return await generateChapter(openai, userInfo, title, prompt + '\n\n' + STRICT_REPORT_RULES, index, extraInstruction);
 }
 
 module.exports = { generateAllChapters, regenerateChapter, SECTIONS };
