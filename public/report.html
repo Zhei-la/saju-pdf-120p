@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -1120,6 +1120,27 @@ function normalizeReportHtmlByType(html) {
   return html;
 }
 
+
+function pickYearlyKeywordTitle(text, fallback) {
+  const t = String(text || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const rules = [
+    ['금전', '금전 점검'], ['재물', '재물 관리'], ['상관', '표현 조절'],
+    ['직업', '직업 변화'], ['사업', '사업 판단'], ['책임', '책임 증가'],
+    ['관계', '관계 재편'], ['인연', '인연 변화'], ['연애', '감정 흐름'],
+    ['감정', '감정 조율'], ['건강', '건강 관리'], ['피로', '체력 회복'],
+    ['대운', '운의 전환'], ['세운', '올해 전환점'], ['충', '관계 변동'],
+    ['합', '흐름 결합'], ['기회', '기회와 도전'], ['도전', '도전 과제'],
+    ['정리', '정리와 선택'], ['주의', '주의 신호'], ['변화', '변화 흐름']
+  ];
+  const found = rules.find(([word]) => t.includes(word));
+  return found ? found[1] : fallback;
+}
+
+function yearlyKeywordTitle(idx, fallback) {
+  const ch = currentChapters[idx] || {};
+  return pickYearlyKeywordTitle(ch.body || ch.content || '', fallback);
+}
+
 async function downloadPDF() {
   if (!currentChapters.length) return;
   const btn = document.getElementById('dlBtn');
@@ -1383,22 +1404,22 @@ async function downloadPDF() {
           <div class="yearly-card-grid">
             <div class="yearly-visual-card">
               <div class="label">KEYWORD 01</div>
-              <div class="title">변화</div>
+              <div class="title">${escapeHtml(yearlyKeywordTitle(0, '올해 전환점'))}</div>
               <div class="desc">${escapeHtml(getDesc(0, '올해는 생활과 관계의 흐름이 이전과 다르게 움직일 수 있습니다.'))}</div>
             </div>
             <div class="yearly-visual-card">
               <div class="label">KEYWORD 02</div>
-              <div class="title">정리</div>
+              <div class="title">${escapeHtml(yearlyKeywordTitle(3, '정리와 선택'))}</div>
               <div class="desc">${escapeHtml(getDesc(3, '오래 끌던 문제나 애매한 관계를 정리해야 흐름이 가벼워집니다.'))}</div>
             </div>
             <div class="yearly-visual-card">
               <div class="label">KEYWORD 03</div>
-              <div class="title">기회</div>
+              <div class="title">${escapeHtml(yearlyKeywordTitle(18, '기회와 도전'))}</div>
               <div class="desc">${escapeHtml(getDesc(18, '놓치지 말아야 할 제안과 사람의 흐름이 들어올 수 있습니다.'))}</div>
             </div>
             <div class="yearly-visual-card">
               <div class="label">KEYWORD 04</div>
-              <div class="title">주의</div>
+              <div class="title">${escapeHtml(yearlyKeywordTitle(17, '주의 신호'))}</div>
               <div class="desc">${escapeHtml(getDesc(17, '반복되는 선택이나 감정 소모가 손해로 이어지지 않게 조심해야 합니다.'))}</div>
             </div>
           </div>
@@ -1416,11 +1437,11 @@ async function downloadPDF() {
             </tr>
             <tr>
               <td>
-                <b style="color:#b8860b;">정리와 준비</b><br>
+                <b style="color:#b8860b;">${escapeHtml(yearlyKeywordTitle(0, '상반기 핵심'))}</b><br>
                 초반에는 관계와 생활 리듬을 정리하는 흐름이 강합니다. 무리하게 확장하기보다, 애매하게 끌고 온 문제를 정리하는 쪽이 유리합니다.
               </td>
               <td>
-                <b style="color:#b8860b;">확장과 결과</b><br>
+                <b style="color:#b8860b;">${escapeHtml(yearlyKeywordTitle(4, '하반기 핵심'))}</b><br>
                 하반기에는 실제 결과가 드러나기 시작합니다. 일, 돈, 관계에서 선택의 결과가 보이고 다음 단계로 넘어갈 준비가 필요합니다.
               </td>
             </tr>
