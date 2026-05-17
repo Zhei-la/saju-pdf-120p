@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>?ъ＜?붿옄 由ы룷??/title>
+<title>사주팔자 리포트</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
   input::placeholder, textarea::placeholder { color: #c4aa88; }
   textarea { resize: vertical; min-height: 240px; line-height: 1.8; font-size: 13px; }
 
-  /* ?좉? 踰꾪듉 */
+  /* 토글 버튼 */
   .toggle-group { display: flex; gap: 0; border: 1px solid var(--parchment-dark);
     background: rgba(255,255,255,0.4); }
   .toggle-btn { flex: 1; padding: 12px; border: none; background: transparent;
@@ -65,11 +65,11 @@
   .toggle-btn + .toggle-btn { border-left: 1px solid var(--parchment-dark); }
   .toggle-btn.active + .toggle-btn { border-left-color: var(--deep); }
 
-  /* ?앸뀈?붿씪 + ?쒓컙 ?쒖쨪 ?덉씠?꾩썐 */
+  /* 생년월일 + 시간 한줄 레이아웃 */
   .date-row { display: grid; grid-template-columns: 90px 1fr 1fr; gap: 8px; }
   .date-row select, .date-row input { padding: 10px 8px; }
 
-  /* 泥댄겕諛뺤뒪 */
+  /* 체크박스 */
   .check-row { display: flex; align-items: center; gap: 8px; margin-top: 10px;
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; }
   .check-row input[type="checkbox"] { width: auto; cursor: pointer; }
@@ -88,7 +88,7 @@
   .btn-row { display: flex; gap: 8px; margin-top: 12px; }
   .btn-row .btn { flex: 1; }
 
-  /* API ??移대뱶 */
+  /* API 키 카드 */
   .key-card { border: 1px solid var(--parchment-dark); padding: 20px 24px;
     background: rgba(255,253,248,0.85); margin-bottom: 18px; }
   .key-row { display: flex; gap: 10px; align-items: flex-end; }
@@ -101,7 +101,7 @@
     margin-top: 8px; line-height: 1.7; }
   .key-help a { color: var(--gold); text-decoration: none; border-bottom: 1px dotted var(--gold); }
 
-  /* 紐⑤떖 */
+  /* 모달 */
   .modal-backdrop { position: fixed; inset: 0; background: rgba(26,18,9,0.75);
     display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
     backdrop-filter: blur(4px); }
@@ -122,7 +122,7 @@
   .modal td:first-child { color: var(--gold); font-weight: 600; }
   .modal td:last-child { color: var(--ink); }
 
-  /* ?곹깭 */
+  /* 상태 */
   .status-box { font-size: 13px; font-family: 'Noto Sans KR', sans-serif; text-align: center;
     padding: 14px 16px; margin-top: 14px; line-height: 1.7; }
   .status-box.err { background: rgba(139,26,26,0.08); color: var(--accent); border: 1px solid rgba(139,26,26,0.2); }
@@ -133,7 +133,7 @@
     vertical-align: middle; margin-right: 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* 梨뺥꽣 */
+  /* 챕터 */
   .saju-info { background: rgba(184,134,11,0.08); border: 1px solid rgba(184,134,11,0.25);
     padding: 16px 20px; margin-bottom: 18px; font-family: 'Noto Sans KR', sans-serif;
     font-size: 13px; color: var(--muted); line-height: 1.9; text-align: center; }
@@ -162,7 +162,7 @@
     border: 1px solid var(--parchment-dark); margin-bottom: 18px; }
   .toolbar .btn { flex: 1; }
 
-  /* PDF ?뚮뜑??*/
+  /* PDF 렌더용 */
   .pdf-render { position: absolute; left: -99999px; top: 0; width: 794px; }
   .pdf-page { width: 794px; min-height: 1123px; padding: 80px 70px; background: #f5ede0;
     border: 2px solid #b8860b; box-sizing: border-box; font-family: 'Noto Serif KR', serif; color: #1a1209; }
@@ -182,7 +182,7 @@
   .pdf-cbody { font-size: 15px; line-height: 2.1; color: #1a1209; white-space: pre-wrap;
     font-family: 'Noto Sans KR', sans-serif; text-align: justify; }
 
-  /* 紐⑹감 ?섏씠吏 */
+  /* 목차 페이지 */
   .pdf-toc-title { font-size: 32px; color: #2c1810; font-weight: 700; letter-spacing: 8px;
     text-align: center; margin-bottom: 10px; }
   .pdf-toc-sub { font-size: 14px; color: #b8860b; text-align: center; letter-spacing: 4px;
@@ -197,7 +197,7 @@
   .pdf-toc-item .num { color: #b8860b; font-weight: 600; margin-right: 10px; min-width: 30px; }
   .pdf-toc-item .title { flex: 1; }
 
-  /* ?덈궡/諛곕꼫 諛뺤뒪 */
+  /* 안내/배너 박스 */
   .pdf-info-box { background: rgba(184,134,11,0.08); border: 2px solid #b8860b;
     padding: 28px 32px; margin: 30px 0; text-align: center; }
   .pdf-info-box h3 { font-size: 18px; color: #2c1810; font-weight: 700; margin-bottom: 12px;
@@ -209,7 +209,7 @@
     background: rgba(255,255,255,0.6); padding: 10px 16px; border-radius: 2px;
     display: inline-block; margin-top: 6px; }
 
-  /* 以묎컙 ?곷떞 諛곕꼫 (梨뺥꽣 ?ъ씠) */
+  /* 중간 상담 배너 (챕터 사이) */
   .pdf-banner { background: #2c1810; color: #d4a843; padding: 26px 30px; margin: 30px 0;
     text-align: center; border: 1px solid #b8860b; }
   .pdf-banner h4 { font-size: 16px; font-weight: 700; margin-bottom: 10px; letter-spacing: 3px;
@@ -489,129 +489,129 @@
 <body>
 <div class="wrap">
   <div class="header">
-    <div class="emblem">??/div>
+    <div class="emblem">☯</div>
     <div class="divider"></div>
-    <h1>?ъ＜?붿옄 由ы룷??/h1>
-    <div class="subtitle">AI ?ъ＜ 遺꾩꽍 쨌 60p / 120p 쨌 ?몄쭛 쨌 PDF ???/div>
+    <h1>사주팔자 리포트</h1>
+    <div class="subtitle">AI 사주 분석 · 60p / 120p · 편집 · PDF 저장</div>
     <div class="divider"></div>
   </div>
 
-  <!-- API ??移대뱶 -->
+  <!-- API 키 카드 -->
   <div class="key-card" id="keyCard">
     <div id="keyExpanded">
-      <div class="card-label">OpenAI API ??/div>
+      <div class="card-label">OpenAI API 키</div>
       <div class="key-row">
         <div class="field"><input type="password" id="apiKey" placeholder="sk-proj-..."></div>
-        <button class="btn btn-gold btn-small" onclick="saveKey()">???/button>
+        <button class="btn btn-gold btn-small" onclick="saveKey()">저장</button>
       </div>
       <div class="key-help">
-        ?뵎 ?ㅺ? ?놁쑝?좉??? <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>?먯꽌 諛쒓툒諛쏆쑝?몄슂.<br>
-        癒쇱? <a href="https://platform.openai.com/settings/organization/billing/overview" target="_blank">寃곗젣 ?섎떒 ?깅줉</a> ??理쒖냼 $10 異⑹쟾??沅뚯옣?⑸땲?? (由ы룷??1?뚮떦 ??1000~1500?? gpt-4o ?ъ슜)
+        🔑 키가 없으신가요? <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>에서 발급받으세요.<br>
+        먼저 <a href="https://platform.openai.com/settings/organization/billing/overview" target="_blank">결제 수단 등록</a> 후 최소 $10 충전을 권장합니다. (리포트 1회당 약 1000~1500원, gpt-4o 사용)
       </div>
     </div>
     <div id="keyCollapsed" class="key-collapsed hidden">
-      <div class="status"><span class="dot"></span>API ????λ맖 (<span id="keyPreview"></span>)</div>
-      <button class="btn btn-ghost btn-small" onclick="editKey()">?섏젙</button>
+      <div class="status"><span class="dot"></span>API 키 저장됨 (<span id="keyPreview"></span>)</div>
+      <button class="btn btn-ghost btn-small" onclick="editKey()">수정</button>
     </div>
   </div>
 
-  <!-- STEP 1: ?낅젰 -->
+  <!-- STEP 1: 입력 -->
   <div id="inputScreen">
     <div class="card">
-      <div class="card-label">?섎ː???뺣낫</div>
+      <div class="card-label">의뢰인 정보</div>
 
       <div class="field">
-        <label>?대쫫</label>
-        <input id="name" placeholder="?띻만??>
+        <label>이름</label>
+        <input id="name" placeholder="홍길동">
       </div>
 
       <div class="field">
-        <label>?깅퀎</label>
+        <label>성별</label>
         <div class="toggle-group">
-          <button type="button" class="toggle-btn active" data-gender="?⑥꽦" onclick="selectGender('?⑥꽦')">?⑥옄</button>
-          <button type="button" class="toggle-btn" data-gender="?ъ꽦" onclick="selectGender('?ъ꽦')">?ъ옄</button>
+          <button type="button" class="toggle-btn active" data-gender="남성" onclick="selectGender('남성')">남자</button>
+          <button type="button" class="toggle-btn" data-gender="여성" onclick="selectGender('여성')">여자</button>
         </div>
       </div>
 
       <div class="field">
         <div class="label-with-icon">
-          <label>?앸뀈?붿씪??/label>
-          <button class="icon-btn" onclick="openModal('zishiModal')">?뵇 12媛꾩? ?쒓컙??/button>
+          <label>생년월일시</label>
+          <button class="icon-btn" onclick="openModal('zishiModal')">🔍 12간지 시간표</button>
         </div>
         <div class="toggle-group" style="margin-bottom: 10px;">
-          <button type="button" class="toggle-btn active" data-cal="solar" onclick="selectCalendar('solar')">?묐젰</button>
-          <button type="button" class="toggle-btn" data-cal="lunar" onclick="selectCalendar('lunar')">?뚮젰</button>
+          <button type="button" class="toggle-btn active" data-cal="solar" onclick="selectCalendar('solar')">양력</button>
+          <button type="button" class="toggle-btn" data-cal="lunar" onclick="selectCalendar('lunar')">음력</button>
         </div>
         <div class="date-row">
-          <input id="year" type="number" placeholder="?? min="1900" max="2100">
-          <input id="month" type="number" placeholder="?? min="1" max="12">
-          <input id="day" type="number" placeholder="?? min="1" max="31">
+          <input id="year" type="number" placeholder="년" min="1900" max="2100">
+          <input id="month" type="number" placeholder="월" min="1" max="12">
+          <input id="day" type="number" placeholder="일" min="1" max="31">
         </div>
         <div class="date-row" style="margin-top: 8px; grid-template-columns: 1fr 1fr;">
-          <select id="hour"><option value="">???좏깮</option></select>
-          <select id="minute"><option value="0">00遺?/option></select>
+          <select id="hour"><option value="">시 선택</option></select>
+          <select id="minute"><option value="0">00분</option></select>
         </div>
         <label class="check-row">
           <input type="checkbox" id="timeUnknown" onchange="toggleTimeUnknown()">
-          <span>?쒓컙??紐⑤쫫 (?뺤삤 湲곗??쇰줈 怨꾩궛)</span>
+          <span>시간을 모름 (정오 기준으로 계산)</span>
         </label>
       </div>
 
       <div class="field">
         <div class="label-with-icon">
-          <label>?쒖뼱???꾩떆</label>
-          <button class="icon-btn" onclick="openModal('cityModal')">?뵇 ?꾩떆 蹂댁젙?대??</button>
+          <label>태어난 도시</label>
+          <button class="icon-btn" onclick="openModal('cityModal')">🔍 도시 보정이란?</button>
         </div>
         <select id="city">
-          <option value="seoul">?쒖슱</option>
-          <option value="busan">遺??/option>
-          <option value="incheon">?몄쿇</option>
-          <option value="daegu">?援?/option>
-          <option value="daejeon">???/option>
-          <option value="gwangju">愿묒＜</option>
-          <option value="ulsan">?몄궛</option>
-          <option value="sejong">?몄쥌</option>
-          <option value="suwon">?섏썝</option>
-          <option value="changwon">李쎌썝</option>
-          <option value="goyang">怨좎뼇</option>
-          <option value="yongin">?⑹씤</option>
-          <option value="seongnam">?깅궓</option>
-          <option value="cheongju">泥?＜</option>
-          <option value="jeonju">?꾩＜</option>
-          <option value="cheonan">泥쒖븞</option>
-          <option value="pohang">?ы빆</option>
-          <option value="jeju">?쒖＜</option>
-          <option value="chuncheon">異섏쿇</option>
-          <option value="gangneung">媛뺣쫱</option>
+          <option value="seoul">서울</option>
+          <option value="busan">부산</option>
+          <option value="incheon">인천</option>
+          <option value="daegu">대구</option>
+          <option value="daejeon">대전</option>
+          <option value="gwangju">광주</option>
+          <option value="ulsan">울산</option>
+          <option value="sejong">세종</option>
+          <option value="suwon">수원</option>
+          <option value="changwon">창원</option>
+          <option value="goyang">고양</option>
+          <option value="yongin">용인</option>
+          <option value="seongnam">성남</option>
+          <option value="cheongju">청주</option>
+          <option value="jeonju">전주</option>
+          <option value="cheonan">천안</option>
+          <option value="pohang">포항</option>
+          <option value="jeju">제주</option>
+          <option value="chuncheon">춘천</option>
+          <option value="gangneung">강릉</option>
         </select>
       </div>
 
       <div class="field">
-        <label>PDF ?곷떞 硫붾돱</label>
+        <label>PDF 상담 메뉴</label>
         <select id="reportMenuSelect" onchange="selectReportType(this.value)" style="width:100%;padding:14px;border:1px solid var(--parch-d);background:rgba(255,255,255,0.7);font-family:inherit;font-size:15px;color:var(--ink);outline:none;">
-          <option value="yearly">?ы빐 ?좊뀈?댁꽭 PDF</option>
-          <option value="deep" selected>?몄깮 ?ъ＜ ?ъ링遺꾩꽍 PDF</option>
-          <option value="love">?곗븷??PDF</option>
-          <option value="marriage">寃고샎??PDF</option>
-          <option value="money">?ъ뾽쨌吏곸옣쨌?щЪ쨌湲덉쟾??PDF</option>
-          <option value="couple">?곗씤 沅곹빀 PDF</option>
+          <option value="yearly">올해 신년운세 PDF</option>
+          <option value="deep" selected>인생 사주 심층분석 PDF</option>
+          <option value="love">연애운 PDF</option>
+          <option value="marriage">결혼운 PDF</option>
+          <option value="money">사업·직장·재물·금전운 PDF</option>
+          <option value="couple">연인 궁합 PDF</option>
         </select>
         <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:'Noto Sans KR',sans-serif;line-height:1.7;">
-          쨌 ?좏깮??硫붾돱??留욎떠 PDF 二쇱젣? 梨뺥꽣媛 ?щ씪吏묐땲??<br>
-          쨌 ?쒓린 ?섏씠吏??理쒖냼 湲곗??대ŉ, ?댁슜???곕씪 珥덇낵 ?앹꽦?????덉뒿?덈떎.
+          · 선택한 메뉴에 맞춰 PDF 주제와 챕터가 달라집니다.<br>
+          · 표기 페이지는 최소 기준이며, 내용에 따라 초과 생성될 수 있습니다.
         </div>
       </div>
     </div>
 
-    <button class="btn btn-primary" id="genBtn" onclick="generateReport()">由ы룷???앹꽦 ?쒖옉</button>
+    <button class="btn btn-primary" id="genBtn" onclick="generateReport()">리포트 생성 시작</button>
     <div id="genStatus"></div>
   </div>
 
-  <!-- STEP 2: 誘몃━蹂닿린 -->
+  <!-- STEP 2: 미리보기 -->
   <div id="previewScreen" class="hidden">
     <div class="toolbar">
-      <button class="btn btn-ghost btn-small" onclick="backToInput()">????由ы룷??/button>
-      <button class="btn btn-gold btn-small" onclick="downloadPDF()" id="dlBtn">??PDF ???/button>
+      <button class="btn btn-ghost btn-small" onclick="backToInput()">← 새 리포트</button>
+      <button class="btn btn-gold btn-small" onclick="downloadPDF()" id="dlBtn">↓ PDF 저장</button>
     </div>
     <div class="saju-info" id="sajuInfo"></div>
     <div id="chaptersBox"></div>
@@ -619,93 +619,94 @@
   </div>
 </div>
 
-<!-- 12媛꾩? 紐⑤떖 -->
+<!-- 12간지 모달 -->
 <div class="modal-backdrop" id="zishiModal" onclick="if(event.target===this)closeModal('zishiModal')">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('zishiModal')">횞</button>
-    <h2>12媛꾩? ?쒓컙??/h2>
-    <p>?대Ⅸ?ㅼ씠 "?몄떆???쒖뼱?щ떎"怨?留먯??섏떆??寃쎌슦, ?꾨옒 ?쒕? 李멸퀬???쒓컙???낅젰?댁＜?몄슂.
-    ?쒓뎅 ?쒖???湲곗??쇰줈 媛?媛꾩?蹂??쒖옉 ?쒓컙?먯꽌 ??30遺??뺣룄 ??쾶 ?낅젰?섏떆??寃껋쓣 異붿쿇?쒕┰?덈떎.
-    ?? ?먯떆?쇰㈃ <b>00:00</b>, 異뺤떆?쇰㈃ <b>02:00</b></p>
+    <button class="modal-close" onclick="closeModal('zishiModal')">×</button>
+    <h2>12간지 시간표</h2>
+    <p>어른들이 "인시에 태어났다"고 말씀하시는 경우, 아래 표를 참고해 시간을 입력해주세요.
+    한국 표준시 기준으로 각 간지별 시작 시간에서 약 30분 정도 늦게 입력하시는 것을 추천드립니다.
+    예) 자시라면 <b>00:00</b>, 축시라면 <b>02:00</b></p>
     <table>
-      <thead><tr><th>媛꾩?</th><th>?쒓컙</th></tr></thead>
+      <thead><tr><th>간지</th><th>시간</th></tr></thead>
       <tbody>
-        <tr><td>?먯떆 (耶먩셽)</td><td>23:30 ~ 01:30</td></tr>
-        <tr><td>異뺤떆 (訝묉셽)</td><td>01:30 ~ 03:30</td></tr>
-        <tr><td>?몄떆 (野끾셽)</td><td>03:30 ~ 05:30</td></tr>
-        <tr><td>臾섏떆 (??셽)</td><td>05:30 ~ 07:30</td></tr>
-        <tr><td>吏꾩떆 (渦경셽)</td><td>07:30 ~ 09:30</td></tr>
-        <tr><td>?ъ떆 (藥녔셽)</td><td>09:30 ~ 11:30</td></tr>
-        <tr><td>?ㅼ떆 (?덃셽)</td><td>11:30 ~ 13:30</td></tr>
-        <tr><td>誘몄떆 (?ゆ셽)</td><td>13:30 ~ 15:30</td></tr>
-        <tr><td>?좎떆 (?녔셽)</td><td>15:30 ~ 17:30</td></tr>
-        <tr><td>?좎떆 (?됪셽)</td><td>17:30 ~ 19:30</td></tr>
-        <tr><td>?좎떆 (?뚧셽)</td><td>19:30 ~ 21:30</td></tr>
-        <tr><td>?댁떆 (雅ζ셽)</td><td>21:30 ~ 23:30</td></tr>
+        <tr><td>자시 (子時)</td><td>23:30 ~ 01:30</td></tr>
+        <tr><td>축시 (丑時)</td><td>01:30 ~ 03:30</td></tr>
+        <tr><td>인시 (寅時)</td><td>03:30 ~ 05:30</td></tr>
+        <tr><td>묘시 (卯時)</td><td>05:30 ~ 07:30</td></tr>
+        <tr><td>진시 (辰時)</td><td>07:30 ~ 09:30</td></tr>
+        <tr><td>사시 (巳時)</td><td>09:30 ~ 11:30</td></tr>
+        <tr><td>오시 (午時)</td><td>11:30 ~ 13:30</td></tr>
+        <tr><td>미시 (未時)</td><td>13:30 ~ 15:30</td></tr>
+        <tr><td>신시 (申時)</td><td>15:30 ~ 17:30</td></tr>
+        <tr><td>유시 (酉時)</td><td>17:30 ~ 19:30</td></tr>
+        <tr><td>술시 (戌時)</td><td>19:30 ~ 21:30</td></tr>
+        <tr><td>해시 (亥時)</td><td>21:30 ~ 23:30</td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- ?꾩떆 蹂댁젙 ?ㅻ챸 紐⑤떖 -->
+<!-- 도시 보정 설명 모달 -->
 <div class="modal-backdrop" id="cityModal" onclick="if(event.target===this)closeModal('cityModal')">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('cityModal')">횞</button>
-    <h2>?꾩떆 蹂댁젙?대??</h2>
-    <p>?쒓뎅 ?쒖???KST)??<b>?숆꼍 135??/b>瑜?湲곗??쇰줈 ?⑸땲?? ?섏?留??ㅼ젣 ?쒓뎅 ?꾩떆?ㅼ? ?숆꼍 126~130?꾩뿉 ?꾩튂??    ?쒖??쒕낫???ㅼ젣 ?쒖뼇?쒓? <b>20~32遺??뺣룄 ??뒿?덈떎</b>.</p>
-    <p>?ъ＜??<b>?ㅼ젣 ?쒖뼇??/b>瑜?湲곗??쇰줈 怨꾩궛?댁빞 ?뺥솗?섎?濡? ?쒖뼱???꾩떆??寃쎈룄??留욎떠 ?쒓컙???먮룞 蹂댁젙?⑸땲??</p>
-    <p>?? ?쒖슱?먯꽌 ?ㅼ쟾 8?쒖뿉 ?쒖뼱?щ떎硫????ㅼ젣 ?쒖뼇?쒕뒗 ?ㅼ쟾 7??28遺??????쒓컙?쇰줈 ?ъ＜瑜?怨꾩궛?⑸땲??</p>
-    <p style="color:var(--accent);">???쒖뼱???꾩떆瑜??뺥솗???좏깮?댁빞 ?쒖＜(?귝윶)媛 ?뺥솗?섍쾶 ?섏샃?덈떎.</p>
+    <button class="modal-close" onclick="closeModal('cityModal')">×</button>
+    <h2>도시 보정이란?</h2>
+    <p>한국 표준시(KST)는 <b>동경 135도</b>를 기준으로 합니다. 하지만 실제 한국 도시들은 동경 126~130도에 위치해
+    표준시보다 실제 태양시가 <b>20~32분 정도 늦습니다</b>.</p>
+    <p>사주는 <b>실제 태양시</b>를 기준으로 계산해야 정확하므로, 태어난 도시의 경도에 맞춰 시간을 자동 보정합니다.</p>
+    <p>예) 서울에서 오전 8시에 태어났다면 → 실제 태양시는 오전 7시 28분 → 이 시간으로 사주를 계산합니다.</p>
+    <p style="color:var(--accent);">⚠ 태어난 도시를 정확히 선택해야 시주(時柱)가 정확하게 나옵니다.</p>
   </div>
 </div>
 
 <div class="pdf-render" id="pdfRender"></div>
 
 <script>
-// ?몄쬆 泥댄겕
+// 인증 체크
 if (!localStorage.getItem('auth_token')) location.href = '/';
-// 湲곗〈 怨듭슜 API ???먮룞 ?쒓굅 (留덉씠洹몃젅?댁뀡)
+// 기존 공용 API 키 자동 제거 (마이그레이션)
 localStorage.removeItem('openai_api_key');
 
-// ?? ?꾩떆蹂??쒓컙 蹂댁젙 (遺??⑥쐞, ?쒓뎅 KST 湲곗? -32~-20遺? ??
+// ── 도시별 시간 보정 (분 단위, 한국 KST 기준 -32~-20분) ──
 const CITY_OFFSETS = {
-  seoul: -32,     // ?쒖슱 126.98
-  busan: -24,     // 遺??129.07
-  incheon: -33,   // ?몄쿇 126.70
-  daegu: -26,     // ?援?128.60
-  daejeon: -30,   // ???127.39
-  gwangju: -33,   // 愿묒＜ 126.85
-  ulsan: -25,     // ?몄궛 129.31
-  sejong: -30,    // ?몄쥌 127.29
-  suwon: -32,     // ?섏썝 127.03
-  changwon: -26,  // 李쎌썝 128.68
-  goyang: -33,    // 怨좎뼇 126.83
-  yongin: -31,    // ?⑹씤 127.18
-  seongnam: -32,  // ?깅궓 127.14
-  cheongju: -30,  // 泥?＜ 127.49
-  jeonju: -31,    // ?꾩＜ 127.15
-  cheonan: -31,   // 泥쒖븞 127.15
-  pohang: -23,    // ?ы빆 129.34
-  jeju: -32,      // ?쒖＜ 126.53
-  chuncheon: -28, // 異섏쿇 127.73
-  gangneung: -24  // 媛뺣쫱 128.88
+  seoul: -32,     // 서울 126.98
+  busan: -24,     // 부산 129.07
+  incheon: -33,   // 인천 126.70
+  daegu: -26,     // 대구 128.60
+  daejeon: -30,   // 대전 127.39
+  gwangju: -33,   // 광주 126.85
+  ulsan: -25,     // 울산 129.31
+  sejong: -30,    // 세종 127.29
+  suwon: -32,     // 수원 127.03
+  changwon: -26,  // 창원 128.68
+  goyang: -33,    // 고양 126.83
+  yongin: -31,    // 용인 127.18
+  seongnam: -32,  // 성남 127.14
+  cheongju: -30,  // 청주 127.49
+  jeonju: -31,    // 전주 127.15
+  cheonan: -31,   // 천안 127.15
+  pohang: -23,    // 포항 129.34
+  jeju: -32,      // 제주 126.53
+  chuncheon: -28, // 춘천 127.73
+  gangneung: -24  // 강릉 128.88
 };
 
-// ?? ?곹깭 ??
+// ── 상태 ──
 let currentUserInfo = null;
 let currentChapters = [];
-let selectedGender = '?⑥꽦';
+let selectedGender = '남성';
 let selectedCalendar = 'solar';
 let selectedReportType = 'deep';
 
-// ?? 珥덇린????
+// ── 초기화 ──
 window.addEventListener('DOMContentLoaded', () => {
-  // ??遺??쒕∼?ㅼ슫
+  // 시/분 드롭다운
   const hourSel = document.getElementById('hour');
   for (let h = 0; h < 24; h++) {
     const opt = document.createElement('option');
     opt.value = h;
-    opt.textContent = String(h).padStart(2, '0') + '??;
+    opt.textContent = String(h).padStart(2, '0') + '시';
     hourSel.appendChild(opt);
   }
   const minSel = document.getElementById('minute');
@@ -713,11 +714,11 @@ window.addEventListener('DOMContentLoaded', () => {
   for (let m = 0; m < 60; m += 5) {
     const opt = document.createElement('option');
     opt.value = m;
-    opt.textContent = String(m).padStart(2, '0') + '遺?;
+    opt.textContent = String(m).padStart(2, '0') + '분';
     minSel.appendChild(opt);
   }
 
-  // ??λ맂 API ??(?ъ슜?먮퀎)
+  // 저장된 API 키 (사용자별)
   const keyName = 'openai_api_key_' + (localStorage.getItem('current_user_name') || '');
   const saved = localStorage.getItem(keyName);
   if (saved) {
@@ -726,7 +727,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// ?? ?좉? 踰꾪듉 ??
+// ── 토글 버튼 ──
 function selectGender(g) {
   selectedGender = g;
   document.querySelectorAll('[data-gender]').forEach(b =>
@@ -743,7 +744,7 @@ function selectReportType(t) {
     b.classList.toggle('active', b.dataset.rtype === t));
 }
 
-// ?? ?쒓컙 紐⑤쫫 泥댄겕諛뺤뒪 ??
+// ── 시간 모름 체크박스 ──
 function toggleTimeUnknown() {
   const checked = document.getElementById('timeUnknown').checked;
   document.getElementById('hour').disabled = checked;
@@ -754,15 +755,15 @@ function toggleTimeUnknown() {
   }
 }
 
-// ?? 紐⑤떖 ??
+// ── 모달 ──
 function openModal(id) { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
-// ?? API ????
+// ── API 키 ──
 function _keyName() { return 'openai_api_key_' + (localStorage.getItem('current_user_name') || ''); }
 function saveKey() {
   const key = document.getElementById('apiKey').value.trim();
-  if (!key || !key.startsWith('sk-')) { alert('?щ컮瑜?OpenAI API ?ㅻ? ?낅젰?댁＜?몄슂 (sk-濡??쒖옉)'); return; }
+  if (!key || !key.startsWith('sk-')) { alert('올바른 OpenAI API 키를 입력해주세요 (sk-로 시작)'); return; }
   localStorage.setItem(_keyName(), key);
   localStorage.removeItem('openai_api_key');
   collapseKey(key);
@@ -780,7 +781,7 @@ function getApiKey() {
   return localStorage.getItem(_keyName()) || document.getElementById('apiKey').value.trim();
 }
 
-// ?? ?곹깭 ??
+// ── 상태 ──
 function showStatus(elId, html, type) {
   const el = document.getElementById(elId);
   el.className = 'status-box ' + type;
@@ -791,7 +792,7 @@ function clearStatus(elId) {
   document.getElementById(elId).innerHTML = '';
 }
 
-// ?? ?쒓컙 蹂댁젙 ?곸슜 ??
+// ── 시간 보정 적용 ──
 function applyCityOffset(hour, minute, cityKey) {
   const offset = CITY_OFFSETS[cityKey] || 0;
   let totalMin = hour * 60 + minute + offset;
@@ -805,10 +806,10 @@ function applyCityOffset(hour, minute, cityKey) {
   };
 }
 
-// ?? 由ы룷???앹꽦 ??
+// ── 리포트 생성 ──
 async function generateReport() {
   const apiKey = getApiKey();
-  if (!apiKey) { showStatus('genStatus', 'OpenAI API ?ㅻ? 癒쇱? ??ν빐二쇱꽭??', 'err'); return; }
+  if (!apiKey) { showStatus('genStatus', 'OpenAI API 키를 먼저 저장해주세요.', 'err'); return; }
 
   const name = document.getElementById('name').value.trim();
   const year = document.getElementById('year').value;
@@ -817,20 +818,20 @@ async function generateReport() {
   const isTimeUnknown = document.getElementById('timeUnknown').checked;
   const cityKey = document.getElementById('city').value;
 
-  if (!name) return showStatus('genStatus', '?대쫫???낅젰?댁＜?몄슂.', 'err');
-  if (!year || !month || !day) return showStatus('genStatus', '?앸뀈?붿씪??紐⑤몢 ?낅젰?댁＜?몄슂.', 'err');
+  if (!name) return showStatus('genStatus', '이름을 입력해주세요.', 'err');
+  if (!year || !month || !day) return showStatus('genStatus', '생년월일을 모두 입력해주세요.', 'err');
 
   let hourVal, minuteVal;
   if (isTimeUnknown) {
     hourVal = null; minuteVal = null;
   } else {
     const hv = document.getElementById('hour').value;
-    if (hv === '') return showStatus('genStatus', '?쒖뼱???쒓컙???좏깮?섍굅??"?쒓컙??紐⑤쫫"??泥댄겕?댁＜?몄슂.', 'err');
+    if (hv === '') return showStatus('genStatus', '태어난 시간을 선택하거나 "시간을 모름"을 체크해주세요.', 'err');
     hourVal = parseInt(hv);
     minuteVal = parseInt(document.getElementById('minute').value) || 0;
   }
 
-  // ?꾩떆 蹂댁젙 ?곸슜
+  // 도시 보정 적용
   let yearN = parseInt(year), monthN = parseInt(month), dayN = parseInt(day);
   if (!isTimeUnknown) {
     const adjusted = applyCityOffset(hourVal, minuteVal, cityKey);
@@ -857,10 +858,10 @@ async function generateReport() {
   };
 
   const btn = document.getElementById('genBtn');
-  btn.disabled = true; btn.textContent = '?앹꽦 以?..';
+  btn.disabled = true; btn.textContent = '생성 중...';
   const chapCount = selectedReportType === 'half' ? 20 : 40;
-  const timeEst = selectedReportType === 'half' ? '??2~3遺? : '??3~5遺?;
-  showStatus('genStatus', `<span class="loader"></span>${chapCount}梨뺥꽣 遺꾩꽍 以?.. ${timeEst} ?뚯슂?⑸땲?? ?좎떆留?湲곕떎?ㅼ＜?몄슂.`, 'loading');
+  const timeEst = selectedReportType === 'half' ? '약 2~3분' : '약 3~5분';
+  showStatus('genStatus', `<span class="loader"></span>${chapCount}챕터 분석 중... ${timeEst} 소요됩니다. 잠시만 기다려주세요.`, 'loading');
 
   try {
     const res = await fetch('/api/generate', {
@@ -869,7 +870,7 @@ async function generateReport() {
       body: JSON.stringify(data)
     });
     const json = await res.json();
-    if (!res.ok) throw new Error(json.error || '?ㅻ쪟');
+    if (!res.ok) throw new Error(json.error || '오류');
 
     currentUserInfo = json.userInfo;
     currentUserInfo.cityName = document.getElementById('city').selectedOptions[0].textContent;
@@ -877,13 +878,13 @@ async function generateReport() {
     currentChapters = json.chapters;
     renderPreview();
   } catch (e) {
-    showStatus('genStatus', '??' + e.message, 'err');
+    showStatus('genStatus', '❌ ' + e.message, 'err');
   } finally {
-    btn.disabled = false; btn.textContent = '由ы룷???앹꽦 ?쒖옉';
+    btn.disabled = false; btn.textContent = '리포트 생성 시작';
   }
 }
 
-// ?? 誘몃━蹂닿린 ??
+// ── 미리보기 ──
 function renderPreview() {
   document.getElementById('inputScreen').classList.add('hidden');
   document.getElementById('previewScreen').classList.remove('hidden');
@@ -891,15 +892,15 @@ function renderPreview() {
 
   const s = currentUserInfo.saju;
   const timeWarning = currentUserInfo.timeUnknown
-    ? '<br><span style="color:var(--accent);font-size:12px;">???쒖뼱???쒓컙??紐⑤Ⅴ?붿꽌 ?뺤삤 湲곗??쇰줈 怨꾩궛?섏뿀?듬땲?? ?쒖＜ 愿??遺꾩꽍? 李멸퀬?⑹엯?덈떎.</span>'
+    ? '<br><span style="color:var(--accent);font-size:12px;">⚠ 태어난 시간을 모르셔서 정오 기준으로 계산되었습니다. 시주 관련 분석은 참고용입니다.</span>'
     : '';
-  const cityInfo = currentUserInfo.cityName ? ` 쨌 ${currentUserInfo.cityName} 湲곗?` : '';
+  const cityInfo = currentUserInfo.cityName ? ` · ${currentUserInfo.cityName} 기준` : '';
   document.getElementById('sajuInfo').innerHTML =
     `<b>${currentUserInfo.name}</b> (${currentUserInfo.gender})${cityInfo}<br>
-     ?묐젰 ${s.solarDate} 쨌 ?뚮젰 ${s.lunarDate} 쨌 ${s.zodiac}??br>
+     양력 ${s.solarDate} · 음력 ${s.lunarDate} · ${s.zodiac}띠<br>
      ${s.fullKorean}<br>
-     ?쇨컙 <b>${s.dayMaster.korean}(${s.dayMaster.hanja}) 쨌 ${s.dayMaster.element}</b> 쨌 
-     ?ㅽ뻾 紐?{s.elements.紐? ??{s.elements.?? ??{s.elements.?? 湲?{s.elements.湲? ??{s.elements.??${timeWarning}`;
+     일간 <b>${s.dayMaster.korean}(${s.dayMaster.hanja}) · ${s.dayMaster.element}</b> · 
+     오행 목${s.elements.목} 화${s.elements.화} 토${s.elements.토} 금${s.elements.금} 수${s.elements.수}${timeWarning}`;
 
   const box = document.getElementById('chaptersBox');
   box.innerHTML = currentChapters.map((c, i) => `
@@ -910,24 +911,24 @@ function renderPreview() {
           <div class="chapter-title">${escapeHtml(c.title)}</div>
         </div>
         <div class="chapter-actions">
-          <button class="btn btn-ghost btn-small" onclick="toggleEdit(${i})">?몄쭛</button>
-          <button class="btn btn-ghost btn-small" onclick="toggleRegen(${i})">?ъ깮??/button>
+          <button class="btn btn-ghost btn-small" onclick="toggleEdit(${i})">편집</button>
+          <button class="btn btn-ghost btn-small" onclick="toggleRegen(${i})">재생성</button>
         </div>
       </div>
       <div class="chapter-body">${escapeHtml(c.content)}</div>
       <div class="edit-area">
         <textarea id="edit-${i}">${escapeHtml(c.content)}</textarea>
         <div class="btn-row">
-          <button class="btn btn-gold btn-small" onclick="saveEdit(${i})">???/button>
-          <button class="btn btn-ghost btn-small" onclick="cancelEdit(${i})">痍⑥냼</button>
+          <button class="btn btn-gold btn-small" onclick="saveEdit(${i})">저장</button>
+          <button class="btn btn-ghost btn-small" onclick="cancelEdit(${i})">취소</button>
         </div>
       </div>
       <div class="regen-box">
-        <label style="font-size:11px;color:var(--muted);font-family:'Noto Sans KR',sans-serif;">異붽? 吏?쒖궗??(?좏깮)</label>
-        <textarea id="regen-${i}" placeholder="?? ??援ъ껜?곸쑝濡?/ 湲띿젙?곸쑝濡?/ ??吏㏐쾶"></textarea>
+        <label style="font-size:11px;color:var(--muted);font-family:'Noto Sans KR',sans-serif;">추가 지시사항 (선택)</label>
+        <textarea id="regen-${i}" placeholder="예: 더 구체적으로 / 긍정적으로 / 더 짧게"></textarea>
         <div class="btn-row">
-          <button class="btn btn-gold btn-small" onclick="doRegen(${i})">?ㅼ떆 ?앹꽦</button>
-          <button class="btn btn-ghost btn-small" onclick="toggleRegen(${i})">痍⑥냼</button>
+          <button class="btn btn-gold btn-small" onclick="doRegen(${i})">다시 생성</button>
+          <button class="btn btn-ghost btn-small" onclick="toggleRegen(${i})">취소</button>
         </div>
       </div>
     </div>
@@ -940,7 +941,7 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// ?? ?몄쭛/?ъ깮????
+// ── 편집/재생성 ──
 function toggleEdit(i) {
   const el = document.getElementById('ch-' + i);
   el.classList.remove('regenerating');
@@ -964,14 +965,14 @@ function toggleRegen(i) {
 }
 async function doRegen(i) {
   const apiKey = getApiKey();
-  if (!apiKey) return alert('API ?ㅺ? ?놁뒿?덈떎');
+  if (!apiKey) return alert('API 키가 없습니다');
   const instruction = document.getElementById('regen-' + i).value.trim();
   const el = document.getElementById('ch-' + i);
   const body = el.querySelector('.chapter-body');
   const actions = el.querySelectorAll('.chapter-actions button');
   actions.forEach(b => b.disabled = true);
   const origText = body.textContent;
-  body.innerHTML = '<span class="loader"></span><span style="color:var(--muted);">?ъ깮??以?..</span>';
+  body.innerHTML = '<span class="loader"></span><span style="color:var(--muted);">재생성 중...</span>';
   try {
     const res = await fetch('/api/regenerate', {
       method: 'POST',
@@ -979,7 +980,7 @@ async function doRegen(i) {
       body: JSON.stringify({ apiKey, userInfo: currentUserInfo, index: i, instruction })
     });
     const json = await res.json();
-    if (!res.ok) throw new Error(json.error || '?ㅻ쪟');
+    if (!res.ok) throw new Error(json.error || '오류');
     currentChapters[i] = json.chapter;
     body.textContent = json.chapter.content;
     document.getElementById('edit-' + i).value = json.chapter.content;
@@ -987,39 +988,40 @@ async function doRegen(i) {
     document.getElementById('regen-' + i).value = '';
   } catch (e) {
     body.textContent = origText;
-    alert('?ъ깮???ㅽ뙣: ' + e.message);
+    alert('재생성 실패: ' + e.message);
   } finally {
     actions.forEach(b => b.disabled = false);
   }
 }
 
 function backToInput() {
-  if (!confirm('?꾩옱 由ы룷?멸? ?щ씪吏묐땲?? 怨꾩냽?섏떆寃좎뒿?덇퉴?')) return;
+  if (!confirm('현재 리포트가 사라집니다. 계속하시겠습니까?')) return;
   document.getElementById('previewScreen').classList.add('hidden');
   document.getElementById('inputScreen').classList.remove('hidden');
   currentUserInfo = null; currentChapters = [];
 }
 
-// ?? PDF ??
-// ???섏씠吏???ㅼ뼱媛?蹂몃Ц 湲????異붿젙 (Noto Sans KR 15px / line-height 2.1 / A4 蹂몃Ц ?곸뿭)
-const PDF_CHARS_PER_PAGE = 1100; // 蹂댁닔?곸쑝濡??≪븘 ?덉쟾?섍쾶
+// ── PDF ──
+// 한 페이지에 들어갈 본문 글자 수 추정 (Noto Sans KR 15px / line-height 2.1 / A4 본문 영역)
+const PDF_CHARS_PER_PAGE = 1100; // 보수적으로 잡아 안전하게
 
-// 梨뺥꽣 蹂몃Ц???섏씠吏 ?⑥쐞濡?遺꾪븷 (?⑤씫 寃쎄퀎?먯꽌 ?딄린)
+// 챕터 본문을 페이지 단위로 분할 (단락 경계에서 끊기)
 function splitContentIntoPages(content, maxCharsPerPage) {
   const paragraphs = String(content || '').split(/\n\s*\n/);
   const pages = [];
   let buf = '';
   for (const p of paragraphs) {
     if (!p.trim()) continue;
-    // ?꾩옱 踰꾪띁???⑤씫 異붽??덉쓣 ???섏씠吏 ?쒓퀎瑜??섏쑝硫??섏씠吏 ?リ퀬 ???섏씠吏
+    // 현재 버퍼에 단락 추가했을 때 페이지 한계를 넘으면 페이지 닫고 새 페이지
     if (buf && (buf.length + p.length + 2) > maxCharsPerPage) {
       pages.push(buf);
       buf = p;
     } else {
       buf = buf ? buf + '\n\n' + p : p;
     }
-    // ???⑤씫???덈Т 湲몄뼱?????섏씠吏?????ㅼ뼱媛???    while (buf.length > maxCharsPerPage * 1.3) {
-      // 臾몄옣 ?⑥쐞 ?딄린 ?쒕룄
+    // 한 단락이 너무 길어서 한 페이지에 안 들어갈 때
+    while (buf.length > maxCharsPerPage * 1.3) {
+      // 문장 단위 끊기 시도
       let cutAt = buf.lastIndexOf('. ', maxCharsPerPage);
       if (cutAt < maxCharsPerPage * 0.5) cutAt = buf.lastIndexOf('\n', maxCharsPerPage);
       if (cutAt < maxCharsPerPage * 0.5) cutAt = maxCharsPerPage;
@@ -1031,24 +1033,24 @@ function splitContentIntoPages(content, maxCharsPerPage) {
   return pages.length ? pages : [''];
 }
 
-// ?ㅽ뻾 留됰?洹몃옒??SVG ?앹꽦
+// 오행 막대그래프 SVG 생성
 function buildElementBarSVG(elements) {
   const items = [
-    { key: '紐?, color: '#3a8c3a', label: '紐?(??' },
-    { key: '??, color: '#c93838', label: '??(??' },
-    { key: '??, color: '#a87b3a', label: '??(??' },
-    { key: '湲?, color: '#9a9a9a', label: '湲?(??' },
-    { key: '??, color: '#2c5d8a', label: '??(麗?' }
+    { key: '목', color: '#3a8c3a', label: '목 (木)' },
+    { key: '화', color: '#c93838', label: '화 (火)' },
+    { key: '토', color: '#a87b3a', label: '토 (土)' },
+    { key: '금', color: '#9a9a9a', label: '금 (金)' },
+    { key: '수', color: '#2c5d8a', label: '수 (水)' }
   ];
   const max = Math.max(...items.map(it => elements[it.key] || 0), 1);
   const W = 600, H = 320, leftPad = 80, topPad = 30, barW = 70, gap = 28;
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" style="width:100%;max-width:600px;display:block;margin:0 auto;">`;
-  // Y異?(寃⑹옄)
+  // Y축 (격자)
   for (let i = 0; i <= 4; i++) {
     const y = topPad + (H - topPad - 60) * (i / 4);
     svg += `<line x1="${leftPad}" y1="${y}" x2="${W - 20}" y2="${y}" stroke="#e0ceb4" stroke-width="1" stroke-dasharray="3,3"/>`;
   }
-  // 留됰?
+  // 막대
   items.forEach((it, idx) => {
     const v = elements[it.key] || 0;
     const barH = (H - topPad - 60) * (v / max);
@@ -1062,36 +1064,37 @@ function buildElementBarSVG(elements) {
   return svg;
 }
 
-// ?ъ＜?붿옄 4횞2 ??(泥쒓컙 ?? 吏吏 ?꾨옒)
+// 사주팔자 4×2 표 (천간 위, 지지 아래)
 function buildSajuTable(s) {
-  // s.fullKorean??"?뺥빐 ?꾩옄 媛묒삤 蹂묒씤" 媛숈? ?뺤떇 媛????遺꾨━
+  // s.fullKorean이 "정해 임자 갑오 병인" 같은 형식 가정 → 분리
   const parts = (s.fullKorean || '').trim().split(/\s+/);
-  // ?쒖옄 ?뺤떇??遺꾨━
+  // 한자 형식도 분리
   const partsHan = (s.fullHanja || '').trim().split(/\s+/);
-  const labels = ['?쒖＜(?귝윶)', '?쇱＜(?ζ윶)', '?붿＜(?덃윶)', '?곗＜(亮닸윶)'];
+  const labels = ['시주(時柱)', '일주(日柱)', '월주(月柱)', '연주(年柱)'];
   const isTimeUnknown = !!currentUserInfo?.timeUnknown;
-  // ?쇰컲?곸쑝濡?fullKorean? ?곗썡?쇱떆 ?쒖꽌. ?쒕뒗 ?쒋넂?쇄넂?붴넂??(?ㅻⅨ履쎌씠 怨쇨굅) 紐낅━??愿??  // ?ш린?쒕뒗 ?덉쟾?섍쾶 ?곗썡?쇱떆 ?쒖쑝濡??쒖떆
-  const orderLabels = ['?곗＜(亮닸윶)', '?붿＜(?덃윶)', '?쇱＜(?ζ윶)', '?쒖＜(?귝윶)'];
+  // 일반적으로 fullKorean은 연월일시 순서. 표는 시→일→월→연 (오른쪽이 과거) 명리학 관습
+  // 여기서는 안전하게 연월일시 순으로 표시
+  const orderLabels = ['연주(年柱)', '월주(月柱)', '일주(日柱)', '시주(時柱)'];
   let html = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid #b8860b;background:#fff;">`;
-  // 泥?以? ?쇰꺼
+  // 첫 줄: 라벨
   for (let i = 0; i < 4; i++) {
     html += `<div style="padding:12px 8px;text-align:center;font-family:'Noto Sans KR',sans-serif;font-size:12px;color:#7a6652;background:rgba(184,134,11,0.12);border-right:1px solid #e0ceb4;border-bottom:1px solid #b8860b;${i===3?'border-right:none;':''}">${orderLabels[i]}</div>`;
   }
-  // ?섏㎏ 以? 泥쒓컙 (?쒓? + ?쒖옄)
+  // 둘째 줄: 천간 (한글 + 한자)
   for (let i = 0; i < 4; i++) {
     const isUnknownHour = isTimeUnknown && i === 3;
-    const kor = isUnknownHour ? 'X' : (parts[i] || '쨌').charAt(0);
-    const han = isUnknownHour ? 'X' : (partsHan[i] || '쨌').charAt(0);
+    const kor = isUnknownHour ? 'X' : (parts[i] || '·').charAt(0);
+    const han = isUnknownHour ? 'X' : (partsHan[i] || '·').charAt(0);
     html += `<div style="padding:30px 10px;text-align:center;border-right:1px solid #e0ceb4;border-bottom:2px solid #b8860b;${i===3?'border-right:none;':''}">
       <div style="font-size:42px;color:#2c1810;font-weight:700;line-height:1;">${han}</div>
       <div style="font-size:14px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:6px;">${kor}</div>
     </div>`;
   }
-  // ?뗭㎏ 以? 吏吏 (?쒓? + ?쒖옄)
+  // 셋째 줄: 지지 (한글 + 한자)
   for (let i = 0; i < 4; i++) {
     const isUnknownHour = isTimeUnknown && i === 3;
-    const kor = isUnknownHour ? 'X' : ((parts[i] || '쨌쨌').charAt(1) || '쨌');
-    const han = isUnknownHour ? 'X' : ((partsHan[i] || '쨌쨌').charAt(1) || '쨌');
+    const kor = isUnknownHour ? 'X' : ((parts[i] || '··').charAt(1) || '·');
+    const han = isUnknownHour ? 'X' : ((partsHan[i] || '··').charAt(1) || '·');
     html += `<div style="padding:30px 10px;text-align:center;border-right:1px solid #e0ceb4;${i===3?'border-right:none;':''}">
       <div style="font-size:42px;color:#2c1810;font-weight:700;line-height:1;">${han}</div>
       <div style="font-size:14px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:6px;">${kor}</div>
@@ -1108,10 +1111,10 @@ function normalizeReportHtmlByType(html) {
 
   if (type === 'yearly') {
     html = html
-      .replace(/??s*??s*??s*遺?s*??s*??g, '????????遺?????)
+      .replace(/연\s*애\s*운\s*분\s*석\s*서/g, '신 년 운 세 분 석 서')
       .replace(/LOVE FORTUNE REPORT/g, 'YEARLY FORTUNE REPORT')
-      .replace(/2024??g, y + '??)
-      .replace(/2025??g, y + '??);
+      .replace(/2024년/g, y + '년')
+      .replace(/2025년/g, y + '년');
   }
 
   return html;
@@ -1120,13 +1123,13 @@ function normalizeReportHtmlByType(html) {
 async function downloadPDF() {
   if (!currentChapters.length) return;
   const btn = document.getElementById('dlBtn');
-  btn.disabled = true; btn.textContent = 'PDF ?앹꽦 以?..';
-  showStatus('dlStatus', '<span class="loader"></span>PDF ?뚮뜑留?以?..', 'loading');
+  btn.disabled = true; btn.textContent = 'PDF 생성 중...';
+  showStatus('dlStatus', '<span class="loader"></span>PDF 렌더링 중...', 'loading');
 
   const s = currentUserInfo.saju;
   const render = document.getElementById('pdfRender');
   const isHalf = currentUserInfo.reportType === 'half' || currentChapters.length <= 20;
-  // 釉뚮옖?쒕챸 (??λ맂 寃??덉쑝硫??ъ슜, ?놁쑝硫?湲곕낯媛?
+  // 브랜드명 (저장된 것 있으면 사용, 없으면 기본값)
   const userName = localStorage.getItem('current_user_name') || '';
   let brandName = '';
   try {
@@ -1136,32 +1139,32 @@ async function downloadPDF() {
       brandName = (meData.user && meData.user.brandName) || '';
     }
   } catch (e) {}
-  if (!brandName) brandName = userName ? `${userName} ?ъ＜` : '?쒖씪???ъ＜';
+  if (!brandName) brandName = userName ? `${userName} 사주` : '제일라 사주';
 
-  // PARTS ?숈쟻 ?앹꽦 (?꾩옱 ?곕룄 諛섏쁺, half硫?PART 1~3留?
+  // PARTS 동적 생성 (현재 연도 반영, half면 PART 1~3만)
   const currYear = new Date().getFullYear();
   const ALL_PARTS = [
-    { title: 'PART 1. ?怨좊궃 ?곗븷 ?깊뼢', sub: 'Love Nature', range: [0, 5] },
-    { title: 'PART 2. 愿怨???媛먯젙 ?먮쫫', sub: 'Emotional Flow', range: [5, 11] },
-    { title: 'PART 3. ?몄뿰怨??꾩떎 ?곗븷??, sub: 'Love Timing', range: [11, 17] },
-    { title: 'PART 4. 嫄닿컯怨??몄깮', sub: 'Health & Life', range: [17, 22] },
+    { title: 'PART 1. 타고난 연애 성향', sub: 'Love Nature', range: [0, 5] },
+    { title: 'PART 2. 관계 속 감정 흐름', sub: 'Emotional Flow', range: [5, 11] },
+    { title: 'PART 3. 인연과 현실 연애운', sub: 'Love Timing', range: [11, 17] },
+    { title: 'PART 4. 건강과 인생', sub: 'Health & Life', range: [17, 22] },
   ];
-  // half??梨뺥꽣 0~19源뚯?留??덉쓬 ??PART 1, 2, 3 (0~5, 5~11, 11~17) + 洹??댄썑 18~19??PART 4 ?쇰?
+  // half는 챕터 0~19까지만 있음 → PART 1, 2, 3 (0~5, 5~11, 11~17) + 그 이후 18~19는 PART 4 일부
   const PARTS = currentUserInfo.reportType === 'yearly'
     ? [
-        { title: 'PART 1. ?ы빐 ?꾩껜 ?먮쫫', sub: 'Yearly Flow', range: [0, 5] },
-        { title: 'PART 2. 愿怨꾩? ?몄뿰 ?먮쫫', sub: 'Relationship Flow', range: [5, 10] },
-        { title: 'PART 3. ?щЪ쨌吏곸뾽쨌嫄닿컯??, sub: 'Money Career Health', range: [10, 15] },
-        { title: 'PART 4. ?좏깮怨?二쇱쓽???먮쫫', sub: 'Caution & Choice', range: [15, 19] },
-        { title: 'PART 5. ?몄깮 援닿끝怨??대챸', sub: 'Life Turning Point', range: [19, 24] },
-        { title: 'PART 6. ?붾퀎 ?듭떖 ?댁꽭', sub: 'Monthly Summary', range: [24, 36] }
+        { title: 'PART 1. 올해 전체 흐름', sub: 'Yearly Flow', range: [0, 5] },
+        { title: 'PART 2. 관계와 인연 흐름', sub: 'Relationship Flow', range: [5, 10] },
+        { title: 'PART 3. 재물·직업·건강운', sub: 'Money Career Health', range: [10, 15] },
+        { title: 'PART 4. 선택과 주의할 흐름', sub: 'Caution & Choice', range: [15, 19] },
+        { title: 'PART 5. 인생 굴곡과 운명', sub: 'Life Turning Point', range: [19, 24] },
+        { title: 'PART 6. 월별 핵심 운세', sub: 'Monthly Summary', range: [24, 36] }
       ]
     : isHalf
     ? [
-        { title: 'PART 1. ?怨좊궃 ?곗븷 ?깊뼢', sub: 'Love Nature', range: [0, 5] },
-        { title: 'PART 2. 愿怨???媛먯젙 ?먮쫫', sub: 'Emotional Flow', range: [5, 11] },
-        { title: 'PART 3. ?몄뿰怨??꾩떎 ?곗븷??, sub: 'Love Timing', range: [11, 17] },
-        { title: 'PART 4. ?곗븷 ?먮쫫 珥앹젙由?, sub: 'Love Summary', range: [17, 20] }
+        { title: 'PART 1. 타고난 연애 성향', sub: 'Love Nature', range: [0, 5] },
+        { title: 'PART 2. 관계 속 감정 흐름', sub: 'Emotional Flow', range: [5, 11] },
+        { title: 'PART 3. 인연과 현실 연애운', sub: 'Love Timing', range: [11, 17] },
+        { title: 'PART 4. 연애 흐름 총정리', sub: 'Love Summary', range: [17, 20] }
       ]
     : ALL_PARTS;
 
@@ -1169,32 +1172,32 @@ async function downloadPDF() {
   const estPages = isHalf ? 60 : 120;
 
   const REPORT_META = {
-    yearly: { title: '?좊뀈?댁꽭 遺꾩꽍?? },
-    deep: { title: '?몄깮 ?ъ＜ ?ъ링遺꾩꽍' },
-    love: { title: '?곗븷??遺꾩꽍?? },
-    marriage: { title: '寃고샎??遺꾩꽍?? },
-    money: { title: '?ъ뾽쨌吏곸옣쨌?щЪ쨌湲덉쟾??遺꾩꽍?? },
-    couple: { title: '?곗씤 沅곹빀 遺꾩꽍?? },
-    half: { title: '?ъ＜ 遺꾩꽍?? }
+    yearly: { title: '신년운세 분석서' },
+    deep: { title: '인생 사주 심층분석' },
+    love: { title: '연애운 분석서' },
+    marriage: { title: '결혼운 분석서' },
+    money: { title: '사업·직장·재물·금전운 분석서' },
+    couple: { title: '연인 궁합 분석서' },
+    half: { title: '사주 분석서' }
   };
 
-  const reportMeta = REPORT_META[currentUserInfo.reportType] || { title: '?ъ＜ 遺꾩꽍?? };
+  const reportMeta = REPORT_META[currentUserInfo.reportType] || { title: '사주 분석서' };
   const reportLabel = reportMeta.title;
 
-  // === ?쒖? ===
+  // === 표지 ===
   let html = `
     <div class="pdf-page pdf-cover">
       <div style="font-size:11px;color:#b8860b;letter-spacing:6px;font-family:'Noto Sans KR',sans-serif;margin-bottom:24px;">${escapeHtml(brandName)}</div>
-      <div class="em">??/div>
-      <h1>${currentUserInfo.reportType === 'yearly' ? '?좊뀈?댁꽭 遺꾩꽍?? : '?곗븷??遺꾩꽍??}</h1>
+      <div class="em">☯</div>
+      <h1>${currentUserInfo.reportType === 'yearly' ? '신년운세 분석서' : '연애운 분석서'}</h1>
       <div class="sub">${currentUserInfo.reportType === 'yearly' ? 'YEARLY FORTUNE REPORT' : 'LOVE FORTUNE REPORT'}</div>
       <div class="ln"></div>
       <div class="nm">${escapeHtml(currentUserInfo.name)} (${escapeHtml(currentUserInfo.gender)})</div>
       <div class="if">
-        ?묐젰 ${s.solarDate}<br>
-        ?뚮젰 ${s.lunarDate} 쨌 ${s.zodiac}??br>
+        양력 ${s.solarDate}<br>
+        음력 ${s.lunarDate} · ${s.zodiac}띠<br>
         ${s.fullKorean}<br>
-        ?쇨컙 ${s.dayMaster.korean}(${s.dayMaster.hanja}) 쨌 ${s.dayMaster.element}
+        일간 ${s.dayMaster.korean}(${s.dayMaster.hanja}) · ${s.dayMaster.element}
       </div>
       <div class="ln"></div>
       <div style="font-size:13px;color:#7a6652;font-family:'Noto Sans KR',sans-serif;margin-top:30px;letter-spacing:2px;">
@@ -1202,50 +1205,50 @@ async function downloadPDF() {
       </div>
     </div>`;
 
-  // === ?ъ＜?붿옄 ???섏씠吏 ===
+  // === 사주팔자 표 페이지 ===
   html += `
     <div class="pdf-page">
-      <div class="pdf-toc-title" style="font-size:26px;letter-spacing:6px;">?ъ＜?붿옄</div>
+      <div class="pdf-toc-title" style="font-size:26px;letter-spacing:6px;">사주팔자</div>
       <div class="pdf-toc-sub">FOUR PILLARS</div>
       <div class="pdf-toc-divider"></div>
       <div style="margin:30px 0 20px;text-align:center;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:#7a6652;line-height:2;">
-        ${escapeHtml(currentUserInfo.name)} ?섏쓽 ?ъ＜???ㅼ쓬怨?媛숈씠 援ъ꽦?⑸땲??<br>
-        ?꾨뒗 <b style="color:#2c1810;">泥쒓컙(鸚⒴묾)</b>, ?꾨옒??<b style="color:#2c1810;">吏吏(?경뵱)</b>?낅땲??
+        ${escapeHtml(currentUserInfo.name)} 님의 사주는 다음과 같이 구성됩니다.<br>
+        위는 <b style="color:#2c1810;">천간(天干)</b>, 아래는 <b style="color:#2c1810;">지지(地支)</b>입니다.
       </div>
       ${buildSajuTable(s)}
       <div style="margin-top:40px;padding:20px 24px;background:rgba(184,134,11,0.08);border:1px solid #e0ceb4;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.95;color:#1a1209;">
-        <div style="font-weight:700;color:#2c1810;margin-bottom:10px;font-size:14px;">湲곕낯 ?뺣낫</div>
-        쨌 ?쇨컙(???먯떊): <b>${s.dayMaster.korean}(${s.dayMaster.hanja}) 쨌 ${s.dayMaster.element}</b><br>
-        쨌 ?좉컯/?좎빟: <b>${s.strength.label}</b> (${s.strength.ratio}%)<br>
-        쨌 ?⑹떊(媛???꾩슂??湲곗슫): <b>${s.yongShin.element}</b><br>
-        쨌 ?? <b>${s.zodiac}</b>
+        <div style="font-weight:700;color:#2c1810;margin-bottom:10px;font-size:14px;">기본 정보</div>
+        · 일간(나 자신): <b>${s.dayMaster.korean}(${s.dayMaster.hanja}) · ${s.dayMaster.element}</b><br>
+        · 신강/신약: <b>${s.strength.label}</b> (${s.strength.ratio}%)<br>
+        · 용신(가장 필요한 기운): <b>${s.yongShin.element}</b><br>
+        · 띠: <b>${s.zodiac}</b>
       </div>
     </div>`;
 
-  // === ?ㅽ뻾 留됰?洹몃옒???섏씠吏 ===
+  // === 오행 막대그래프 페이지 ===
   html += `
     <div class="pdf-page">
-      <div class="pdf-toc-title" style="font-size:26px;letter-spacing:6px;">?ㅽ뻾??洹좏삎</div>
+      <div class="pdf-toc-title" style="font-size:26px;letter-spacing:6px;">오행의 균형</div>
       <div class="pdf-toc-sub">FIVE ELEMENTS BALANCE</div>
       <div class="pdf-toc-divider"></div>
       <div style="margin:30px 0;text-align:center;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:#7a6652;line-height:2;">
-        紐㈑룻솕쨌?졖룰툑쨌???ㅼ꽢 媛吏 湲곗슫??遺꾪룷瑜?蹂댁뿬以띾땲??<br>
-        洹좏삎 ?≫엺 ?ㅽ뻾??媛??醫뗪퀬, 遺議깊븳 湲곗슫? 蹂댁땐?섎뒗 寃껋씠 醫뗭뒿?덈떎.
+        목·화·토·금·수 다섯 가지 기운의 분포를 보여줍니다.<br>
+        균형 잡힌 오행이 가장 좋고, 부족한 기운은 보충하는 것이 좋습니다.
       </div>
       <div style="margin:30px 0;">
         ${buildElementBarSVG(s.elements)}
       </div>
       <div style="margin-top:30px;padding:18px 22px;background:rgba(184,134,11,0.08);border:1px solid #e0ceb4;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.95;color:#1a1209;">
-        <div style="font-weight:700;color:#2c1810;margin-bottom:8px;">遺꾪룷 (媛쒖닔 / 鍮꾩쑉)</div>
-        紐?${s.elements.紐?媛?(${s.elementPercent.紐?%) 쨌 ??${s.elements.??媛?(${s.elementPercent.??%) 쨌 ??${s.elements.??媛?(${s.elementPercent.??%) 쨌 湲?${s.elements.湲?媛?(${s.elementPercent.湲?%) 쨌 ??${s.elements.??媛?(${s.elementPercent.??%)
+        <div style="font-weight:700;color:#2c1810;margin-bottom:8px;">분포 (개수 / 비율)</div>
+        목 ${s.elements.목}개 (${s.elementPercent.목}%) · 화 ${s.elements.화}개 (${s.elementPercent.화}%) · 토 ${s.elements.토}개 (${s.elementPercent.토}%) · 금 ${s.elements.금}개 (${s.elementPercent.금}%) · 수 ${s.elements.수}개 (${s.elementPercent.수}%)
       </div>
     </div>`;
 
-  // === 紐⑹감 ?섏씠吏 ===
+  // === 목차 페이지 ===
   const tocPages = [];
   let tocPage = `
     <div class="pdf-page">
-      <div class="pdf-toc-title">紐?李?/div>
+      <div class="pdf-toc-title">목 차</div>
       <div class="pdf-toc-sub">CONTENTS</div>
       <div class="pdf-toc-divider"></div>`;
 
@@ -1257,7 +1260,7 @@ async function downloadPDF() {
     tocPages.push(tocPage);
     tocPage = `
     <div class="pdf-page">
-      <div class="pdf-toc-title">紐?李?/div>
+      <div class="pdf-toc-title">목 차</div>
       <div class="pdf-toc-sub">CONTENTS</div>
       <div class="pdf-toc-divider"></div>`;
     tocLineCount = 0;
@@ -1284,12 +1287,12 @@ async function downloadPDF() {
   pushTocPage();
   html += tocPages.join('');
 
-  // === 梨뺥꽣??(PART 媛꾩? + ?먮룞 ?섏씠吏 遺꾪븷) ===
+  // === 챕터들 (PART 간지 + 자동 페이지 분할) ===
   PARTS.forEach((part, partIdx) => {
-    // PART 媛꾩? ?섏씠吏
+    // PART 간지 페이지
     html += `
       <div class="pdf-page" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
-        <div style="font-size:80px;color:#b8860b;margin-bottom:30px;line-height:1;">??/div>
+        <div style="font-size:80px;color:#b8860b;margin-bottom:30px;line-height:1;">☯</div>
         <div style="font-size:18px;color:#b8860b;letter-spacing:8px;font-family:'Noto Sans KR',sans-serif;margin-bottom:20px;">PART ${partIdx + 1}</div>
         <div class="pdf-toc-divider" style="width:140px;margin:10px auto 30px;"></div>
         <div style="font-size:34px;color:#2c1810;font-weight:700;letter-spacing:6px;margin-bottom:14px;">
@@ -1307,28 +1310,28 @@ async function downloadPDF() {
 
       html += `
         <div class="pdf-page visual-summary-page">
-          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">?붾퀎 ?먮쫫 ?쒕늿??蹂닿린</div>
+          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">월별 흐름 한눈에 보기</div>
           <div class="pdf-toc-sub">MONTHLY FLOW CARDS</div>
           <div class="pdf-toc-divider"></div>
           <div class="visual-card-grid">
       `;
 
       monthChapters.forEach((ch, idx) => {
-        const month = `${idx + 1}??;
-        const rawTitle = (ch?.title || '').replace(/?듭떖 ?댁꽭/g, '').trim();
+        const month = `${idx + 1}월`;
+        const rawTitle = (ch?.title || '').replace(/핵심 운세/g, '').trim();
         const bodyText = (ch?.body || ch?.content || '')
           .replace(/<[^>]*>/g, ' ')
           .replace(/\s+/g, ' ')
           .trim();
 
         let desc = bodyText
-          .split(/[.!???n]/)
+          .split(/[.!?。\n]/)
           .map(v => v.trim())
-          .filter(Boolean)[0] || '???ъ쓽 ?먮쫫? 蹂몃Ц?먯꽌 ?먯꽭???뺤씤?????덉뒿?덈떎.';
+          .filter(Boolean)[0] || '이 달의 흐름은 본문에서 자세히 확인할 수 있습니다.';
 
         desc = desc
-          .replace(/^0?\d{1,2}?붿?\s*/g, '')
-          .replace(/^0?\d{1,2}??s*/g, '')
+          .replace(/^0?\d{1,2}월은\s*/g, '')
+          .replace(/^0?\d{1,2}월\s*/g, '')
           .trim();
 
         if (!desc.endsWith('.')) {
@@ -1338,8 +1341,8 @@ async function downloadPDF() {
         html += `
           <div class="visual-month-card">
             <div class="month">${month}</div>
-            <div class="theme">${escapeHtml(rawTitle || month + ' ?댁꽭')}</div>
-            <div class="desc">${escapeHtml(month + '? ' + desc)}</div>
+            <div class="theme">${escapeHtml(rawTitle || month + ' 운세')}</div>
+            <div class="desc">${escapeHtml(month + '은 ' + desc)}</div>
           </div>
         `;
       });
@@ -1347,7 +1350,7 @@ async function downloadPDF() {
       html += `
           </div>
           <div class="visual-note-box">
-            ???섏씠吏???ы빐 ?붾퀎 ?먮쫫???쒕늿???뺣━???붿빟 移대뱶?낅땲?? ?먯꽭???먮쫫怨??댁꽍? ?댁뼱吏???붾퀎 ?댁꽭?먯꽌 ?뺤씤?????덉뒿?덈떎.
+            이 페이지는 올해 월별 흐름을 한눈에 정리한 요약 카드입니다. 자세한 흐름과 해석은 이어지는 월별 운세에서 확인할 수 있습니다.
           </div>
         </div>
       `;
@@ -1360,88 +1363,73 @@ async function downloadPDF() {
       const toSentenceSummary = (txt, maxSentences = 2) => {
         const t = cleanText(txt);
         if (!t) return '';
-        const sentences = t.match(/[^.!???+[.!????/g) || [t];
+        const sentences = t.match(/[^.!?。]+[.!?。]?/g) || [t];
         let summary = sentences.slice(0, maxSentences).join(' ').trim();
         summary = summary.replace(/\.\.\.$/, '').trim();
-        if (summary && !/[.!???$/.test(summary)) summary += '.';
+        if (summary && !/[.!?。]$/.test(summary)) summary += '.';
         return summary;
       };
       const getDesc = (idx, fallback) => {
         const t = currentChapters[idx]?.body || currentChapters[idx]?.content || '';
         return toSentenceSummary(t, 2) || fallback;
       };
-      const pickKeywordTitle = (text, fallback) => {
-        const t = cleanText(text);
-        const rules = [
-          ['湲덉쟾', '湲덉쟾 ?먭?'], ['?щЪ', '?щЪ 愿由?], ['吏곸뾽', '吏곸뾽 蹂??], ['?ъ뾽', '?ъ뾽 ?먮떒'],
-          ['愿怨?, '愿怨??ы렪'], ['?몄뿰', '?몄뿰 蹂??], ['?곗븷', '媛먯젙 ?먮쫫'], ['媛먯젙', '媛먯젙 議곗쑉'],
-          ['嫄닿컯', '嫄닿컯 愿由?], ['?쇰줈', '泥대젰 ?뚮났'], ['梨낆엫', '梨낆엫 利앷?'], ['?뺣컯', '?꾩떎 ?뺣컯'],
-          ['?대룞', '?대룞 蹂??], ['蹂??, '?섍꼍 蹂??], ['湲고쉶', '湲고쉶 ?ъ갑'], ['二쇱쓽', '二쇱쓽 ?좏샇'],
-          ['?뺣━', '?뺣━? ?좏깮'], ['怨꾩빟', '臾몄꽌쨌怨꾩빟'], ['?깃낵', '?깃낵 ?뺤옣'], ['媛덈벑', '媛덈벑 議곗쑉']
-        ];
-        const found = rules.find(([word]) => t.includes(word));
-        return found ? found[1] : fallback;
-      };
-
-      const keywordTitle = (idx, fallback) =>
-        pickKeywordTitle(currentChapters[idx]?.body || currentChapters[idx]?.content || '', fallback);
 
       html += `
         <div class="pdf-page yearly-visual-page">
-          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">?ы빐 ?듭떖 ?ㅼ썙??/div>
+          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">올해 핵심 키워드</div>
           <div class="pdf-toc-sub">YEARLY KEYWORD CARDS</div>
           <div class="pdf-toc-divider"></div>
 
           <div class="yearly-card-grid">
             <div class="yearly-visual-card">
               <div class="label">KEYWORD 01</div>
-              <div class="title">${escapeHtml(keywordTitle(0, '?ы빐 ?먮쫫'))}</div>
-              <div class="desc">${escapeHtml(getDesc(0, '?ы빐???앺솢怨?愿怨꾩쓽 ?먮쫫???댁쟾怨??ㅻⅤ寃??吏곸씪 ???덉뒿?덈떎.'))}</div>
+              <div class="title">변화</div>
+              <div class="desc">${escapeHtml(getDesc(0, '올해는 생활과 관계의 흐름이 이전과 다르게 움직일 수 있습니다.'))}</div>
             </div>
             <div class="yearly-visual-card">
               <div class="label">KEYWORD 02</div>
-              <div class="title">${escapeHtml(keywordTitle(3, '?뺣━? ?좏깮'))}</div>
-              <div class="desc">${escapeHtml(getDesc(3, '?ㅻ옒 ?뚮뜕 臾몄젣???좊ℓ??愿怨꾨? ?뺣━?댁빞 ?먮쫫??媛踰쇱썙吏묐땲??'))}</div>
+              <div class="title">정리</div>
+              <div class="desc">${escapeHtml(getDesc(3, '오래 끌던 문제나 애매한 관계를 정리해야 흐름이 가벼워집니다.'))}</div>
             </div>
             <div class="yearly-visual-card">
               <div class="label">KEYWORD 03</div>
-              <div class="title">${escapeHtml(keywordTitle(18, '湲고쉶 ?ъ갑'))}</div>
-              <div class="desc">${escapeHtml(getDesc(18, '?볦튂吏 留먯븘?????쒖븞怨??щ엺???먮쫫???ㅼ뼱?????덉뒿?덈떎.'))}</div>
+              <div class="title">기회</div>
+              <div class="desc">${escapeHtml(getDesc(18, '놓치지 말아야 할 제안과 사람의 흐름이 들어올 수 있습니다.'))}</div>
             </div>
             <div class="yearly-visual-card">
               <div class="label">KEYWORD 04</div>
-              <div class="title">${escapeHtml(keywordTitle(17, '二쇱쓽 ?좏샇'))}</div>
-              <div class="desc">${escapeHtml(getDesc(17, '諛섎났?섎뒗 ?좏깮?대굹 媛먯젙 ?뚮え媛 ?먰빐濡??댁뼱吏吏 ?딄쾶 議곗떖?댁빞 ?⑸땲??'))}</div>
+              <div class="title">주의</div>
+              <div class="desc">${escapeHtml(getDesc(17, '반복되는 선택이나 감정 소모가 손해로 이어지지 않게 조심해야 합니다.'))}</div>
             </div>
           </div>
         </div>
 
         <div class="pdf-page yearly-visual-page">
-          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">?곷컲湲?쨌 ?섎컲湲??먮쫫</div>
+          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">상반기 · 하반기 흐름</div>
           <div class="pdf-toc-sub">FIRST HALF VS SECOND HALF</div>
           <div class="pdf-toc-divider"></div>
 
           <table class="yearly-compare-table">
             <tr>
-              <th>?곷컲湲??먮쫫</th>
-              <th>?섎컲湲??먮쫫</th>
+              <th>상반기 흐름</th>
+              <th>하반기 흐름</th>
             </tr>
             <tr>
               <td>
-                <b style="color:#b8860b;">${escapeHtml(keywordTitle(0, '?곷컲湲??듭떖'))}</b><br>
-                ${escapeHtml(getDesc(0, '?곷컲湲곗뿉???먭뎅怨??몄슫???먮쫫???곕씪 以묒슂???좏깮怨?議곗쑉???꾩슂?⑸땲??'))}
+                <b style="color:#b8860b;">정리와 준비</b><br>
+                초반에는 관계와 생활 리듬을 정리하는 흐름이 강합니다. 무리하게 확장하기보다, 애매하게 끌고 온 문제를 정리하는 쪽이 유리합니다.
               </td>
               <td>
-                <b style="color:#b8860b;">${escapeHtml(keywordTitle(4, '?섎컲湲??듭떖'))}</b><br>
-                ${escapeHtml(getDesc(4, '?섎컲湲곗뿉???곷컲湲곗쓽 ?좏깮???꾩떎?곸씤 寃곌낵濡??댁뼱吏???먮쫫??媛뺥빐吏묐땲??'))}
+                <b style="color:#b8860b;">확장과 결과</b><br>
+                하반기에는 실제 결과가 드러나기 시작합니다. 일, 돈, 관계에서 선택의 결과가 보이고 다음 단계로 넘어갈 준비가 필요합니다.
               </td>
             </tr>
             <tr>
               <td>
-                ${escapeHtml(getDesc(0, '?ы빐 珥덈컲? 諛⑺뼢???ㅼ떆 ?↔퀬 遺덊븘?뷀븳 遺?댁쓣 ?쒖뼱?대뒗 ?쒓린?낅땲??'))}
+                ${escapeHtml(getDesc(0, '올해 초반은 방향을 다시 잡고 불필요한 부담을 덜어내는 시기입니다.'))}
               </td>
               <td>
-                ${escapeHtml(getDesc(4, '?ы빐 ?꾨컲? ?먮쫫??寃곌낵媛 ?쒕윭?섍퀬 以묒슂???좏깮???꾩떎?붾릺???쒓린?낅땲??'))}
+                ${escapeHtml(getDesc(4, '올해 후반은 흐름의 결과가 드러나고 중요한 선택이 현실화되는 시기입니다.'))}
               </td>
             </tr>
           </table>
@@ -1483,23 +1471,23 @@ async function downloadPDF() {
       const countWord = (words) => words.reduce((sum, word) => sum + ((bodyAll.match(new RegExp(word, 'g')) || []).length), 0);
       const clampScore = (n) => Math.max(45, Math.min(95, Math.round(n)));
 
-      const relationBoost = countWord(['愿怨?, '?몄뿰', '?곗븷', '媛먯젙', '?뚰넻']);
-      const moneyBoost = countWord(['?щЪ', '湲덉쟾', '??, '?섏엯', '吏異?, '?ъ옄']);
-      const careerBoost = countWord(['吏곸뾽', '??, '?ъ뾽', '?깃낵', '?꾨줈?앺듃', '湲고쉶']);
-      const healthBoost = countWord(['嫄닿컯', '泥대젰', '?쇰줈', '?ㅽ듃?덉뒪', '?댁떇']);
-      const cautionBoost = countWord(['二쇱쓽', '媛덈벑', '異⑸룎', '臾대━', '遺덉븞']);
+      const relationBoost = countWord(['관계', '인연', '연애', '감정', '소통']);
+      const moneyBoost = countWord(['재물', '금전', '돈', '수입', '지출', '투자']);
+      const careerBoost = countWord(['직업', '일', '사업', '성과', '프로젝트', '기회']);
+      const healthBoost = countWord(['건강', '체력', '피로', '스트레스', '휴식']);
+      const cautionBoost = countWord(['주의', '갈등', '충돌', '무리', '불안']);
 
       const scores = [
-        ['?곗븷??, clampScore(hashScore('love') + Math.min(relationBoost, 8) - Math.min(cautionBoost, 5))],
-        ['?щЪ??, clampScore(hashScore('money') + Math.min(moneyBoost, 8) - Math.min(cautionBoost, 4))],
-        ['吏곸뾽??, clampScore(hashScore('career') + Math.min(careerBoost, 8) - Math.min(cautionBoost, 3))],
-        ['?멸컙愿怨?, clampScore(hashScore('relation') + Math.min(relationBoost, 9) - Math.min(cautionBoost, 6))],
-        ['嫄닿컯??, clampScore(hashScore('health') + Math.min(healthBoost, 6) - Math.min(cautionBoost, 7))]
+        ['연애운', clampScore(hashScore('love') + Math.min(relationBoost, 8) - Math.min(cautionBoost, 5))],
+        ['재물운', clampScore(hashScore('money') + Math.min(moneyBoost, 8) - Math.min(cautionBoost, 4))],
+        ['직업운', clampScore(hashScore('career') + Math.min(careerBoost, 8) - Math.min(cautionBoost, 3))],
+        ['인간관계', clampScore(hashScore('relation') + Math.min(relationBoost, 9) - Math.min(cautionBoost, 6))],
+        ['건강운', clampScore(hashScore('health') + Math.min(healthBoost, 6) - Math.min(cautionBoost, 7))]
       ];
 
       html += `
         <div class="pdf-page yearly-visual-page">
-          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">?ы빐 ?댁꽭 媛뺣룄</div>
+          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">올해 운세 강도</div>
           <div class="pdf-toc-sub">FORTUNE INTENSITY GRAPH</div>
           <div class="pdf-toc-divider"></div>
 
@@ -1510,13 +1498,13 @@ async function downloadPDF() {
                 <div class="yearly-bar-bg">
                   <div class="yearly-bar-fill" style="width:${Math.min(score, 95)}%;"></div>
                 </div>
-                <div class="yearly-bar-score">${score}??/div>
+                <div class="yearly-bar-score">${score}점</div>
               </div>
             `).join('')}
           </div>
 
           <div class="visual-note-box" style="margin-top:40px;">
-            ??洹몃옒?꾨뒗 ?ы빐 ?꾩껜 由ы룷???먮쫫??湲곗??쇰줈 二쇱슂 ?댁쓽 媛뺣룄瑜??쒕늿???뺣━???쒓컖 ?먮즺?낅땲??
+            이 그래프는 올해 전체 리포트 흐름을 기준으로 주요 운의 강도를 한눈에 정리한 시각 자료입니다.
           </div>
         </div>
       `;
@@ -1530,13 +1518,242 @@ async function downloadPDF() {
       const toSentenceSummary = (txt, maxSentences = 2) => {
         const t = cleanText(txt);
         if (!t) return '';
-        const sentences = t.match(/[^.!???+[.!????/g) || [t];
+        const sentences = t.match(/[^.!?。]+[.!?。]?/g) || [t];
         let summary = sentences.slice(0, maxSentences).join(' ').trim();
         summary = summary.replace(/\.\.\.$/, '').trim();
-        if (summary && !/[.!???$/.test(summary)) summary += '.';
+        if (summary && !/[.!?。]$/.test(summary)) summary += '.';
         return summary;
       };
       const getDesc = (idx, fallback) => {
         const t = currentChapters[idx]?.body || currentChapters[idx]?.content || '';
         return toSentenceSummary(t, 2) || fallback;
       };
+
+      html += `
+        <div class="pdf-page love-visual-page">
+          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">연애 성향 핵심 카드</div>
+          <div class="pdf-toc-sub">LOVE STYLE CARDS</div>
+          <div class="pdf-toc-divider"></div>
+
+          <div class="love-card-grid">
+            <div class="love-visual-card">
+              <div class="label">LOVE 01</div>
+              <div class="title">끌림의 방식</div>
+              <div class="desc">${escapeHtml(getDesc(0, '마음이 열리는 순간과 사랑에 빠지는 방식이 드러납니다.'))}</div>
+            </div>
+            <div class="love-visual-card">
+              <div class="label">LOVE 02</div>
+              <div class="title">표현 방식</div>
+              <div class="desc">${escapeHtml(getDesc(2, '좋아할수록 말투와 거리감, 답장 방식에서 변화가 나타납니다.'))}</div>
+            </div>
+            <div class="love-visual-card">
+              <div class="label">LOVE 03</div>
+              <div class="title">연락 반응</div>
+              <div class="desc">${escapeHtml(getDesc(5, '답장 텐션과 연락 간격에 따라 감정 흐름이 달라질 수 있습니다.'))}</div>
+            </div>
+            <div class="love-visual-card">
+              <div class="label">LOVE 04</div>
+              <div class="title">관계 주의점</div>
+              <div class="desc">${escapeHtml(getDesc(8, '감정을 숨기는 방식과 거리감이 관계의 오해로 이어질 수 있습니다.'))}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (currentUserInfo.reportType === 'love' && partIdx === 1) {
+      html += `
+        <div class="pdf-page love-visual-page">
+          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">연애 스타일 매칭</div>
+          <div class="pdf-toc-sub">LOVE MATCH STYLE</div>
+          <div class="pdf-toc-divider"></div>
+
+          <table class="love-match-table">
+            <tr>
+              <th>구분</th>
+              <th>잘 맞는 스타일</th>
+              <th>주의할 스타일</th>
+            </tr>
+            <tr>
+              <td><b style="color:#b8860b;">관계 속도</b></td>
+              <td>천천히 신뢰를 쌓고, 말과 행동이 일관적인 사람</td>
+              <td>감정 표현은 빠르지만 행동이 자주 바뀌는 사람</td>
+            </tr>
+            <tr>
+              <td><b style="color:#b8860b;">연락 방식</b></td>
+              <td>연락 텀이 안정적이고, 애매한 말투를 남기지 않는 사람</td>
+              <td>읽씹·밀당·불규칙한 연락으로 불안을 키우는 사람</td>
+            </tr>
+            <tr>
+              <td><b style="color:#b8860b;">갈등 방식</b></td>
+              <td>서운함을 차분히 풀고 관계를 방치하지 않는 사람</td>
+              <td>침묵하거나 회피하면서 상대를 더 불안하게 만드는 사람</td>
+            </tr>
+          </table>
+        </div>
+      `;
+    }
+
+    if (currentUserInfo.reportType === 'love' && partIdx === 2) {
+      const seed = (currentUserInfo.name || '').length;
+      const scores = [
+        ['감정 몰입도', 72 + (seed % 10)],
+        ['표현 적극성', 58 + (seed % 14)],
+        ['연락 민감도', 70 + (seed % 12)],
+        ['재회 흔들림', 55 + (seed % 15)],
+        ['장기 안정도', 66 + (seed % 10)]
+      ];
+
+      html += `
+        <div class="pdf-page love-visual-page">
+          <div class="pdf-toc-title" style="font-size:26px;letter-spacing:5px;">연애 감정 흐름 그래프</div>
+          <div class="pdf-toc-sub">EMOTIONAL FLOW GRAPH</div>
+          <div class="pdf-toc-divider"></div>
+
+          <div class="love-bar-wrap">
+            ${scores.map(([name, score]) => `
+              <div class="love-bar-row">
+                <div class="love-bar-name">${name}</div>
+                <div class="love-bar-bg">
+                  <div class="love-bar-fill" style="width:${Math.min(score, 95)}%;"></div>
+                </div>
+                <div class="love-bar-score">${score}점</div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="visual-note-box" style="margin-top:40px;">
+            이 그래프는 연애운 리포트의 전체 흐름을 기준으로 감정 반응과 관계 안정도를 시각적으로 정리한 페이지입니다.
+          </div>
+        </div>
+      `;
+    }
+    // === LOVE_VISUAL_SUMMARY_END ===
+
+    // PART 내 챕터들
+    for (let i = part.range[0]; i < part.range[1]; i++) {
+      const c = currentChapters[i];
+      if (!c) continue;
+      // 본문을 페이지 단위로 분할
+      const contentPages = splitContentIntoPages(c.content, PDF_CHARS_PER_PAGE);
+      contentPages.forEach((pageContent, pageIdx) => {
+        const isFirst = pageIdx === 0;
+        const isLast = pageIdx === contentPages.length - 1;
+        const continuedMark = !isFirst ? ' <span style="font-size:11px;color:#7a6652;">(이어서)</span>' : '';
+        html += `
+          <div class="pdf-page">
+            ${isFirst ? `
+              <div class="pdf-cnum">CHAPTER ${String(i+1).padStart(2,'0')}</div>
+              <div class="pdf-ctitle">${escapeHtml(c.title)}</div>
+              <div class="pdf-cline"></div>
+            ` : `
+              <div class="pdf-cnum">CHAPTER ${String(i+1).padStart(2,'0')}${continuedMark}</div>
+              <div style="font-size:18px;color:#7a6652;font-weight:600;margin-bottom:14px;">${escapeHtml(c.title)}</div>
+              <div class="pdf-cline"></div>
+            `}
+            <div class="pdf-cbody">${escapeHtml(pageContent)}</div>
+          </div>`;
+      });
+    }
+});
+
+  // === 엔딩 페이지 ===
+  html += `
+    <div class="pdf-page">
+      <div style="text-align:center;padding-top:60px;">
+        <div style="font-size:50px;color:#b8860b;margin-bottom:20px;">☯</div>
+        <div class="pdf-toc-title" style="font-size:26px;">리포트를 마치며</div>
+        <div class="pdf-toc-divider" style="margin-top:20px;"></div>
+      </div>
+      <div style="font-size:14px;color:#1a1209;font-family:'Noto Sans KR',sans-serif;line-height:2.1;margin-top:30px;padding:0 10px;">
+        ${escapeHtml(currentUserInfo.name)} 님, 여기까지 읽어주셔서 감사합니다.
+        <br><br>
+        본 리포트가 ${escapeHtml(currentUserInfo.name)} 님의 인생을 이해하고 앞으로의 방향을 잡는 데 작은 도움이 되었기를 바랍니다.
+        <br><br>
+        사주는 타고난 기운의 지도와 같습니다. 같은 지도를 가지고도 어떻게 걸어가느냐에 따라 도착지는 달라집니다. 이 리포트를 참고 자료로 활용하시되, 결국 인생의 주인공은 본인임을 잊지 마시기 바랍니다.
+      </div>
+      <div style="margin-top:50px;padding:24px 28px;background:rgba(184,134,11,0.08);border:1px solid #b8860b;text-align:center;font-family:'Noto Sans KR',sans-serif;">
+        <div style="font-size:14px;color:#2c1810;font-weight:700;letter-spacing:3px;margin-bottom:10px;">${escapeHtml(brandName)}</div>
+        <div style="font-size:12px;color:#7a6652;line-height:1.9;">정통 명리 해석 기반 프리미엄 사주 리포트</div>
+      </div>
+    </div>`;
+
+  html = normalizeReportHtmlByType(html);
+  render.innerHTML = html;
+  await new Promise(r => setTimeout(r, 600));
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+    const pages = render.querySelectorAll('.pdf-page');
+    for (let i = 0; i < pages.length; i++) {
+      showStatus('dlStatus', `<span class="loader"></span>PDF ${i+1}/${pages.length} 페이지 생성 중...`, 'loading');
+      // 실제 렌더된 사이즈 캡처 (잘림 방지)
+      const pageEl = pages[i];
+      const realW = pageEl.offsetWidth;
+      const realH = pageEl.scrollHeight;
+      const canvas = await html2canvas(pageEl, {
+        scale: 2,
+        backgroundColor: '#f5ede0',
+        useCORS: true,
+        width: realW,
+        height: realH,
+        windowWidth: realW,
+        windowHeight: realH
+      });
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      if (i > 0) pdf.addPage();
+      // A4 비율 유지하면서 너비에 맞춰 꽉 채움
+      const pdfW = 210;
+      const pdfH = (canvas.height / canvas.width) * pdfW;
+      // 한 페이지에 다 안 들어가는 경우 (chapter 본문이 너무 길 때) - 자르거나 비례 축소
+      if (pdfH > 297) {
+        // 297mm에 맞춰 비율 축소 (이미 splitContentIntoPages로 잘랐기 때문에 거의 발생 안 함)
+        const scale = 297 / pdfH;
+        const adjW = pdfW * scale;
+        const adjH = 297;
+        pdf.addImage(imgData, 'JPEG', (210 - adjW) / 2, 0, adjW, adjH);
+      } else {
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+      }
+    }
+    const fileTitleMap = {
+      love: '연애운분석서',
+      yearly: '신년운세분석서',
+      marriage: '결혼운분석서',
+      money: '사업직장재물금전운분석서',
+      couple: '궁합분석서',
+      deep: '사주심층분석서',
+      full: '사주심층분석서',
+      half: '사주분석서'
+    };
+    const fileTitle = fileTitleMap[currentUserInfo.reportType] || '사주분석서';
+    pdf.save(`${fileTitle}_${currentUserInfo.name}.pdf`);
+    showStatus('dlStatus', '✅ PDF 저장 완료!', 'ok');
+  } catch (e) {
+    showStatus('dlStatus', '❌ PDF 생성 실패: ' + e.message, 'err');
+    console.error(e);
+  } finally {
+    render.innerHTML = '';
+    btn.disabled = false; btn.textContent = '↓ PDF 저장';
+  }
+}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
