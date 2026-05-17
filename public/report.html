@@ -435,8 +435,7 @@
 }
 
 .yearly-visual-card .desc,
-.visual-month-card .desc,
-.yearly-compare-table td {
+.visual-month-card .desc {
   display: block !important;
   -webkit-line-clamp: unset !important;
   overflow: visible !important;
@@ -1310,9 +1309,18 @@ async function downloadPDF() {
     // === YEARLY_VISUAL_SUMMARY_START ===
     if (currentUserInfo.reportType === 'yearly' && partIdx === 0) {
       const cleanText = (txt) => (txt || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      const toSentenceSummary = (txt, maxSentences = 2) => {
+        const t = cleanText(txt);
+        if (!t) return '';
+        const sentences = t.match(/[^.!?。]+[.!?。]?/g) || [t];
+        let summary = sentences.slice(0, maxSentences).join(' ').trim();
+        summary = summary.replace(/\.\.\.$/, '').trim();
+        if (summary && !/[.!?。]$/.test(summary)) summary += '.';
+        return summary;
+      };
       const getDesc = (idx, fallback) => {
-        const t = cleanText(currentChapters[idx]?.body || currentChapters[idx]?.content || '');
-        return t ? (t.length > 180 ? t.slice(0, 180) : t) : fallback;
+        const t = currentChapters[idx]?.body || currentChapters[idx]?.content || '';
+        return toSentenceSummary(t, 2) || fallback;
       };
 
       html += `
@@ -1378,7 +1386,7 @@ async function downloadPDF() {
       `;
     }
 
-    if (currentUserInfo.reportType === 'yearly' && partIdx === 1) {
+    if (currentUserInfo.reportType === 'yearly' && partIdx === 0) {
       const scoreSeed = (currentUserInfo.name || '').length;
       const scores = [
         ['연애운', 68 + (scoreSeed % 10)],
@@ -1418,9 +1426,18 @@ async function downloadPDF() {
     // === LOVE_VISUAL_SUMMARY_START ===
     if (currentUserInfo.reportType === 'love' && partIdx === 0) {
       const cleanText = (txt) => (txt || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      const toSentenceSummary = (txt, maxSentences = 2) => {
+        const t = cleanText(txt);
+        if (!t) return '';
+        const sentences = t.match(/[^.!?。]+[.!?。]?/g) || [t];
+        let summary = sentences.slice(0, maxSentences).join(' ').trim();
+        summary = summary.replace(/\.\.\.$/, '').trim();
+        if (summary && !/[.!?。]$/.test(summary)) summary += '.';
+        return summary;
+      };
       const getDesc = (idx, fallback) => {
-        const t = cleanText(currentChapters[idx]?.body || currentChapters[idx]?.content || '');
-        return t ? (t.length > 180 ? t.slice(0, 180) : t) : fallback;
+        const t = currentChapters[idx]?.body || currentChapters[idx]?.content || '';
+        return toSentenceSummary(t, 2) || fallback;
       };
 
       html += `
@@ -1635,6 +1652,7 @@ async function downloadPDF() {
 </script>
 </body>
 </html>
+
 
 
 
