@@ -603,7 +603,7 @@
         <label>PDF 상담 메뉴</label>
         <select id="reportMenuSelect" onchange="selectReportType(this.value)" style="width:100%;padding:14px;border:1px solid var(--parch-d);background:rgba(255,255,255,0.7);font-family:inherit;font-size:15px;color:var(--ink);outline:none;">
           <option value="yearly">올해 신년운세 PDF</option>
-          <option value="deep" selected>인생 사주 심층분석 PDF</option>
+          <option value="deep" selected>인생 종합 사주 분석서 PDF</option>
           <option value="love">연애운 PDF</option>
           <option value="marriage">결혼운 PDF</option>
           <option value="money">사업·직장·재물·금전운 PDF</option>
@@ -1195,28 +1195,28 @@ async function downloadPDF() {
   // half는 챕터 0~19까지만 있음 → PART 1, 2, 3 (0~5, 5~11, 11~17) + 그 이후 18~19는 PART 4 일부
   const PARTS_BY_TYPE = {
     deep: [
-      { title: 'PART 1. 사주 원국 핵심', sub: 'Core Saju Structure', range: [0, 5] },
-      { title: 'PART 2. 오행과 십성 심화', sub: 'Elements & Ten Gods', range: [5, 20] },
+      { title: 'PART 1. 사주 원국과 타고난 기질', sub: 'Core Saju Structure', range: [0, 5] },
+      { title: 'PART 2. 오행과 감정 구조', sub: 'Five Elements & Emotional Flow', range: [5, 20] },
       { title: 'PART 3. 성격·관계·심리', sub: 'Personality & Relation', range: [20, 25] },
       { title: 'PART 4. 직업·재물·현실운', sub: 'Career & Money', range: [25, 35] },
       { title: 'PART 5. 연애·결혼·가족', sub: 'Love Marriage Family', range: [35, 40] },
-      { title: 'PART 6. 건강·생활 패턴', sub: 'Health & Lifestyle', range: [40, 45] },
-      { title: 'PART 7. 대운·연령별 흐름', sub: 'Life Cycle', range: [45, 52] },
-      { title: 'PART 8. 종합 조언·개운법', sub: 'Life Guidance', range: [52, 55] }
+      { title: 'PART 6. 건강·생활 패턴', sub: 'Health & Emotional Balance', range: [40, 45] },
+      { title: 'PART 7. 대운·연령별 흐름', sub: 'Life Cycle Flow Flow', range: [45, 52] },
+      { title: 'PART 8. 용신과 인생 방향성', sub: 'Destiny & Life Direction', range: [52, 55] }
     ],
     full: [
-      { title: 'PART 1. 사주 원국 핵심', sub: 'Core Saju Structure', range: [0, 5] },
-      { title: 'PART 2. 오행과 십성 심화', sub: 'Elements & Ten Gods', range: [5, 20] },
+      { title: 'PART 1. 사주 원국과 타고난 기질', sub: 'Core Saju Structure', range: [0, 5] },
+      { title: 'PART 2. 오행과 감정 구조', sub: 'Five Elements & Emotional Flow', range: [5, 20] },
       { title: 'PART 3. 성격·관계·심리', sub: 'Personality & Relation', range: [20, 25] },
       { title: 'PART 4. 직업·재물·현실운', sub: 'Career & Money', range: [25, 35] },
       { title: 'PART 5. 연애·결혼·가족', sub: 'Love Marriage Family', range: [35, 40] },
-      { title: 'PART 6. 건강·생활 패턴', sub: 'Health & Lifestyle', range: [40, 45] },
-      { title: 'PART 7. 대운·연령별 흐름', sub: 'Life Cycle', range: [45, 52] },
-      { title: 'PART 8. 종합 조언·개운법', sub: 'Life Guidance', range: [52, 55] }
+      { title: 'PART 6. 건강·생활 패턴', sub: 'Health & Emotional Balance', range: [40, 45] },
+      { title: 'PART 7. 대운·연령별 흐름', sub: 'Life Cycle Flow Flow', range: [45, 52] },
+      { title: 'PART 8. 용신과 인생 방향성', sub: 'Destiny & Life Direction', range: [52, 55] }
     ],
     half: [
       { title: 'PART 1. 사주 핵심 분석', sub: 'Core Saju', range: [0, 4] },
-      { title: 'PART 2. 현실 조언과 방향성', sub: 'Life Guidance', range: [4, 8] }
+      { title: 'PART 2. 현실 조언과 방향성', sub: 'Destiny & Life Direction', range: [4, 8] }
     ],
     love: [
       { title: 'PART 1. 타고난 연애 성향', sub: 'Love Nature', range: [0, 3] },
@@ -1260,8 +1260,8 @@ async function downloadPDF() {
 
   const REPORT_META = {
     yearly: { title: '신년운세 분석서', sub: 'YEARLY FORTUNE REPORT', label: '신년운세 분석서' },
-    deep: { title: '사주 심층 분석서', sub: 'DEEP SAJU REPORT', label: '사주 심층 분석서' },
-    full: { title: '사주 심층 분석서', sub: 'DEEP SAJU REPORT', label: '사주 심층 분석서' },
+    deep: { title: '인생 종합 사주 분석서', sub: 'LIFE SAJU ANALYSIS REPORT', label: '인생 종합 사주 분석서' },
+    full: { title: '인생 종합 사주 분석서', sub: 'LIFE SAJU ANALYSIS REPORT', label: '인생 종합 사주 분석서' },
     half: { title: '사주 분석서', sub: 'SAJU REPORT', label: '사주 분석서' },
     love: { title: '연애운 분석서', sub: 'LOVE FORTUNE REPORT', label: '연애운 분석서' },
     marriage: { title: '결혼운 분석서', sub: 'MARRIAGE FORTUNE REPORT', label: '결혼운 분석서' },
@@ -1812,8 +1812,8 @@ async function downloadPDF() {
       marriage: '결혼운분석서',
       money: '사업직장재물금전운분석서',
       couple: '궁합분석서',
-      deep: '사주심층분석서',
-      full: '사주심층분석서',
+      deep: '인생종합사주분석서',
+      full: '인생종합사주분석서',
       half: '사주분석서'
     };
     const fileTitle = fileTitleMap[currentUserInfo.reportType] || '사주분석서';
