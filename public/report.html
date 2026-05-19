@@ -497,7 +497,33 @@
     .timeline-item{margin-bottom:20px;font-size:13px;line-height:1.8;color:#444;}
     .style-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:30px;}
     .style-card{background:#f6f1e7;border-radius:14px;padding:16px;text-align:center;font-weight:600;color:#6d5320;}
-  </style>
+  /* TOC overflow fix */
+.pdf-page.toc-page,
+.pdf-page.pdf-toc-page,
+.pdf-page.pdf-toc-page-break {
+  min-height: 1122px !important;
+  height: auto !important;
+  overflow: visible !important;
+  page-break-after: always;
+  break-after: page;
+}
+
+.toc-section {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+  margin-bottom: 18px;
+}
+
+.toc-section:nth-of-type(4),
+.toc-section:nth-of-type(7) {
+  page-break-before: always;
+  break-before: page;
+}
+
+.pdf-page {
+  overflow: visible !important;
+}
+</style>
 </head>
 <body>
 <div class="wrap">
