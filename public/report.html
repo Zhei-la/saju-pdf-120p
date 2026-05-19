@@ -514,11 +514,7 @@
   margin-bottom: 18px;
 }
 
-.toc-section:nth-of-type(4),
-.toc-section:nth-of-type(7) {
-  page-break-before: always;
-  break-before: page;
-}
+
 
 .pdf-page {
   overflow: visible !important;
@@ -1368,7 +1364,7 @@ async function downloadPDF() {
       <div class="pdf-toc-divider"></div>`;
 
   let tocLineCount = 0;
-  const maxTocLines = currentUserInfo.reportType === 'yearly' ? 28 : 34;
+  const maxTocLines = currentUserInfo.reportType === 'yearly' ? 22 : 20;
 
   function pushTocPage() {
     tocPage += `</div>`;
@@ -1389,7 +1385,7 @@ async function downloadPDF() {
       }
     }
 
-    const needLines = 2 + partItems.length;
+    const needLines = 5 + partItems.length;
     if (tocLineCount > 0 && tocLineCount + needLines > maxTocLines) {
       pushTocPage();
     }
