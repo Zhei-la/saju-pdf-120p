@@ -387,10 +387,20 @@ async function doLogout() {
   showLogin();
 }
 
+function setTextSafe(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function setValueSafe(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value;
+}
+
 async function showDash() {
   document.querySelectorAll('#loginPage,#signupPage,#dashPage,#adminPage').forEach(e => e.classList.add('hidden'));
   document.getElementById('dashPage').classList.remove('hidden');
-  document.getElementById('navName').textContent = currentUser.name + ' 님';
+  setTextSafe('navName', currentUser.name + ' 님');
 
   // 현재 사용자 이름 저장 (report.html 등에서 사용)
   localStorage.setItem('current_user_name', currentUser.name);
@@ -401,41 +411,41 @@ async function showDash() {
   }
 
   // 브랜드 이름
-  document.getElementById('brandName').value = currentUser.brandName || '';
+  setValueSafe('brandName', currentUser.brandName || '');
 
   // 후기 링크
   if (currentUser.reviewToken) {
     const link = `${location.origin}/review.html?t=${currentUser.reviewToken}`;
-    document.getElementById('reviewLink').value = link;
+    setValueSafe('reviewLink', link);
   }
 
   // 키 불러오기 (사용자별)
   const keyName = 'openai_api_key_' + currentUser.name;
   const saved = localStorage.getItem(keyName);
-  if (saved) { document.getElementById('apiKey').value = saved; collapseKey(saved); }
+  if (saved) { setValueSafe('apiKey', saved); collapseKey(saved); }
 
   // Gemini 키 불러오기
   const geminiKeyName = 'gemini_api_key_' + currentUser.name;
   const savedGemini = localStorage.getItem(geminiKeyName);
-  if (savedGemini) { document.getElementById('geminiKey').value = savedGemini; collapseGeminiKey(savedGemini); }
+  if (savedGemini) { setValueSafe('geminiKey', savedGemini); collapseGeminiKey(savedGemini); }
 
   // 통계
   const s = await (await api('/api/stats')).json();
   if (s.stats) {
-    document.getElementById('stToday').textContent = s.stats.todayCombined;
-    document.getElementById('stWeek').textContent = s.stats.weekCombined;
-    document.getElementById('stTotal').textContent = s.stats.totalConsults;
+    setTextSafe('stToday', s.stats.todayCombined);
+    setTextSafe('stWeek', s.stats.weekCombined);
+    setTextSafe('stTotal', s.stats.totalConsults);
   }
   if (s.reviewStats) {
     const avg = s.reviewStats.avgRating > 0 ? ' (' + s.reviewStats.avgRating + '★)' : '';
-    document.getElementById('stReviews').textContent = s.reviewStats.total + avg;
+    setTextSafe('stReviews', s.reviewStats.total + avg);
   }
   if (s.revenue) {
     const fmt = n => (n || 0).toLocaleString() + '원';
-    document.getElementById('rvToday').textContent = fmt(s.revenue.today);
-    document.getElementById('rvWeek').textContent = fmt(s.revenue.week);
-    document.getElementById('rvTotal').textContent = fmt(s.revenue.total);
-    document.getElementById('rvPrice').textContent = fmt(s.revenue.price);
+    setTextSafe('rvToday', fmt(s.revenue.today));
+    setTextSafe('rvWeek', fmt(s.revenue.week));
+    setTextSafe('rvTotal', fmt(s.revenue.total));
+    setTextSafe('rvPrice', fmt(s.revenue.price));
   }
 
   // 리포트 목록
@@ -506,7 +516,7 @@ function saveKey() {
 function collapseKey(key) {
   document.getElementById('keyExpanded').classList.add('hidden');
   document.getElementById('keyCollapsed').classList.remove('hidden');
-  document.getElementById('keyPrev').textContent = key.slice(0, 7) + '...' + key.slice(-4);
+  setTextSafe('keyPrev', key.slice(0, 7) + '...' + key.slice(-4));
 }
 function editKey() {
   document.getElementById('keyExpanded').classList.remove('hidden');
@@ -523,7 +533,7 @@ function saveGeminiKey() {
 function collapseGeminiKey(key) {
   document.getElementById('geminiKeyExpanded').classList.add('hidden');
   document.getElementById('geminiKeyCollapsed').classList.remove('hidden');
-  document.getElementById('geminiKeyPrev').textContent = key.slice(0, 8) + '...' + key.slice(-4);
+  setTextSafe('geminiKeyPrev', key.slice(0, 8) + '...' + key.slice(-4));
 }
 function editGeminiKey() {
   document.getElementById('geminiKeyExpanded').classList.remove('hidden');
