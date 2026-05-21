@@ -1034,7 +1034,7 @@ function getBrandName() {
     currentUserInfo?.storeName ||
     currentUserInfo?.companyName ||
     localStorage.getItem('brandName') ||
-    localStorage.getItem('shopName') || '운명사주'
+    localStorage.getItem('shopName') || ''
   );
 }
 
@@ -1270,7 +1270,7 @@ async function downloadPDF() {
       brandName = (meData.user && meData.user.brandName) || '';
     }
   } catch (e) {}
-  if (!brandName) brandName = userName ? `${userName} 사주` : '운명사주';
+  if (!brandName) { alert('사주 브랜드 이름을 먼저 입력해주세요. 홈 화면에서 브랜드명을 저장한 뒤 다시 생성해주세요.'); throw new Error('브랜드명이 설정되지 않았습니다.'); }
 
   // PARTS 동적 생성 (현재 연도 반영, half면 PART 1~3만)
   const currYear = new Date().getFullYear();

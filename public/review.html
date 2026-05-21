@@ -102,7 +102,7 @@ if (!token) {
 
 // 브랜드 이름 로드
 fetch('/api/review-info/' + token).then(r => r.json()).then(d => {
-  document.getElementById('pageTitle').textContent = (d.brandName || '운명사주') + ' 후기 작성';
+  document.getElementById('pageTitle').textContent = d.brandName ? d.brandName + ' 후기 작성' : '브랜드 이름을 먼저 설정해주세요';
 }).catch(() => {});
 
 // 별점 클릭
