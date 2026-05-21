@@ -118,9 +118,30 @@ body:not(.logged-in) #dashPage {
 body.logged-in #loginPage {
   display: none !important;
 }
+/* auth locked hard hide */
+body.auth-locked #dashPage,
+body.auth-locked .nav,
+body.auth-locked .stats,
+body.auth-locked .stat,
+body.auth-locked .menu-grid,
+body.auth-locked .menu-item,
+body.auth-locked .dashboard-only,
+body.auth-locked #dashPage *,
+body.auth-locked #dashPage ~ * {
+  display: none !important;
+}
+
+body.auth-locked #loginPage,
+body.auth-locked #loginPage * {
+  display: block;
+}
+body.auth-locked #loginPage input,
+body.auth-locked #loginPage button {
+  display: block;
+}
 </style>
 </head>
-<body>
+<body class="auth-locked">
 <div class="wrap">
 
 <!-- 로그인 -->
@@ -305,6 +326,7 @@ async function init() {
     token = '';
     localStorage.removeItem('auth_token');
   document.body.classList.remove('logged-in');
+  document.body.classList.add('auth-locked');
     localStorage.removeItem('openai_api_key');
     return showLogin();
   }
@@ -358,6 +380,7 @@ async function doLogout() {
   token = ''; 
   localStorage.removeItem('auth_token');
   document.body.classList.remove('logged-in');
+  document.body.classList.add('auth-locked');
   localStorage.removeItem('openai_api_key');
   localStorage.removeItem('current_user_name');
   currentUser = null;
