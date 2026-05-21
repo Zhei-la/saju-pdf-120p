@@ -103,9 +103,21 @@
     input, select, button { font-size: 14px; }
     .row { flex-direction: row; }
   }
+/* login mode hard hide */
+body.login-mode > .card,
+body.login-mode > .stats,
+body.login-mode > .menu-grid,
+body.login-mode > .menu-item,
+body.login-mode > .nav,
+body.login-mode #dashPage {
+  display: none !important;
+}
+body.login-mode #loginPage {
+  display: block !important;
+}
 </style>
 </head>
-<body>
+<body class="login-mode">
 <div class="wrap">
 
 <!-- 로그인 -->
@@ -289,6 +301,7 @@ async function init() {
   if (!res.ok) {
     token = '';
     localStorage.removeItem('auth_token');
+  document.body.classList.add('login-mode');
   document.body.classList.remove('logged-in');
   document.body.classList.add('auth-locked');
     localStorage.removeItem('openai_api_key');
@@ -343,6 +356,7 @@ async function doLogout() {
   await api('/api/logout', { method: 'POST' });
   token = ''; 
   localStorage.removeItem('auth_token');
+  document.body.classList.add('login-mode');
   document.body.classList.remove('logged-in');
   document.body.classList.add('auth-locked');
   localStorage.removeItem('openai_api_key');
@@ -362,6 +376,7 @@ function setValueSafe(id, value) {
 }
 
 async function showDash() {
+  document.body.classList.remove('login-mode');
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('dashPage').classList.remove('hidden');
   document.querySelectorAll('#loginPage,#signupPage,#dashPage,#adminPage').forEach(e => e.classList.add('hidden'));
