@@ -103,45 +103,9 @@
     input, select, button { font-size: 14px; }
     .row { flex-direction: row; }
   }
-/* login dashboard visibility fix */
-#loginPage:not(.hidden) ~ #dashPage,
-#loginPage:not(.hidden) ~ .card,
-#loginPage:not(.hidden) ~ .stats {
-  display: none !important;
-}
-.dashboard-only { display: block; }
-#loginPage:not(.hidden) ~ .dashboard-only { display: none !important; }
-/* force hide dashboard before login */
-body:not(.logged-in) #dashPage {
-  display: none !important;
-}
-body.logged-in #loginPage {
-  display: none !important;
-}
-/* auth locked hard hide */
-body.auth-locked #dashPage,
-body.auth-locked .nav,
-body.auth-locked .stats,
-body.auth-locked .stat,
-body.auth-locked .menu-grid,
-body.auth-locked .menu-item,
-body.auth-locked .dashboard-only,
-body.auth-locked #dashPage *,
-body.auth-locked #dashPage ~ * {
-  display: none !important;
-}
-
-body.auth-locked #loginPage,
-body.auth-locked #loginPage * {
-  display: block;
-}
-body.auth-locked #loginPage input,
-body.auth-locked #loginPage button {
-  display: block;
-}
 </style>
 </head>
-<body class="auth-locked">
+<body>
 <div class="wrap">
 
 <!-- 로그인 -->
@@ -398,6 +362,8 @@ function setValueSafe(id, value) {
 }
 
 async function showDash() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('dashPage').classList.remove('hidden');
   document.querySelectorAll('#loginPage,#signupPage,#dashPage,#adminPage').forEach(e => e.classList.add('hidden'));
   document.getElementById('dashPage').classList.remove('hidden');
   setTextSafe('navName', currentUser.name + ' 님');
