@@ -117,6 +117,26 @@ body.login-mode #loginCard input,
 body.login-mode #loginCard button {
   display: block !important;
 }
+/* report pager */
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.pager-info {
+  font-size: 13px;
+  color: var(--muted);
+  min-width: 60px;
+  text-align: center;
+}
+.pager button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
 </style>
 </head>
 <body class="login-mode">
@@ -286,6 +306,8 @@ body.login-mode #loginCard button {
 <script>
 let token = localStorage.getItem('auth_token') || '';
 let currentUser = null;
+let reportPage = 1;
+const REPORTS_PER_PAGE = 15;
 
 function api(url, opts = {}) {
   return fetch(url, {
@@ -439,7 +461,14 @@ async function showDash() {
   if (!r.reports || !r.reports.length) {
     box.innerHTML = '<div class="empty">아직 생성한 리포트가 없습니다. 위 메뉴에서 시작하세요.</div>';
   } else {
-    box.innerHTML = r.reports.slice(0, 10).map(rep => {
+    const totalReports = r.reports.length;
+    const totalPages = Math.max(1, Math.ceil(totalReports / REPORTS_PER_PAGE));
+    if (reportPage > totalPages) reportPage = totalPages;
+
+    const start = (reportPage - 1) * REPORTS_PER_PAGE;
+    const pageReports = r.reports.slice(start, start + REPORTS_PER_PAGE);
+
+    const listHtml = pageReports.map(rep => {
       const d = new Date(rep.created_at).toLocaleDateString('ko-KR');
       return `<div class="rep-item">
         <div>
@@ -450,6 +479,16 @@ async function showDash() {
         <button class="btn-ghost btn-sm" onclick="delReport(${rep.id})">삭제</button>
       </div>`;
     }).join('');
+
+    const pagerHtml = totalPages > 1
+      ? `<div class="pager">
+          <button class="btn-ghost btn-sm" onclick="changeReportPage(${reportPage - 1})" ${reportPage <= 1 ? 'disabled' : ''}>이전</button>
+          <span class="pager-info">${reportPage} / ${totalPages}</span>
+          <button class="btn-ghost btn-sm" onclick="changeReportPage(${reportPage + 1})" ${reportPage >= totalPages ? 'disabled' : ''}>다음</button>
+        </div>`
+      : '';
+
+    box.innerHTML = listHtml + pagerHtml;
   }
 }
 
@@ -472,6 +511,11 @@ function copyReviewLink() {
   if (!link) return;
   navigator.clipboard.writeText(link);
   alert('링크가 복사되었습니다!\n카톡으로 고객에게 전송하세요.');
+}
+
+function changeReportPage(page) {
+  reportPage = page;
+  showDash();
 }
 
 async function delReport(id) {
