@@ -1020,6 +1020,21 @@ function renderPreview() {
 }
 
 
+
+function getReportVisualTheme() {
+  const type = currentUserInfo?.reportType || 'deep';
+  const themes = {
+    deep: { label: 'LIFE SAJU', symbol: '☯' },
+    full: { label: 'PREMIUM', symbol: '✦' },
+    yearly: { label: 'YEARLY FLOW', symbol: '◈' },
+    love: { label: 'LOVE', symbol: '♥' },
+    money: { label: 'MONEY', symbol: '◆' },
+    marriage: { label: 'MARRIAGE', symbol: '❀' },
+    compatibility: { label: 'COMPATIBILITY', symbol: '☾' }
+  };
+  return themes[type] || themes.deep;
+}
+
 function getBrandName() {
   return (
     currentUserInfo?.brandName ||
