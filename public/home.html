@@ -156,34 +156,10 @@
     <div class="stat"><div class="label">총 후기 (평점)</div><div class="val" id="stReviews" style="font-size:18px;">0</div></div>
   </div>
 
-  <div class="stats">
-    <div class="stat"><div class="label">오늘 수익</div><div class="val" id="rvToday" style="font-size:18px;">0원</div></div>
-    <div class="stat"><div class="label">이번 주 수익</div><div class="val" id="rvWeek" style="font-size:18px;">0원</div></div>
-    <div class="stat"><div class="label">총 누적 수익</div><div class="val" id="rvTotal" style="font-size:18px;">0원</div></div>
-    <div class="stat"><div class="label">리포트 가격</div><div class="val" id="rvPrice" style="font-size:18px;">0원</div></div>
+  
   </div>
 
-  <div class="card">
-    <div class="card-t">사주 리포트 가격 (원)</div>
-    <div style="display:grid;gap:10px;">
-      <div>
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">120p 풀리포트 가격</label>
-        <div class="row">
-          <input id="reportPrice" type="number" placeholder="예: 100000" min="0">
-        </div>
-      </div>
-      <div>
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">60p 라이트 가격</label>
-        <div class="row">
-          <input id="reportPriceHalf" type="number" placeholder="예: 50000" min="0">
-          <button class="btn-gold btn-sm" onclick="savePrice()" style="flex:0 0 auto;">전체 저장</button>
-        </div>
-      </div>
-    </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:6px;">
-      각 리포트 1개당 가격입니다. 수익 통계 계산에 사용됩니다.
-    </div>
-  </div>
+  
 
   <div class="card">
     <div class="card-t">사주 브랜드 이름</div>
@@ -389,10 +365,6 @@ async function showDash() {
   // 브랜드 이름
   document.getElementById('brandName').value = currentUser.brandName || '';
 
-  // 리포트 가격
-  document.getElementById('reportPrice').value = currentUser.reportPrice || '';
-  document.getElementById('reportPriceHalf').value = currentUser.reportPriceHalf || '';
-
   // 후기 링크
   if (currentUser.reviewToken) {
     const link = `${location.origin}/review.html?t=${currentUser.reviewToken}`;
@@ -460,17 +432,7 @@ async function saveBrand() {
   }
 }
 
-async function savePrice() {
-  const price = parseInt(document.getElementById('reportPrice').value) || 0;
-  const priceHalf = parseInt(document.getElementById('reportPriceHalf').value) || 0;
-  const res = await api('/api/me/price', { method: 'POST', body: JSON.stringify({ price, priceHalf }) });
-  if (res.ok) {
-    alert('가격이 저장되었습니다\n· 120p 풀: ' + price.toLocaleString() + '원\n· 60p 라이트: ' + priceHalf.toLocaleString() + '원');
-    location.reload();
-  } else {
-    alert('저장 실패');
-  }
-}
+
 
 function copyReviewLink() {
   const link = document.getElementById('reviewLink').value;
