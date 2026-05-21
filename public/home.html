@@ -111,6 +111,13 @@
 }
 .dashboard-only { display: block; }
 #loginPage:not(.hidden) ~ .dashboard-only { display: none !important; }
+/* force hide dashboard before login */
+body:not(.logged-in) #dashPage {
+  display: none !important;
+}
+body.logged-in #loginPage {
+  display: none !important;
+}
 </style>
 </head>
 <body>
@@ -297,6 +304,7 @@ async function init() {
   if (!res.ok) {
     token = '';
     localStorage.removeItem('auth_token');
+  document.body.classList.remove('logged-in');
     localStorage.removeItem('openai_api_key');
     return showLogin();
   }
@@ -349,6 +357,7 @@ async function doLogout() {
   await api('/api/logout', { method: 'POST' });
   token = ''; 
   localStorage.removeItem('auth_token');
+  document.body.classList.remove('logged-in');
   localStorage.removeItem('openai_api_key');
   localStorage.removeItem('current_user_name');
   currentUser = null;
