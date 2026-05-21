@@ -103,6 +103,14 @@
     input, select, button { font-size: 14px; }
     .row { flex-direction: row; }
   }
+/* login dashboard visibility fix */
+#loginPage:not(.hidden) ~ #dashPage,
+#loginPage:not(.hidden) ~ .card,
+#loginPage:not(.hidden) ~ .stats {
+  display: none !important;
+}
+.dashboard-only { display: block; }
+#loginPage:not(.hidden) ~ .dashboard-only { display: none !important; }
 </style>
 </head>
 <body>
@@ -161,8 +169,7 @@
 
   
 
-  <div class="card">
-    <div class="card-t">사주 브랜드 이름</div>
+  <div class="card dashboard-only"><div class="card-t">사주 브랜드 이름</div>
     <div class="row">
       <input id="brandName" placeholder="예: 제일라사주, 운명사주, ...">
       <button class="btn-gold btn-sm" onclick="saveBrand()" style="flex:0 0 auto;">저장</button>
@@ -172,8 +179,7 @@
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-t">OpenAI API 키 (리포트·개인상담 첫답변용 - 유료)</div>
+  <div class="card dashboard-only"><div class="card-t">OpenAI API 키 (리포트·개인상담 첫답변용 - 유료)</div>
     <div id="keyExpanded">
       <div class="row">
         <input type="password" id="apiKey" placeholder="sk-proj-...">
