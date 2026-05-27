@@ -996,6 +996,29 @@ async function generateReport() {
   }
 }
 
+function revealPdfPreview() {
+  const render = document.getElementById('pdfRender');
+
+  document.getElementById('step1')?.classList.add('hidden');
+  document.getElementById('step2')?.classList.remove('hidden');
+
+  if (render) {
+    render.classList.remove('hidden');
+    render.style.display = 'block';
+
+    let p = render.parentElement;
+    while (p && p !== document.body) {
+      p.classList?.remove('hidden');
+      if (p.style && p.style.display === 'none') p.style.display = 'block';
+      p = p.parentElement;
+    }
+
+    setTimeout(() => {
+      render.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+  }
+}
+
 function renderPreview() {
   if (currentUserInfo?.reportType === 'free') {
     const render = document.getElementById('pdfRender');
