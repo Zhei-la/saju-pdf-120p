@@ -1048,8 +1048,14 @@ function renderPreview() {
     document.getElementById('step2')?.classList.remove('hidden');
 
     render.classList.remove('hidden');
+    render.style.position = 'static';
+    render.style.left = 'auto';
+    render.style.top = 'auto';
     render.style.display = 'block';
     render.style.visibility = 'visible';
+    render.style.opacity = '1';
+    render.style.width = '794px';
+    render.style.margin = '30px auto';
     render.style.minHeight = '400px';
 
     clearStatus('genStatus');
@@ -1586,13 +1592,6 @@ async function downloadPDF() {
   const reportMeta = REPORT_META[currentUserInfo.reportType] || { title: '사주 분석서' };
   const reportLabel = reportMeta.label || reportMeta.title;
 
-  // FREE_BASIC_REPORT_RENDER_BRANCH
-  if (currentUserInfo.reportType === 'free') {
-    render.innerHTML = renderFreeBasicReport();
-    revealPdfPreview();
-    return render.innerHTML;
-  }
-
   // === 표지 ===
   let html = `
     <div class="pdf-page pdf-cover report-theme-${currentUserInfo.reportType || 'deep'}">
@@ -2088,10 +2087,12 @@ async function downloadPDF() {
     </div>`;
 
   html = normalizeReportHtmlByType(html);
+
   if (currentUserInfo?.reportType === 'free') {
-      html = renderFreeBasicReport();
-    }
-    render.innerHTML = html;
+    html = renderFreeBasicReport();
+  }
+
+  render.innerHTML = html;
   await new Promise(r => setTimeout(r, 600));
 
   try {
