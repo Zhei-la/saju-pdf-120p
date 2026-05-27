@@ -677,6 +677,7 @@
           <option value="marriage">결혼운 PDF</option>
           <option value="money">사업·직장·재물·금전운 PDF</option>
           <option value="couple">연인 궁합 PDF</option>
+          <option value="free">무료 기본사주 PDF</option>
         </select>
         <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:'Noto Sans KR',sans-serif;line-height:1.7;">
           · 선택한 메뉴에 맞춰 PDF 주제와 챕터가 달라집니다.<br>
@@ -1314,6 +1315,12 @@ async function downloadPDF() {
       { title: 'PART 1. 사주 핵심 분석', sub: 'Core Saju', range: [0, 4] },
       { title: 'PART 2. 현실 조언과 방향성', sub: 'Destiny & Life Direction', range: [4, 8] }
     ],
+
+    free: [
+      { title: 'PART 1. 타고난 성향', sub: 'Basic Personality', range: [0, 2] },
+      { title: 'PART 2. 연애·금전 흐름', sub: 'Love & Money', range: [2, 4] },
+      { title: 'PART 3. 인생 조언', sub: 'Life Advice', range: [4, 5] }
+    ],
     love: [
       { title: 'PART 1. 타고난 연애 성향', sub: 'Love Nature', range: [0, 3] },
       { title: 'PART 2. 관계 속 감정 흐름', sub: 'Emotional Flow', range: [3, 5] },
@@ -1359,6 +1366,7 @@ async function downloadPDF() {
     deep: { title: '인생 종합 사주 분석서', sub: 'LIFE SAJU ANALYSIS REPORT', label: '인생 종합 사주 분석서' },
     full: { title: '인생 종합 사주 분석서', sub: 'LIFE SAJU ANALYSIS REPORT', label: '인생 종합 사주 분석서' },
     half: { title: '사주 분석서', sub: 'SAJU REPORT', label: '사주 분석서' },
+    free: { title: '무료 사주 풀이', sub: 'FREE SAJU REPORT', label: '무료 사주 풀이' },
     love: { title: '연애운 분석서', sub: 'LOVE FORTUNE REPORT', label: '연애운 분석서' },
     marriage: { title: '결혼운 분석서', sub: 'MARRIAGE FORTUNE REPORT', label: '결혼운 분석서' },
     money: { title: '사업·직장·재물·금전운 분석서', sub: 'MONEY CAREER REPORT', label: '사업·직장·재물·금전운 분석서' },
@@ -1910,7 +1918,8 @@ async function downloadPDF() {
       couple: '궁합분석서',
       deep: '인생종합사주분석서',
       full: '인생종합사주분석서',
-      half: '사주분석서'
+      half: '사주분석서',
+      free: '무료사주풀이'
     };
     const fileTitle = fileTitleMap[currentUserInfo.reportType] || '사주분석서';
     pdf.save(`${fileTitle}_${currentUserInfo.name}.pdf`);
