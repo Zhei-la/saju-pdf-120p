@@ -550,24 +550,11 @@ async function saveFreePdfSettings() {
     document.getElementById('freePdfLink').value
   );
 
-  const img1 = document.getElementById('freePdfImage1').files[0];
-  const img2 = document.getElementById('freePdfImage2').files[0];
-
-  function readFile(file) {
-    return new Promise(resolve => {
-      if (!file) return resolve(null);
-
-      const reader = new FileReader();
-      reader.onload = e => resolve(e.target.result);
-      reader.readAsDataURL(file);
-    });
+  for (let i = 1; i <= 10; i++) {
+    const file = document.getElementById('freePdfImage' + i)?.files?.[0];
+    const base = await readFile(file);
+    if (base) localStorage.setItem('freePdfImage' + i, base);
   }
-
-  const base1 = await readFile(img1);
-  const base2 = await readFile(img2);
-
-  if (base1) localStorage.setItem('freePdfImage1', base1);
-  if (base2) localStorage.setItem('freePdfImage2', base2);
 
   alert('무료 PDF 설정 저장 완료');
 }
