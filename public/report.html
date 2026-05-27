@@ -929,6 +929,8 @@ async function generateReport() {
     }
   }
 
+  selectedReportType = document.getElementById('reportMenuSelect')?.value || selectedReportType;
+
   const data = {
     apiKey, name,
     gender: selectedGender,
@@ -942,8 +944,8 @@ async function generateReport() {
 
   const btn = document.getElementById('genBtn');
   btn.disabled = true; btn.textContent = '생성 중...';
-  const chapCount = selectedReportType === 'half' ? 20 : 40;
-  const timeEst = selectedReportType === 'half' ? '약 2~3분' : '약 3~5분';
+  const chapCount = selectedReportType === 'free' ? 5 : (selectedReportType === 'half' ? 20 : 40);
+  const timeEst = selectedReportType === 'free' ? '약 1분' : (selectedReportType === 'half' ? '약 2~3분' : '약 3~5분');
   showStatus('genStatus', `<span class="loader"></span>${chapCount}챕터 분석 중... ${timeEst} 소요됩니다. 잠시만 기다려주세요.`, 'loading');
 
   try {
@@ -969,6 +971,15 @@ async function generateReport() {
 
 // ── 미리보기 ──
 function renderPreview() {
+  if (currentUserInfo?.reportType === 'free') {
+    const render = document.getElementById('pdfRender');
+    render.innerHTML = renderFreeBasicReport();
+    render.classList.remove('hidden');
+
+    document.getElementById('step2')?.classList.remove('hidden');
+    document.getElementById('step1')?.classList.add('hidden');
+    return;
+  }
   document.getElementById('inputScreen').classList.add('hidden');
   document.getElementById('previewScreen').classList.remove('hidden');
   clearStatus('genStatus');
