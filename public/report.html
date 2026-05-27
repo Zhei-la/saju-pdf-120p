@@ -931,6 +931,8 @@ async function generateReport() {
 
   selectedReportType = document.getElementById('reportMenuSelect')?.value || selectedReportType;
 
+  selectedReportType = document.getElementById('reportMenuSelect')?.value || selectedReportType;
+
   const data = {
     apiKey, name,
     gender: selectedGender,
@@ -959,7 +961,7 @@ async function generateReport() {
 
     currentUserInfo = json.userInfo;
     currentUserInfo.cityName = document.getElementById('city').selectedOptions[0].textContent;
-    currentUserInfo.reportType = json.reportType || selectedReportType;
+    currentUserInfo.reportType = selectedReportType;
     currentChapters = json.chapters;
     renderPreview();
   } catch (e) {
@@ -971,6 +973,14 @@ async function generateReport() {
 
 // ── 미리보기 ──
 function renderPreview() {
+  if (currentUserInfo?.reportType === 'free') {
+    const render = document.getElementById('pdfRender');
+    render.innerHTML = renderFreeBasicReport();
+    render.classList.remove('hidden');
+    document.getElementById('step1')?.classList.add('hidden');
+    document.getElementById('step2')?.classList.remove('hidden');
+    return;
+  }
   if (currentUserInfo?.reportType === 'free') {
     const render = document.getElementById('pdfRender');
     render.innerHTML = renderFreeBasicReport();
@@ -2007,7 +2017,10 @@ async function downloadPDF() {
     </div>`;
 
   html = normalizeReportHtmlByType(html);
-  render.innerHTML = html;
+  if (currentUserInfo?.reportType === 'free') {
+      html = renderFreeBasicReport();
+    }
+    render.innerHTML = html;
   await new Promise(r => setTimeout(r, 600));
 
   try {
