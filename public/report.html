@@ -891,8 +891,13 @@ function applyCityOffset(hour, minute, cityKey) {
 
 // ── 리포트 생성 ──
 async function generateReport() {
+  selectedReportType = document.getElementById('reportMenuSelect')?.value || selectedReportType;
+
   const apiKey = getApiKey();
-  if (!apiKey) { showStatus('genStatus', 'OpenAI API 키를 먼저 저장해주세요.', 'err'); return; }
+  if (selectedReportType !== 'free' && !apiKey) {
+    showStatus('genStatus', 'OpenAI API 키를 먼저 저장해주세요.', 'err');
+    return;
+  }
 
   const name = document.getElementById('name').value.trim();
   const year = document.getElementById('year').value;
@@ -934,7 +939,7 @@ async function generateReport() {
   selectedReportType = document.getElementById('reportMenuSelect')?.value || selectedReportType;
 
   const data = {
-    apiKey, name,
+    apiKey: selectedReportType === 'free' ? '' : apiKey, name,
     gender: selectedGender,
     year: yearN, month: monthN, day: dayN,
     hour: hourVal, minute: minuteVal,
@@ -946,6 +951,55 @@ async function generateReport() {
 
   const btn = document.getElementById('genBtn');
   btn.disabled = true; btn.textContent = '생성 중...';
+
+  if (selectedReportType === 'free') {
+    currentUserInfo = {
+      name,
+      gender: selectedGender,
+      year: yearN,
+      month: monthN,
+      day: dayN,
+      hour: isTimeUnknown ? null : hourVal,
+      minute: minuteVal,
+      city: cityKey,
+      isLunar: selectedCalendar === 'lunar',
+      timeUnknown: isTimeUnknown,
+      reportType: 'free',
+      saju: null
+    };
+
+    const res = await fetch('/api/generate-free-saju-only', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('auth_token') || ''
+      },
+      body: JSON.stringify({
+        name,
+        gender: selectedGender,
+        year: yearN,
+        month: monthN,
+        day: dayN,
+        hour: hourVal,
+        minute: minuteVal,
+        isLunar: selectedCalendar === 'lunar',
+        timeUnknown: isTimeUnknown,
+        city: cityKey
+      })
+    });
+
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || '무료 사주 계산 실패');
+
+    currentUserInfo.saju = json.saju;
+    currentChapters = json.chapters;
+    renderPreview();
+
+    btn.disabled = false;
+    btn.textContent = '리포트 생성 시작';
+    showStatus('genStatus', '무료 기본사주 PDF 미리보기 생성 완료', 'ok');
+    return;
+  }
   const chapCount = selectedReportType === 'free' ? 5 : (selectedReportType === 'half' ? 20 : 40);
   const timeEst = selectedReportType === 'free' ? '약 1분' : (selectedReportType === 'half' ? '약 2~3분' : '약 3~5분');
   showStatus('genStatus', `<span class="loader"></span>${chapCount}챕터 분석 중... ${timeEst} 소요됩니다. 잠시만 기다려주세요.`, 'loading');
