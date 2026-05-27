@@ -986,6 +986,7 @@ async function generateReport() {
     currentChapters = json.chapters;
 
     renderPreview();
+    revealPdfPreview();
     showStatus('genStatus', '리포트 미리보기 생성 완료', 'ok');
   } catch (e) {
     console.error(e);
@@ -997,25 +998,42 @@ async function generateReport() {
 }
 
 function revealPdfPreview() {
-  const render = document.getElementById('pdfRender');
-
+  const ids = ['step1','step2','pdfRender','previewWrap','previewArea','pdfPreview'];
   document.getElementById('step1')?.classList.add('hidden');
   document.getElementById('step2')?.classList.remove('hidden');
 
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (id !== 'step1') {
+      el.classList.remove('hidden');
+      el.style.display = 'block';
+      el.style.visibility = 'visible';
+      el.style.opacity = '1';
+    }
+  });
+
+  const render = document.getElementById('pdfRender');
   if (render) {
     render.classList.remove('hidden');
     render.style.display = 'block';
+    render.style.minHeight = '400px';
+    render.style.visibility = 'visible';
 
     let p = render.parentElement;
     while (p && p !== document.body) {
       p.classList?.remove('hidden');
-      if (p.style && p.style.display === 'none') p.style.display = 'block';
+      if (p.style) {
+        p.style.display = p.style.display === 'none' ? 'block' : p.style.display;
+        p.style.visibility = 'visible';
+        p.style.opacity = '1';
+      }
       p = p.parentElement;
     }
 
     setTimeout(() => {
       render.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 200);
+    }, 150);
   }
 }
 
@@ -1023,18 +1041,26 @@ function renderPreview() {
   if (currentUserInfo?.reportType === 'free') {
     const render = document.getElementById('pdfRender');
     render.innerHTML = renderFreeBasicReport();
-    revealPdfPreview();
-    return;
-  }
-  if (currentUserInfo?.reportType === 'free') {
-    const render = document.getElementById('pdfRender');
-    render.innerHTML = renderFreeBasicReport();
-    render.classList.remove('hidden');
 
-    document.getElementById('step2')?.classList.remove('hidden');
+    document.getElementById('inputScreen')?.classList.add('hidden');
+    document.getElementById('previewScreen')?.classList.remove('hidden');
     document.getElementById('step1')?.classList.add('hidden');
+    document.getElementById('step2')?.classList.remove('hidden');
+
+    render.classList.remove('hidden');
+    render.style.display = 'block';
+    render.style.visibility = 'visible';
+    render.style.minHeight = '400px';
+
+    clearStatus('genStatus');
+
+    setTimeout(() => {
+      render.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+
     return;
   }
+
   document.getElementById('inputScreen').classList.add('hidden');
   document.getElementById('previewScreen').classList.remove('hidden');
   clearStatus('genStatus');
