@@ -6,29 +6,55 @@
 <title>무료 사주풀이</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:'Noto Sans KR',Arial,sans-serif;background:#111;color:#fff}
-.app{max-width:430px;margin:0 auto;min-height:100vh;background:
-linear-gradient(rgba(8,8,12,.18),rgba(8,8,12,.88)),
-radial-gradient(circle at 50% 8%,rgba(218,173,86,.38),transparent 32%),
-linear-gradient(160deg,#152238,#090b10 70%);padding:28px 22px}
-.brand{font-weight:900;color:#f2c35a;letter-spacing:2px}
-.hero{padding-top:74px;text-align:center}
-.hero .tag{color:#f2c35a;font-size:13px;letter-spacing:4px;margin-bottom:18px}
-h1{font-size:44px;line-height:1.08;margin:0;text-shadow:0 5px 20px rgba(0,0,0,.5)}
-.hero p{color:#e9dfcf;line-height:1.7;margin:22px 0 28px}
-.btn{width:100%;padding:16px;border:0;border-radius:14px;background:#0d5fb8;color:#fff;font-size:17px;font-weight:900;cursor:pointer;margin-top:12px}
-.gold{background:linear-gradient(135deg,#d8ac48,#9b6b14);color:#21140b}
-.form,.result{display:none;margin-top:30px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:22px;backdrop-filter:blur(8px)}
-label{display:block;margin-top:16px;font-weight:800}
-input,select{width:100%;padding:13px;margin-top:8px;border-radius:10px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:#fff}
+body{margin:0;font-family:'Noto Sans KR','Malgun Gothic',Arial,sans-serif;background:#08090d;color:#fff}
+.app{max-width:430px;margin:0 auto;min-height:100vh;padding:26px 20px;background:
+radial-gradient(circle at 50% 12%,rgba(221,177,84,.38),transparent 28%),
+linear-gradient(rgba(10,12,18,.2),rgba(10,12,18,.94)),
+linear-gradient(160deg,#18243d,#08090d 70%)}
+.brand{color:#f4c867;font-weight:900;letter-spacing:2px}
+.hero{text-align:center;padding-top:72px}
+.tag{font-size:12px;letter-spacing:4px;color:#f4c867;margin-bottom:16px}
+h1{font-size:42px;line-height:1.12;margin:0;text-shadow:0 5px 24px rgba(0,0,0,.55)}
+.hero p{color:#e9dfcf;line-height:1.7;margin:22px 0}
+.btn{width:100%;border:0;border-radius:15px;padding:16px;margin-top:12px;font-size:17px;font-weight:900;cursor:pointer}
+.gold{background:linear-gradient(135deg,#f1cf78,#9d6818);color:#21140b}
+.blue{background:#0d5fb8;color:#fff}
+.kakao{background:#f9df4a;color:#2b1d00}
+.pdf{background:#21140b;color:#e8bf5c}
+.form,.loading,.result{display:none;margin-top:28px}
+.panel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:22px;backdrop-filter:blur(8px)}
+label{display:block;margin-top:15px;font-weight:800}
+input,select{width:100%;margin-top:8px;padding:13px;border-radius:11px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:#fff}
 select option{color:#111}
-.result{background:#fff;color:#2c1810}
-.table{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:15px 0}
-.cell{background:#f7efe2;border:1px solid #d7bd86;border-radius:10px;text-align:center;padding:12px 4px;font-weight:900}
-.toc{padding-left:20px;line-height:1.9}
-.pdf{background:#2c1810;color:#d4a843}
-.kakao{background:#f9df4a;color:#2c1810}
-.small{font-size:12px;color:#7a6652;line-height:1.6}
+.spinner{width:54px;height:54px;border:5px solid rgba(255,255,255,.25);border-top-color:#f4c867;border-radius:50%;animation:spin 1s linear infinite;margin:90px auto 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{text-align:center;color:#f4c867;font-weight:900}
+.result{color:#2c1810}
+.saju-image{position:relative;overflow:hidden;border-radius:28px;padding:22px;background:
+radial-gradient(circle at 50% 28%,rgba(255,255,255,.85),rgba(255,247,230,.8) 32%,rgba(232,204,148,.9) 68%,rgba(142,94,26,.95)),
+linear-gradient(135deg,#f8edcf,#d2a64a);box-shadow:0 24px 70px rgba(0,0,0,.45);border:2px solid #e9c66d}
+.saju-image:before{content:"";position:absolute;inset:10px;border:1px solid rgba(92,55,10,.35);border-radius:22px}
+.saju-image:after{content:"命";position:absolute;right:22px;top:20px;width:54px;height:54px;border-radius:50%;border:2px solid rgba(128,20,20,.6);color:rgba(128,20,20,.65);font-size:30px;font-weight:900;display:flex;align-items:center;justify-content:center;transform:rotate(-14deg)}
+.saju-head{text-align:center;position:relative;z-index:1}
+.saju-head .small{font-size:11px;letter-spacing:4px;color:#8a5b12;font-weight:900}
+.saju-head h2{font-size:27px;margin:8px 0 4px;color:#2b1607}
+.profile{margin-top:16px;background:rgba(255,255,255,.5);border-radius:16px;padding:12px;font-size:13px;color:#51330d;line-height:1.7}
+.wheel{position:relative;width:250px;height:250px;margin:24px auto;border-radius:50%;background:
+radial-gradient(circle,#fff8e7 0 30%,#ead18a 31% 34%,#fff8e7 35% 55%,#bd8429 56% 58%,#f8e5ae 59% 100%);border:3px solid #7b4d12;box-shadow:inset 0 0 20px rgba(91,50,8,.25)}
+.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:88px;height:88px;border-radius:50%;background:#2c1810;color:#f4c867;display:flex;align-items:center;justify-content:center;text-align:center;font-size:18px;font-weight:900;line-height:1.3}
+.pillar{position:absolute;width:58px;height:58px;border-radius:16px;background:#fffdf6;border:2px solid #9b6b14;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;color:#2c1810;font-size:14px;box-shadow:0 5px 12px rgba(80,48,8,.18)}
+.p1{left:96px;top:8px}.p2{right:18px;top:96px}.p3{left:96px;bottom:8px}.p4{left:18px;top:96px}
+.five{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:18px}
+.el{border-radius:14px;padding:10px 4px;text-align:center;font-weight:900;font-size:13px;color:#fff}
+.wood{background:#2d8a47}.fire{background:#c43b2d}.earth{background:#a5742a}.metal{background:#b9b5aa;color:#211}.water{background:#2459a6}
+.section{background:#fffdf8;border-radius:20px;padding:20px;margin-top:18px;box-shadow:0 14px 36px rgba(0,0,0,.22)}
+.section h3{margin:0 0 12px;color:#2c1810}
+.toc{padding-left:20px;line-height:1.9;color:#51330d}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mini{background:#f7efe2;border:1px solid #dec087;border-radius:14px;padding:12px;font-size:13px;line-height:1.55}
+.summary{line-height:1.75;color:#51330d}
+.edit{background:#fff;border:1px solid #d4a843;color:#2c1810}
+@media print{body{background:#fff}.app{max-width:none;background:#fff;color:#111}.brand,.btn,.hero,.form,.loading{display:none!important}.result{display:block!important}.saju-image,.section{box-shadow:none}}
 </style>
 </head>
 <body>
@@ -42,19 +68,15 @@ select option{color:#111}
     <button class="btn gold" onclick="startForm()">무료 사주풀이 시작하기</button>
   </section>
 
-  <section class="form" id="form">
+  <section class="form panel" id="form">
     <label>이름</label>
     <input id="name" placeholder="이름">
-
     <label>생년월일</label>
     <input id="birth" placeholder="1990.01.01">
-
     <label>성별</label>
     <select id="gender"><option>여성</option><option>남성</option></select>
-
     <label>양력/음력</label>
     <select id="calendar"><option>양력</option><option>음력</option></select>
-
     <label>태어난 시간</label>
     <select id="birthTime">
       <option>시간 모름</option><option>자시 23:00-01:00</option><option>축시 01:00-03:00</option>
@@ -62,35 +84,71 @@ select option{color:#111}
       <option>사시 09:00-11:00</option><option>오시 11:00-13:00</option><option>미시 13:00-15:00</option>
       <option>신시 15:00-17:00</option><option>유시 17:00-19:00</option><option>술시 19:00-21:00</option><option>해시 21:00-23:00</option>
     </select>
-
     <button class="btn gold" onclick="makeResult()">사주 보러가기</button>
+    <button class="btn edit" onclick="backHero()">수정하기</button>
+  </section>
+
+  <section class="loading" id="loading">
+    <div class="spinner"></div>
+    <div>사주를 생성중입니다</div>
+    <p style="color:#e9dfcf;font-weight:400">만세력과 기본 해석을 정리하고 있습니다.</p>
   </section>
 
   <section class="result" id="result">
-    <h2 id="resultTitle"></h2>
-    <p class="small">무료 리포트는 기본 흐름만 제공합니다. 세부 대운·세운·연애운·금전운은 상담에서 더 깊게 볼 수 있습니다.</p>
+    <div class="saju-image">
+      <div class="saju-head">
+        <div class="small">BASIC SAJU CHART</div>
+        <h2 id="resultTitle">님의 사주풀이</h2>
+        <div class="profile" id="profileText"></div>
+      </div>
 
-    <h3>기본 만세력</h3>
-    <div class="table">
-      <div class="cell">년주<br>갑자</div>
-      <div class="cell">월주<br>병인</div>
-      <div class="cell">일주<br>무진</div>
-      <div class="cell">시주<br>미상</div>
+      <div class="wheel">
+        <div class="center">사주<br>팔자</div>
+        <div class="pillar p1">년주<br>갑자</div>
+        <div class="pillar p2">월주<br>병인</div>
+        <div class="pillar p3">일주<br>무진</div>
+        <div class="pillar p4">시주<br>미상</div>
+      </div>
+
+      <div class="five">
+        <div class="el wood">목<br>강</div>
+        <div class="el fire">화<br>중</div>
+        <div class="el earth">토<br>강</div>
+        <div class="el metal">금<br>약</div>
+        <div class="el water">수<br>중</div>
+      </div>
     </div>
 
-    <h3>PDF 목차</h3>
-    <ol class="toc">
-      <li>나의 기본 사주 구조</li>
-      <li>오행 균형 요약</li>
-      <li>타고난 성향</li>
-      <li>조심해야 할 흐름</li>
-      <li>상담으로 더 깊게 볼 부분</li>
-    </ol>
+    <div class="section">
+      <h3>사주풀이 요약</h3>
+      <p class="summary" id="summary"></p>
+    </div>
 
-    <p id="summary"></p>
+    <div class="section">
+      <h3>십성 · 오행 분석</h3>
+      <div class="grid2">
+        <div class="mini"><b>강한 기운</b><br>자기 기준과 추진력이 강한 편입니다.</div>
+        <div class="mini"><b>보완할 기운</b><br>관계 조율과 현실 판단을 의식하면 좋습니다.</div>
+        <div class="mini"><b>금전 흐름</b><br>한 번에 크게 벌기보다 꾸준한 누적형이 유리합니다.</div>
+        <div class="mini"><b>연애 흐름</b><br>표현 방식이 중요하며 속도를 조절하는 게 좋습니다.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>PDF 목차</h3>
+      <ol class="toc">
+        <li>나의 기본 사주 구조</li>
+        <li>만세력으로 보는 사주팔자</li>
+        <li>오행 균형과 부족한 기운</li>
+        <li>타고난 성향과 조심할 부분</li>
+        <li>금전운 · 연애운 기본 흐름</li>
+        <li>상담으로 더 깊게 볼 부분</li>
+      </ol>
+    </div>
 
     <button class="btn pdf" onclick="window.print()">PDF 다운로드</button>
     <button class="btn kakao" onclick="goKakao()">카카오톡 상담하기</button>
+    <button class="btn edit" onclick="editAgain()">수정하기</button>
   </section>
 </div>
 
@@ -99,32 +157,47 @@ let siteData={brandName:'무료 사주풀이',kakaoLink:'#',introText:''};
 
 async function loadBrand(){
   const slug=location.pathname.split('/').pop();
-  const res=await fetch('/api/free-site/'+slug);
-  if(res.ok){
-    const json=await res.json();
-    siteData=json.site;
-  }
-  document.getElementById('brandTop').textContent=siteData.brandName;
-  if(siteData.introText) document.getElementById('intro').textContent=siteData.introText;
+  try{
+    const res=await fetch('/api/free-site/'+slug);
+    if(res.ok){
+      const json=await res.json();
+      siteData=json.site;
+    }
+  }catch(e){}
+  brandTop.textContent=siteData.brandName || '무료 사주풀이';
+  if(siteData.introText) intro.textContent=siteData.introText;
 }
-function startForm(){
-  hero.style.display='none';
-  form.style.display='block';
-}
+
+function startForm(){hero.style.display='none';form.style.display='block'}
+function backHero(){form.style.display='none';hero.style.display='block'}
+function editAgain(){result.style.display='none';form.style.display='block'}
+
 function makeResult(){
   const name=document.getElementById('name').value.trim();
-  if(!name){alert('이름을 입력해주세요');return;}
+  const birth=document.getElementById('birth').value.trim();
+  const gender=document.getElementById('gender').value;
+  const calendar=document.getElementById('calendar').value;
+  const birthTime=document.getElementById('birthTime').value;
+  if(!name){alert('이름을 입력해주세요');return}
+
   form.style.display='none';
-  result.style.display='block';
-  resultTitle.textContent=name+'님의 사주풀이';
-  summary.textContent=name+'님은 기본적으로 자신의 흐름을 직접 만들어가려는 기질이 있습니다. 다만 오행의 균형에 따라 일, 돈, 관계의 흐름은 달라질 수 있어 자세한 해석은 상담으로 확인하는 것이 좋습니다.';
+  loading.style.display='block';
+
+  setTimeout(()=>{
+    loading.style.display='none';
+    result.style.display='block';
+    resultTitle.textContent=name+'님의 사주풀이';
+    profileText.innerHTML=`이름 ${name}<br>생년월일 ${birth || '-'} · ${calendar} · ${gender}<br>태어난 시간 ${birthTime}`;
+    summary.textContent=name+'님은 기본적으로 자기 흐름을 직접 만들어가려는 기질이 있습니다. 강한 기운은 장점이 되지만, 한쪽으로 치우치면 관계나 선택에서 급해질 수 있습니다. 무료 리포트에서는 기본 구조만 보여드리며, 대운·세운·금전운·연애운은 상담을 통해 더 구체적으로 볼 수 있습니다.';
+  },1200);
 }
+
 function goKakao(){
-  if(!siteData.kakaoLink || siteData.kakaoLink==='#'){alert('상담 링크가 설정되지 않았습니다.');return;}
+  if(!siteData.kakaoLink || siteData.kakaoLink==='#'){alert('상담 링크가 설정되지 않았습니다.');return}
   location.href=siteData.kakaoLink;
 }
+
 loadBrand();
 </script>
 </body>
 </html>
-
