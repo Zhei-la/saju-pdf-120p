@@ -71,7 +71,7 @@ app.post('/api/free-site', (req, res) => {
   }
 });
 
-app.get('/api/free-site/:slug', (req, res) => {
+app.get('/api/free-site-disabled/:slug', (req, res) => {
   try {
     const fsx = require('fs');
     const pathx = require('path');
@@ -95,6 +95,36 @@ app.get('/api/free-site/:slug', (req, res) => {
       error: '무료사주 웹사이트 조회 중 서버 오류',
       detail: err.message
     });
+  }
+});
+
+
+app.get('/api/free-site/:slug', (req, res) => {
+  try {
+    const fsx = require('fs');
+    const pathx = require('path');
+    const saveFile = pathx.join(process.cwd(), 'data', 'free-sites.json');
+
+    if (!fsx.existsSync(saveFile)) {
+      return res.status(404).json({ error: '사이트를 찾을 수 없습니다.' });
+    }
+
+    const sites = JSON.parse(fsx.readFileSync(saveFile, 'utf8') || '{}');
+
+    const raw = req.params.slug;
+    const encoded = encodeURIComponent(raw);
+    const decoded = decodeURIComponent(raw);
+
+    const site = sites[raw] || sites[encoded] || sites[decoded];
+
+    if (!site) {
+      return res.status(404).json({ error: '사이트를 찾을 수 없습니다.' });
+    }
+
+    return res.json({ site });
+  } catch (err) {
+    console.error('FREE_SITE_LOAD_ERROR', err);
+    return res.status(500).json({ error: '조회 오류', detail: err.message });
   }
 });
 
@@ -141,7 +171,7 @@ app.post('/api/free-site', (req, res) => {
   res.json({ site: sites[slug], url: '/u/' + slug });
 });
 
-app.get('/api/free-site/:slug', (req, res) => {
+app.get('/api/free-site-disabled/:slug', (req, res) => {
   const sites = readFreeSites();
   const site = sites[req.params.slug];
   if (!site) return res.status(404).json({ error: '사이트를 찾을 수 없습니다.' });
