@@ -6,304 +6,325 @@
 <title>무료 사주풀이</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:'Noto Sans KR','Malgun Gothic',Arial,sans-serif;background:#08090d;color:#fff}
-.app{max-width:430px;margin:0 auto;min-height:100vh;padding:26px 20px;background:radial-gradient(circle at 50% 12%,rgba(221,177,84,.38),transparent 28%),linear-gradient(rgba(10,12,18,.2),rgba(10,12,18,.94)),linear-gradient(160deg,#18243d,#08090d 70%)}
-.brand{color:#f4c867;font-weight:900;letter-spacing:2px}
-.hero{text-align:center;padding-top:72px}
-.tag{font-size:12px;letter-spacing:4px;color:#f4c867;margin-bottom:16px}
-h1{font-size:42px;line-height:1.12;margin:0;text-shadow:0 5px 24px rgba(0,0,0,.55)}
-.hero p{color:#e9dfcf;line-height:1.7;margin:22px 0}
-.btn{width:100%;border:0;border-radius:15px;padding:16px;margin-top:12px;font-size:17px;font-weight:900;cursor:pointer}
-.gold{background:linear-gradient(135deg,#f1cf78,#9d6818);color:#21140b}
+body{margin:0;font-family:'Malgun Gothic',Arial,sans-serif;background:#f4f1ec;color:#3a3028}
+.app{max-width:760px;margin:0 auto;background:#fff;min-height:100vh;padding:22px}
+.brand{font-weight:900;color:#b58220;margin-bottom:20px}
+.hero{min-height:92vh;background:linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.75)),linear-gradient(135deg,#14233c,#080b12);border-radius:20px;padding:40px 24px;text-align:center;color:#fff;display:flex;flex-direction:column;justify-content:center}
+.hero h1{font-size:42px;line-height:1.18;margin:0}
+.hero p{line-height:1.7;color:#eadfcd}
+.btn{width:100%;border:0;border-radius:14px;padding:16px;margin-top:12px;font-size:17px;font-weight:900;cursor:pointer}
+.gold{background:#ffd166;color:#2b1a00}
+.dark{background:#3d342e;color:#fff}
 .kakao{background:#f9df4a;color:#2b1d00}
-.pdf{background:#21140b;color:#e8bf5c}
-.edit{background:#fff;border:1px solid #d4a843;color:#2c1810}
-.form,.loading,.result{display:none;margin-top:28px}
-.panel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:22px;backdrop-filter:blur(8px)}
-label{display:block;margin-top:15px;font-weight:800}
-input,select{width:100%;margin-top:8px;padding:13px;border-radius:11px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:#fff}
-select option{color:#111}
-.spinner{width:54px;height:54px;border:5px solid rgba(255,255,255,.25);border-top-color:#f4c867;border-radius:50%;animation:spin 1s linear infinite;margin:90px auto 20px}
+.pdf{background:#2c1810;color:#d4a843}
+.form,.loading,.result{display:none}
+.panel{background:#fff;border:1px solid #ddd;border-radius:18px;padding:22px;margin-top:20px}
+label{display:block;margin-top:16px;font-weight:800}
+input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;margin-top:8px;font-size:16px}
+.loading{text-align:center;padding:120px 20px}
+.spinner{width:58px;height:58px;border:6px solid #eee;border-top-color:#b58220;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading{text-align:center;color:#f4c867;font-weight:900}
-.result{color:#2c1810}
-.saju-image{position:relative;overflow:hidden;border-radius:28px;padding:22px;background:radial-gradient(circle at 50% 28%,rgba(255,255,255,.85),rgba(255,247,230,.8) 32%,rgba(232,204,148,.9) 68%,rgba(142,94,26,.95)),linear-gradient(135deg,#f8edcf,#d2a64a);box-shadow:0 24px 70px rgba(0,0,0,.45);border:2px solid #e9c66d}
-.saju-image:before{content:"";position:absolute;inset:10px;border:1px solid rgba(92,55,10,.35);border-radius:22px}
-.saju-image:after{content:"命";position:absolute;right:22px;top:20px;width:54px;height:54px;border-radius:50%;border:2px solid rgba(128,20,20,.6);color:rgba(128,20,20,.65);font-size:30px;font-weight:900;display:flex;align-items:center;justify-content:center;transform:rotate(-14deg)}
-.saju-head{text-align:center;position:relative;z-index:1}
-.saju-head .small{font-size:11px;letter-spacing:4px;color:#8a5b12;font-weight:900}
-.saju-head h2{font-size:27px;margin:8px 0 4px;color:#2b1607}
-.profile{margin-top:16px;background:rgba(255,255,255,.5);border-radius:16px;padding:12px;font-size:13px;color:#51330d;line-height:1.7}
-.wheel{position:relative;width:250px;height:250px;margin:24px auto;border-radius:50%;background:radial-gradient(circle,#fff8e7 0 30%,#ead18a 31% 34%,#fff8e7 35% 55%,#bd8429 56% 58%,#f8e5ae 59% 100%);border:3px solid #7b4d12;box-shadow:inset 0 0 20px rgba(91,50,8,.25)}
-.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:88px;height:88px;border-radius:50%;background:#2c1810;color:#f4c867;display:flex;align-items:center;justify-content:center;text-align:center;font-size:18px;font-weight:900;line-height:1.3}
-.pillar{position:absolute;width:58px;height:58px;border-radius:16px;background:#fffdf6;border:2px solid #9b6b14;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;color:#2c1810;font-size:14px;box-shadow:0 5px 12px rgba(80,48,8,.18)}
-.p1{left:96px;top:8px}.p2{right:18px;top:96px}.p3{left:96px;bottom:8px}.p4{left:18px;top:96px}
-.five{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:18px}
-.el{border-radius:14px;padding:10px 4px;text-align:center;font-weight:900;font-size:13px;color:#fff}
-.wood{background:#2d8a47}.fire{background:#c43b2d}.earth{background:#a5742a}.metal{background:#b9b5aa;color:#211}.water{background:#2459a6}
-.section{background:#fffdf8;border-radius:20px;padding:20px;margin-top:18px;box-shadow:0 14px 36px rgba(0,0,0,.22)}
-.section h3{margin:0 0 12px;color:#2c1810}
-.toc{padding-left:20px;line-height:1.9;color:#51330d}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.mini{background:#f7efe2;border:1px solid #dec087;border-radius:14px;padding:12px;font-size:13px;line-height:1.55}
-.summary{line-height:1.75;color:#51330d}
-@media print{body{background:#fff}.app{max-width:none;background:#fff;color:#111}.brand,.btn,.hero,.form,.loading{display:none!important}.result{display:block!important}.saju-image,.section{box-shadow:none}}
+
+.section{background:#fff;border-radius:18px;padding:22px;margin:22px 0;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.section h2{margin:0 0 16px;font-size:26px}
+.profile-head{display:flex;gap:14px;align-items:center}
+.avatar{width:60px;height:60px;border-radius:50%;background:#e9f5ff;display:flex;align-items:center;justify-content:center;font-size:28px}
+.muted{color:#7b7068;font-size:13px;line-height:1.6}
+
+.manse-table{width:100%;border-collapse:collapse;margin-top:14px;text-align:center}
+.manse-table th{font-size:13px;padding:8px;color:#4d4036}
+.manse-table td{border:1px solid #bbb;padding:10px;background:#fff}
+.big-kanji{font-size:34px;font-weight:900;color:#b58220;line-height:1.1}
+.sub{font-size:12px;color:#6b5d52;margin-top:5px}
+
+.detail-box{background:#ddd8d2;border-radius:0 0 12px 12px;padding:18px}
+.detail-title{background:#4d463f;color:#fff;padding:14px 18px;border-radius:12px 12px 0 0;font-weight:900}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.badge{background:#fff;border-radius:999px;padding:8px 13px;font-size:13px}
+.detail-table{width:100%;border-collapse:collapse;text-align:center;background:#fff}
+.detail-table td,.detail-table th{border:1px solid #c9c2ba;padding:10px;font-size:13px}
+.detail-table .kanji{font-size:28px;font-weight:900;color:#b58220}
+
+.analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.donut{height:230px;border-radius:50%;background:conic-gradient(#e76f51 0 25%,#4f8da3 25% 62.5%,#ffd166 62.5% 100%);position:relative;margin:0 auto;width:230px}
+.donut:after{content:"";position:absolute;inset:48px;background:#fff;border-radius:50%}
+.donut-text{position:absolute;z-index:2;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900}
+.simple-table{width:100%;border-collapse:collapse;margin-top:14px}
+.simple-table td,.simple-table th{border:1px solid #ccc;padding:10px;text-align:center}
+
+.relation{position:relative;height:430px}
+.circle{position:absolute;width:122px;height:122px;border:2px solid #c9c2ba;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;font-weight:900}
+.c1{left:50%;top:10px;transform:translateX(-50%)}
+.c2{right:20px;top:150px}
+.c3{right:90px;bottom:20px}
+.c4{left:90px;bottom:20px}
+.c5{left:20px;top:150px}
+.arrow{position:absolute;height:4px;background:#4285f4;transform-origin:left center}
+.a1{left:385px;top:135px;width:80px;transform:rotate(35deg)}
+.a2{left:415px;top:290px;width:80px;transform:rotate(160deg)}
+.a3{left:210px;top:345px;width:80px;transform:rotate(-160deg)}
+.a4{left:150px;top:220px;width:80px;transform:rotate(-80deg)}
+.a5{left:270px;top:120px;width:80px;transform:rotate(110deg)}
+
+.luck-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px}
+.luck-card{min-width:58px;text-align:center}
+.luck-age{font-size:12px;color:#6b5d52}
+.luck-box{border-radius:8px;padding:9px 4px;font-size:24px;font-weight:900;background:#f4c06a;border:1px solid #c9a15b}
+.luck-sub{font-size:11px;color:#6b5d52;margin-top:4px}
+
+.toc{line-height:2;padding-left:22px}
+.summary{line-height:1.8;color:#4a3a2f}
+
+@media(max-width:600px){
+  .app{padding:14px}
+  .analysis-grid{grid-template-columns:1fr}
+  .big-kanji{font-size:28px}
+  .relation{height:390px}
+  .circle{width:100px;height:100px;font-size:18px}
+}
 </style>
 </head>
-
 <body>
 <div class="app">
   <div class="brand" id="brandTop">무료 사주풀이</div>
 
   <section class="hero" id="hero">
-    <div class="tag">무료 사주풀이</div>
-    <h1>내 사주의<br>기본 흐름 확인하기</h1>
-    <p id="intro">생년월일과 태어난 시간을 입력하면 기본 만세력과 사주풀이 요약을 무료 PDF로 확인할 수 있습니다.</p>
+    <h1>무료 사주풀이</h1>
+    <p id="intro">생년월일과 태어난 시간을 입력하면 기본 만세력과 사주풀이 요약을 확인할 수 있습니다.</p>
     <button class="btn gold" onclick="startForm()">무료 사주풀이 시작하기</button>
   </section>
 
   <section class="form panel" id="form">
+    <h2>입력하신 프로필을 확인해주세요.</h2>
     <label>이름</label>
-    <input id="name" placeholder="이름">
-
+    <input id="name" placeholder="김가영">
     <label>생년월일</label>
-    <input id="birth" placeholder="1990.01.01">
-
+    <input id="birth" placeholder="1999.02.21">
     <label>성별</label>
-    <select id="gender">
-      <option>여성</option>
-      <option>남성</option>
-    </select>
-
+    <select id="gender"><option>여성</option><option>남성</option></select>
     <label>양력/음력</label>
-    <select id="calendar">
-      <option>양력</option>
-      <option>음력</option>
-    </select>
-
+    <select id="calendar"><option>양력</option><option>음력</option></select>
     <label>태어난 시간</label>
     <select id="birthTime">
       <option>시간 모름</option>
-      <option>자시 23:00-01:00</option>
-      <option>축시 01:00-03:00</option>
-      <option>인시 03:00-05:00</option>
-      <option>묘시 05:00-07:00</option>
-      <option>진시 07:00-09:00</option>
-      <option>사시 09:00-11:00</option>
-      <option>오시 11:00-13:00</option>
-      <option>미시 13:00-15:00</option>
-      <option>신시 15:00-17:00</option>
-      <option>유시 17:00-19:00</option>
-      <option>술시 19:00-21:00</option>
-      <option>해시 21:00-23:00</option>
+      <option>자시 23:00-01:00</option><option>축시 01:00-03:00</option>
+      <option>인시 03:00-05:00</option><option>묘시 05:00-07:00</option>
+      <option>진시 07:00-09:00</option><option>사시 09:00-11:00</option>
+      <option>오시 11:00-13:00</option><option>미시 13:00-15:00</option>
+      <option>신시 15:00-17:00</option><option>유시 17:00-19:00</option>
+      <option>술시 19:00-21:00</option><option>해시 21:00-23:00</option>
     </select>
-
     <button class="btn gold" onclick="makeResult()">사주 보러가기</button>
-    <button class="btn edit" onclick="backHero()">수정하기</button>
+    <button class="btn dark" onclick="backHero()">프로필 수정하기</button>
   </section>
 
   <section class="loading" id="loading">
     <div class="spinner"></div>
-    <div>사주를 생성중입니다</div>
-    <p style="color:#e9dfcf;font-weight:400">만세력과 기본 해석을 정리하고 있습니다.</p>
+    <h3>사주를 생성중입니다</h3>
+    <p>만세력과 오행 흐름을 정리하고 있습니다.</p>
   </section>
 
   <section class="result" id="result">
-    <div class="saju-image">
-      <div class="saju-head">
-        <div class="small">무료 사주 리포트</div>
-        <h2 id="resultTitle">님의 사주풀이</h2>
-        <div class="profile" id="profileText"></div>
+    <div class="section">
+      <div class="profile-head">
+        <div class="avatar">☁️</div>
+        <div>
+          <h2 id="resultTitle">사주풀이</h2>
+          <div class="muted" id="profileText"></div>
+        </div>
       </div>
 
-      <div class="wheel">
-        <div class="center">사주<br>팔자</div>
-        <div class="pillar p1">년주<br>-</div>
-        <div class="pillar p2">월주<br>-</div>
-        <div class="pillar p3">일주<br>-</div>
-        <div class="pillar p4">시주<br>-</div>
-      </div>
+      <table class="manse-table">
+        <thead>
+          <tr><th></th><th>생시</th><th>생일</th><th>생월</th><th>생년</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>천간</th>
+            <td><div class="big-kanji" id="hGan">-</div><div class="sub" id="hGanSub"></div></td>
+            <td><div class="big-kanji" id="dGan">-</div><div class="sub" id="dGanSub"></div></td>
+            <td><div class="big-kanji" id="mGan">-</div><div class="sub" id="mGanSub"></div></td>
+            <td><div class="big-kanji" id="yGan">-</div><div class="sub" id="yGanSub"></div></td>
+          </tr>
+          <tr>
+            <th>지지</th>
+            <td><div class="big-kanji" id="hJi">-</div><div class="sub" id="hJiSub"></div></td>
+            <td><div class="big-kanji" id="dJi">-</div><div class="sub" id="dJiSub"></div></td>
+            <td><div class="big-kanji" id="mJi">-</div><div class="sub" id="mJiSub"></div></td>
+            <td><div class="big-kanji" id="yJi">-</div><div class="sub" id="yJiSub"></div></td>
+          </tr>
+          <tr>
+            <th>십성</th>
+            <td id="hTen">-</td><td id="dTen">일간</td><td id="mTen">-</td><td id="yTen">-</td>
+          </tr>
+          <tr>
+            <th>12운성</th>
+            <td id="hUn">-</td><td id="dUn">-</td><td id="mUn">-</td><td id="yUn">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <div class="five">
-        <div class="el wood">목<br>0%</div>
-        <div class="el fire">화<br>0%</div>
-        <div class="el earth">토<br>0%</div>
-        <div class="el metal">금<br>0%</div>
-        <div class="el water">수<br>0%</div>
+    <div class="detail-title">사주 풀이 자세히 보기</div>
+    <div class="detail-box">
+      <div class="badges">
+        <span class="badge">궁성</span><span class="badge">천간합</span><span class="badge">지지육합</span>
+        <span class="badge">지지삼합</span><span class="badge">지지방합</span><span class="badge">공망</span>
+      </div>
+      <table class="detail-table">
+        <tr><th></th><th>생시</th><th>생일</th><th>생월</th><th>생년</th></tr>
+        <tr><td>천간</td><td class="kanji" id="dhGan">-</td><td class="kanji" id="ddGan">-</td><td class="kanji" id="dmGan">-</td><td class="kanji" id="dyGan">-</td></tr>
+        <tr><td>지지</td><td class="kanji" id="dhJi">-</td><td class="kanji" id="ddJi">-</td><td class="kanji" id="dmJi">-</td><td class="kanji" id="dyJi">-</td></tr>
+        <tr><td>해석</td><td>미래성</td><td>자기중심</td><td>사회성</td><td>초년운</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>오행과 십성 분석</h2>
+      <div class="analysis-grid">
+        <div>
+          <div class="donut" id="elementDonut"><div class="donut-text" id="mainElement">목</div></div>
+          <table class="simple-table">
+            <tr><th>오행</th><th>비율</th></tr>
+            <tr><td>목(木)</td><td id="woodP">0%</td></tr>
+            <tr><td>화(火)</td><td id="fireP">0%</td></tr>
+            <tr><td>토(土)</td><td id="earthP">0%</td></tr>
+            <tr><td>금(金)</td><td id="metalP">0%</td></tr>
+            <tr><td>수(水)</td><td id="waterP">0%</td></tr>
+          </table>
+        </div>
+        <div>
+          <div class="donut" style="background:conic-gradient(#222 0 25%,#7c8790 25% 50%,#b5bdc3 50% 75%,#444 75% 100%)"><div class="donut-text">십성</div></div>
+          <table class="simple-table">
+            <tr><th>십성</th><th>요약</th></tr>
+            <tr><td>비견</td><td>자기주도</td></tr>
+            <tr><td>식신</td><td>표현력</td></tr>
+            <tr><td>정재</td><td>현실감각</td></tr>
+            <tr><td>편관</td><td>압박과 책임</td></tr>
+          </table>
+        </div>
       </div>
     </div>
 
     <div class="section">
-      <h3>사주풀이 요약</h3>
-      <p class="summary" id="summary"></p>
-    </div>
-
-    <div class="section">
-      <h3>십성 · 오행 분석</h3>
-      <div class="grid2">
-        <div class="mini"><b>강한 기운</b><br>오행 비율에서 높은 기운을 중심으로 성향을 봅니다.</div>
-        <div class="mini"><b>보완할 기운</b><br>부족한 기운은 관계와 선택에서 의식하면 좋습니다.</div>
-        <div class="mini"><b>금전 흐름</b><br>무료 리포트에서는 기본 경향만 안내합니다.</div>
-        <div class="mini"><b>연애 흐름</b><br>자세한 흐름은 상담에서 개인 상황과 함께 봅니다.</div>
+      <h2>나의 오행 관계도</h2>
+      <div class="relation">
+        <div class="arrow a1"></div><div class="arrow a2"></div><div class="arrow a3"></div><div class="arrow a4"></div><div class="arrow a5"></div>
+        <div class="circle c1" id="relWood">목<br>0%</div>
+        <div class="circle c2" id="relFire">화<br>0%</div>
+        <div class="circle c3" id="relEarth">토<br>0%</div>
+        <div class="circle c4" id="relMetal">금<br>0%</div>
+        <div class="circle c5" id="relWater">수<br>0%</div>
       </div>
     </div>
 
     <div class="section">
-      <h3>PDF 목차</h3>
+      <h2>대운 · 연운 · 월운</h2>
+      <h3>대운</h3>
+      <div class="luck-row" id="daeunRow"></div>
+      <h3>연운</h3>
+      <div class="luck-row" id="yearRow"></div>
+      <h3>월운</h3>
+      <div class="luck-row" id="monthRow"></div>
+    </div>
+
+    <div class="section">
+      <h2>PDF 목차</h2>
       <ol class="toc">
         <li>나의 기본 사주 구조</li>
         <li>만세력으로 보는 사주팔자</li>
         <li>오행 균형과 부족한 기운</li>
         <li>타고난 성향과 조심할 부분</li>
-        <li>금전운 · 연애운 기본 흐름</li>
+        <li>대운 · 세운 · 월운 흐름</li>
         <li>상담으로 더 깊게 볼 부분</li>
       </ol>
+      <p class="summary" id="summary"></p>
     </div>
 
     <button class="btn pdf" onclick="window.print()">PDF 다운로드</button>
     <button class="btn kakao" onclick="goKakao()">카카오톡 상담하기</button>
-    <button class="btn edit" onclick="editAgain()">수정하기</button>
+    <button class="btn dark" onclick="editAgain()">수정하기</button>
   </section>
 </div>
 
 <script>
-let siteData = {
-  brandName:'무료 사주풀이',
-  kakaoLink:'#',
-  introText:''
-};
+let siteData={brandName:'무료 사주풀이',kakaoLink:'#',introText:''};
 
 async function loadBrand(){
-  const slug = location.pathname.split('/').pop();
-
-  try {
-    const res = await fetch('/api/free-site/' + slug);
-
-    if (res.ok) {
-      const json = await res.json();
-      siteData = json.site;
-    }
-  } catch(e) {}
-
-  document.getElementById('brandTop').textContent =
-    siteData.brandName || '무료 사주풀이';
-
-  if (siteData.introText) {
-    document.getElementById('intro').textContent =
-      siteData.introText;
-  }
+  const slug=location.pathname.split('/').pop();
+  try{
+    const res=await fetch('/api/free-site/'+slug);
+    if(res.ok){ siteData=(await res.json()).site; }
+  }catch(e){}
+  brandTop.textContent=siteData.brandName || '무료 사주풀이';
+  if(siteData.introText) intro.textContent=siteData.introText;
 }
 
-function startForm(){
-  document.getElementById('hero').style.display='none';
-  document.getElementById('form').style.display='block';
-}
+function startForm(){hero.style.display='none';form.style.display='block'}
+function backHero(){form.style.display='none';hero.style.display='block'}
+function editAgain(){result.style.display='none';form.style.display='block'}
 
-function backHero(){
-  document.getElementById('form').style.display='none';
-  document.getElementById('hero').style.display='block';
+function splitPillar(p){return (!p||p==='미상')?['-','-']:[p[0],p[1]]}
+function put(id,v){document.getElementById(id).innerHTML=v}
+function makeLuck(rowId,items){
+  const row=document.getElementById(rowId);
+  row.innerHTML='';
+  items.forEach(x=>{
+    const p=x.pillar||'-';
+    row.innerHTML+=`<div class="luck-card"><div class="luck-age">${x.age||x.year||x.month}</div><div class="luck-box">${p}</div><div class="luck-sub">${x.label||''}</div></div>`;
+  });
 }
-
-function editAgain(){
-  document.getElementById('result').style.display='none';
-  document.getElementById('form').style.display='block';
+function fakeMonths(){
+  const gs=['갑자','을축','병인','정묘','무진','기사','경오','신미','임신','계유','갑술','을해'];
+  return gs.map((p,i)=>({month:(i+1)+'월',pillar:p,label:'월운'}));
 }
 
 async function makeResult(){
-  const name = document.getElementById('name').value.trim();
-  const birth = document.getElementById('birth').value.trim();
-  const gender = document.getElementById('gender').value;
-  const calendar = document.getElementById('calendar').value;
-  const birthTime = document.getElementById('birthTime').value;
+  const name=nameInput();
+  const birth=document.getElementById('birth').value.trim();
+  const gender=document.getElementById('gender').value;
+  const calendar=document.getElementById('calendar').value;
+  const birthTime=document.getElementById('birthTime').value;
+  if(!name){alert('이름을 입력해주세요');return}
+  if(!birth){alert('생년월일을 입력해주세요');return}
 
-  if(!name){
-    alert('이름을 입력해주세요');
-    return;
-  }
+  form.style.display='none'; loading.style.display='block';
+  const res=await fetch('/api/free-saju/calc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,birth,gender,calendar,birthTime})});
+  const data=await res.json();
+  if(!res.ok){loading.style.display='none';form.style.display='block';alert(data.error||'사주 계산 실패');return}
 
-  if(!birth){
-    alert('생년월일을 입력해주세요');
-    return;
-  }
+  loading.style.display='none'; result.style.display='block';
+  resultTitle.textContent=name+'님의 사주풀이';
+  profileText.innerHTML=`양 ${data.profile.solarDate}<br>음 ${data.profile.lunarDate}<br>${birthTime}`;
 
-  document.getElementById('form').style.display='none';
-  document.getElementById('loading').style.display='block';
+  const [yg,yj]=splitPillar(data.pillars.year);
+  const [mg,mj]=splitPillar(data.pillars.month);
+  const [dg,dj]=splitPillar(data.pillars.day);
+  const [hg,hj]=splitPillar(data.pillars.hour);
 
-  const res = await fetch('/api/free-saju/calc', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      name,
-      birth,
-      gender,
-      calendar,
-      birthTime
-    })
-  });
+  put('yGan',yg); put('yJi',yj); put('mGan',mg); put('mJi',mj); put('dGan',dg); put('dJi',dj); put('hGan',hg); put('hJi',hj);
+  put('dyGan',yg); put('dyJi',yj); put('dmGan',mg); put('dmJi',mj); put('ddGan',dg); put('ddJi',dj); put('dhGan',hg); put('dhJi',hj);
 
-  const data = await res.json();
+  const e=data.elementPercent||{};
+  const wood=e.목||0, fire=e.화||0, earth=e.토||0, metal=e.금||0, water=e.수||0;
+  woodP.textContent=wood+'%'; fireP.textContent=fire+'%'; earthP.textContent=earth+'%'; metalP.textContent=metal+'%'; waterP.textContent=water+'%';
+  relWood.innerHTML='목<br>'+wood+'%'; relFire.innerHTML='화<br>'+fire+'%'; relEarth.innerHTML='토<br>'+earth+'%'; relMetal.innerHTML='금<br>'+metal+'%'; relWater.innerHTML='수<br>'+water+'%';
 
-  if(!res.ok){
-    document.getElementById('loading').style.display='none';
-    document.getElementById('form').style.display='block';
-    alert(data.error || '사주 계산 실패');
-    return;
-  }
+  const maxName=Object.entries(e).sort((a,b)=>b[1]-a[1])[0]?.[0]||'목';
+  mainElement.textContent=maxName;
+  elementDonut.style.background=`conic-gradient(#2d8a47 0 ${wood}%,#c43b2d ${wood}% ${wood+fire}%,#c78b2b ${wood+fire}% ${wood+fire+earth}%,#b9b5aa ${wood+fire+earth}% ${wood+fire+earth+metal}%,#2459a6 ${wood+fire+earth+metal}% 100%)`;
 
-  document.getElementById('loading').style.display='none';
-  document.getElementById('result').style.display='block';
-
-  document.getElementById('resultTitle').textContent =
-    name + '님의 사주풀이';
-
-  document.getElementById('profileText').innerHTML =
-    '이름 ' + name + '<br>' +
-    '생년월일 ' + birth + ' · ' + calendar + ' · ' + gender + '<br>' +
-    '태어난 시간 ' + birthTime + '<br>' +
-    '양력 ' + data.profile.solarDate + ' / 음력 ' + data.profile.lunarDate;
-
-  document.querySelector('.p1').innerHTML =
-    '년주<br>' + data.pillars.year;
-
-  document.querySelector('.p2').innerHTML =
-    '월주<br>' + data.pillars.month;
-
-  document.querySelector('.p3').innerHTML =
-    '일주<br>' + data.pillars.day;
-
-  document.querySelector('.p4').innerHTML =
-    '시주<br>' + data.pillars.hour;
-
-  const e = data.elementPercent || {};
-
-  document.querySelector('.wood').innerHTML =
-    '목<br>' + (e.목 || 0) + '%';
-
-  document.querySelector('.fire').innerHTML =
-    '화<br>' + (e.화 || 0) + '%';
-
-  document.querySelector('.earth').innerHTML =
-    '토<br>' + (e.토 || 0) + '%';
-
-  document.querySelector('.metal').innerHTML =
-    '금<br>' + (e.금 || 0) + '%';
-
-  document.querySelector('.water').innerHTML =
-    '수<br>' + (e.수 || 0) + '%';
-
-  document.getElementById('summary').textContent =
-    data.summary || '';
+  makeLuck('daeunRow',data.daeyun||[]);
+  makeLuck('yearRow',data.yearly||[]);
+  makeLuck('monthRow',data.months||fakeMonths());
+  summary.textContent=data.summary||'';
 }
 
+function nameInput(){return document.getElementById('name').value.trim()}
 function goKakao(){
-  if(!siteData.kakaoLink || siteData.kakaoLink === '#'){
-    alert('상담 링크가 설정되지 않았습니다.');
-    return;
-  }
-
-  location.href = siteData.kakaoLink;
+  if(!siteData.kakaoLink || siteData.kakaoLink==='#'){alert('상담 링크가 설정되지 않았습니다.');return}
+  location.href=siteData.kakaoLink;
 }
-
 loadBrand();
 </script>
 </body>
