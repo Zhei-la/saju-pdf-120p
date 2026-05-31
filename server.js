@@ -8,6 +8,8 @@ const { consultAnswer, personalConsult, personalConsultFollowup, freeThreadReadi
 const db = require('./services/db');
 
 const app = express();
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.post('/api/free-saju/calc', (req, res) => {
   try {
 
@@ -30,8 +32,6 @@ app.post('/api/free-saju/calc', (req, res) => {
     });
   }
 });
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.post('/api/free-site', (req, res) => {
   try {
