@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>무료 사주풀이</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'Noto Sans KR',Arial,sans-serif;background:#111;color:#fff}
+.app{max-width:430px;margin:0 auto;min-height:100vh;background:
+linear-gradient(rgba(8,8,12,.18),rgba(8,8,12,.88)),
+radial-gradient(circle at 50% 8%,rgba(218,173,86,.38),transparent 32%),
+linear-gradient(160deg,#152238,#090b10 70%);padding:28px 22px}
+.brand{font-weight:900;color:#f2c35a;letter-spacing:2px}
+.hero{padding-top:74px;text-align:center}
+.hero .tag{color:#f2c35a;font-size:13px;letter-spacing:4px;margin-bottom:18px}
+h1{font-size:44px;line-height:1.08;margin:0;text-shadow:0 5px 20px rgba(0,0,0,.5)}
+.hero p{color:#e9dfcf;line-height:1.7;margin:22px 0 28px}
+.btn{width:100%;padding:16px;border:0;border-radius:14px;background:#0d5fb8;color:#fff;font-size:17px;font-weight:900;cursor:pointer;margin-top:12px}
+.gold{background:linear-gradient(135deg,#d8ac48,#9b6b14);color:#21140b}
+.form,.result{display:none;margin-top:30px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:22px;backdrop-filter:blur(8px)}
+label{display:block;margin-top:16px;font-weight:800}
+input,select{width:100%;padding:13px;margin-top:8px;border-radius:10px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:#fff}
+select option{color:#111}
+.result{background:#fff;color:#2c1810}
+.table{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:15px 0}
+.cell{background:#f7efe2;border:1px solid #d7bd86;border-radius:10px;text-align:center;padding:12px 4px;font-weight:900}
+.toc{padding-left:20px;line-height:1.9}
+.pdf{background:#2c1810;color:#d4a843}
+.kakao{background:#f9df4a;color:#2c1810}
+.small{font-size:12px;color:#7a6652;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brand" id="brandTop">무료 사주풀이</div>
+
+  <section class="hero" id="hero">
+    <div class="tag">FREE SAJU REPORT</div>
+    <h1>내 사주의<br>기본 흐름 확인하기</h1>
+    <p id="intro">생년월일과 태어난 시간을 입력하면 기본 만세력과 사주풀이 요약을 무료 PDF로 확인할 수 있습니다.</p>
+    <button class="btn gold" onclick="startForm()">무료 사주풀이 시작하기</button>
+  </section>
+
+  <section class="form" id="form">
+    <label>이름</label>
+    <input id="name" placeholder="이름">
+
+    <label>생년월일</label>
+    <input id="birth" placeholder="1990.01.01">
+
+    <label>성별</label>
+    <select id="gender"><option>여성</option><option>남성</option></select>
+
+    <label>양력/음력</label>
+    <select id="calendar"><option>양력</option><option>음력</option></select>
+
+    <label>태어난 시간</label>
+    <select id="birthTime">
+      <option>시간 모름</option><option>자시 23:00-01:00</option><option>축시 01:00-03:00</option>
+      <option>인시 03:00-05:00</option><option>묘시 05:00-07:00</option><option>진시 07:00-09:00</option>
+      <option>사시 09:00-11:00</option><option>오시 11:00-13:00</option><option>미시 13:00-15:00</option>
+      <option>신시 15:00-17:00</option><option>유시 17:00-19:00</option><option>술시 19:00-21:00</option><option>해시 21:00-23:00</option>
+    </select>
+
+    <button class="btn gold" onclick="makeResult()">만세력 결과 보기</button>
+  </section>
+
+  <section class="result" id="result">
+    <h2 id="resultTitle"></h2>
+    <p class="small">무료 리포트는 기본 흐름만 제공합니다. 세부 대운·세운·연애운·금전운은 상담에서 더 깊게 볼 수 있습니다.</p>
+
+    <h3>기본 만세력</h3>
+    <div class="table">
+      <div class="cell">년주<br>갑자</div>
+      <div class="cell">월주<br>병인</div>
+      <div class="cell">일주<br>무진</div>
+      <div class="cell">시주<br>미상</div>
+    </div>
+
+    <h3>PDF 목차</h3>
+    <ol class="toc">
+      <li>나의 기본 사주 구조</li>
+      <li>오행 균형 요약</li>
+      <li>타고난 성향</li>
+      <li>조심해야 할 흐름</li>
+      <li>상담으로 더 깊게 볼 부분</li>
+    </ol>
+
+    <p id="summary"></p>
+
+    <button class="btn pdf" onclick="window.print()">PDF 다운로드</button>
+    <button class="btn kakao" onclick="goKakao()">카카오톡 상담 신청</button>
+  </section>
+</div>
+
+<script>
+let siteData={brandName:'무료 사주풀이',kakaoLink:'#',introText:''};
+
+async function loadBrand(){
+  const slug=location.pathname.split('/').pop();
+  const res=await fetch('/api/free-site/'+slug);
+  if(res.ok){
+    const json=await res.json();
+    siteData=json.site;
+  }
+  document.getElementById('brandTop').textContent=siteData.brandName;
+  if(siteData.introText) document.getElementById('intro').textContent=siteData.introText;
+}
+function startForm(){
+  hero.style.display='none';
+  form.style.display='block';
+}
+function makeResult(){
+  const name=document.getElementById('name').value.trim();
+  if(!name){alert('이름을 입력해주세요');return;}
+  form.style.display='none';
+  result.style.display='block';
+  resultTitle.textContent=name+'님의 사주풀이';
+  summary.textContent=name+'님은 기본적으로 자신의 흐름을 직접 만들어가려는 기질이 있습니다. 다만 오행의 균형에 따라 일, 돈, 관계의 흐름은 달라질 수 있어 자세한 해석은 상담으로 확인하는 것이 좋습니다.';
+}
+function goKakao(){
+  if(!siteData.kakaoLink || siteData.kakaoLink==='#'){alert('상담 링크가 설정되지 않았습니다.');return;}
+  location.href=siteData.kakaoLink;
+}
+loadBrand();
+</script>
+</body>
+</html>
