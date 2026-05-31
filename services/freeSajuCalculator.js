@@ -13,109 +13,69 @@ const BRANCH_ELEMENT = {
   오:'화', 미:'토', 신:'금', 유:'금', 술:'토', 해:'수'
 };
 
-function parseBirthTime(birthTime) {
-  if (!birthTime || birthTime.includes('모름')) return null;
-
-  const m = birthTime.match(/(\d{1,2})/);
-
-  if (!m) return null;
-
-  return Number(m[1]);
+function parseBirth(birth) {
+  const m = String(birth || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
+  if (!m) throw new Error('생년월일 형식이 올바르지 않습니다.');
+  return {
+    year: Number(m[1]),
+    month: Number(m[2]),
+    day: Number(m[3])
+  };
 }
 
-function getElementCount(pillars) {
-  const count = {
-    목:0,
-    화:0,
-    토:0,
-    금:0,
-    수:0
-  };
+function parseHour(birthTime) {
+  if (!birthTime || birthTime.includes('모름')) return null;
+  const m = String(birthTime).match(/(\d{1,2})/);
+  return m ? Number(m[1]) : null;
+}
+
+function getElementPercent(pillars) {
+  const count = { 목:0, 화:0, 토:0, 금:0, 수:0 };
 
   Object.values(pillars).forEach(p => {
     if (!p || p === '미상') return;
-
     const gan = p[0];
     const ji = p[1];
-
-    if (STEM_ELEMENT[gan]) {
-      count[STEM_ELEMENT[gan]]++;
-    }
-
-    if (BRANCH_ELEMENT[ji]) {
-      count[BRANCH_ELEMENT[ji]]++;
-    }
+    if (STEM_ELEMENT[gan]) count[STEM_ELEMENT[gan]]++;
+    if (BRANCH_ELEMENT[ji]) count[BRANCH_ELEMENT[ji]]++;
   });
 
-  const total =
-    Object.values(count).reduce((a,b)=>a+b,0) || 1;
-
+  const total = Object.values(count).reduce((a,b)=>a+b,0) || 1;
   const percent = {};
-
   Object.keys(count).forEach(k => {
-    percent[k] =
-      Math.round((count[k] / total) * 1000) / 10;
+    percent[k] = Math.round(count[k] / total * 1000) / 10;
   });
 
-  return {
-    count,
-    percent
-  };
+  return { count, percent };
 }
 
-function calculateFreeSaju({
-  name,
-  birth,
-  gender,
-  calendar,
-  birthTime
-}) {
+function ganjiByYear(year) {
+  const idx = year - 1984;
+  return STEMS[((idx % 10) + 10) % 10] + BRANCHES[((idx % 12) + 12) % 12];
+}
 
-  const m = String(birth || '')
-    .match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
+function calculateFreeSaju(input) {
+  const name = String(input.name || '').trim();
+  const gender = String(input.gender || '').trim();
+  const calendar = String(input.calendar || '양력').trim();
+  const birthTime = String(input.birthTime || '시간 모름').trim();
 
-  if (!m) {
-    throw new Error('생년월일 형식이 올바르지 않습니다.');
-  }
+  if (!name) throw new Error('이름을 입력해주세요.');
 
-  const year = Number(m[1]);
-  const month = Number(m[2]);
-  const day = Number(m[3]);
-
-  const hour = parseBirthTime(birthTime);
-
-  const calcHour =
-    hour === null ? 12 : hour;
+  const { year, month, day } = parseBirth(input.birth);
+  const hour = parseHour(birthTime);
+  const calcHour = hour === null ? 12 : hour;
 
   let solar;
 
   if (calendar === '음력') {
-
-    const lunar = Lunar.fromYmdHms(
-      year,
-      month,
-      day,
-      calcHour,
-      0,
-      0
-    );
-
-    solar = lunar.getSolar();
-
+    const lunarInput = Lunar.fromYmdHms(year, month, day, calcHour, 0, 0);
+    solar = lunarInput.getSolar();
   } else {
-
-    solar = Solar.fromYmdHms(
-      year,
-      month,
-      day,
-      calcHour,
-      0,
-      0
-    );
+    solar = Solar.fromYmdHms(year, month, day, calcHour, 0, 0);
   }
 
   const lunar = solar.getLunar();
-
   const ec = lunar.getEightChar();
 
   const pillars = {
@@ -125,90 +85,42 @@ function calculateFreeSaju({
     hour: hour === null ? '미상' : ec.getTime()
   };
 
-  const element = getElementCount(pillars);
-
-  const dayMaster =
-    pillars.day ? pillars.day[0] : '';
-
-  const dayElement =
-    STEM_ELEMENT[dayMaster] || '';
-
-  const daeyun = [];
-
-  try {
-
-    const genderNum =
-      gender === '남성' ? 1 : 0;
-
-    const yun = ec.getYun(genderNum);
-
-    const arr = yun.getDaYun();
-
-    arr.slice(1, 9).forEach(d => {
-
-      daeyun.push({
-        age: d.getStartAge(),
-        pillar: d.getGanZhi()
-      });
-
-    });
-
-  } catch (e) {}
-
-  const currentYear =
-    new Date().getFullYear();
+  const element = getElementPercent(pillars);
+  const dayMaster = pillars.day ? pillars.day[0] : '';
+  const dayElement = STEM_ELEMENT[dayMaster] || '';
 
   const yearly = [];
-
-  for (let y = currentYear; y < currentYear + 5; y++) {
-
-    const ly =
-      Lunar.fromDate(new Date(y, 0, 1));
-
+  const now = new Date().getFullYear();
+  for (let y = now; y < now + 5; y++) {
     yearly.push({
       year: y,
-      pillar: ly.getYearInGanZhi()
+      pillar: ganjiByYear(y)
     });
   }
 
   return {
-
     profile: {
       name,
-      birth,
+      birth: input.birth,
       gender,
       calendar,
       birthTime,
-
-      solarDate:
-        `${solar.getYear()}년 ${solar.getMonth()}월 ${solar.getDay()}일`,
-
-      lunarDate:
-        `${lunar.getYear()}년 ${lunar.getMonth()}월 ${lunar.getDay()}일`
+      solarDate: `${solar.getYear()}년 ${solar.getMonth()}월 ${solar.getDay()}일`,
+      lunarDate: `${lunar.getYear()}년 ${lunar.getMonth()}월 ${lunar.getDay()}일`
     },
-
     pillars,
-
     dayMaster: {
       stem: dayMaster,
       element: dayElement
     },
-
     elementCount: element.count,
-
     elementPercent: element.percent,
-
-    daeyun,
-
     yearly,
-
     summary:
-      `${name}님은 일간 ${dayMaster}(${dayElement}) 기운을 중심으로 사주가 구성됩니다. ` +
+      `${name}님은 일간 ${dayMaster}(${dayElement || '오행'}) 기운을 중심으로 사주가 구성됩니다. ` +
       `무료 리포트에서는 기본 만세력과 오행 균형을 간단히 보여드립니다. ` +
       `대운, 세운, 금전운, 연애운은 개인 상황에 따라 해석이 달라지므로 상담에서 더 자세히 확인하는 것이 좋습니다.`
   };
 }
 
-module.exports = {
-  calculateFreeSaju
-};
+module.exports = { calculateFreeSaju };
