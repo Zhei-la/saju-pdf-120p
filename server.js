@@ -8,7 +8,28 @@ const { consultAnswer, personalConsult, personalConsultFollowup, freeThreadReadi
 const db = require('./services/db');
 
 const app = express();
+app.post('/api/free-saju/calc', (req, res) => {
+  try {
 
+    const {
+      calculateFreeSaju
+    } = require('./services/freeSajuCalculator');
+
+    const result =
+      calculateFreeSaju(req.body || {});
+
+    return res.json(result);
+
+  } catch (err) {
+
+    console.error('FREE_SAJU_CALC_ERROR', err);
+
+    return res.status(500).json({
+      error: '사주 계산 중 오류가 발생했습니다.',
+      detail: err.message
+    });
+  }
+});
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
