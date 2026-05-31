@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>제일라 사주 AI 플랫폼</title>
+<title>루월당 사주 AI 플랫폼</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root { --ink:#1a1209; --gold:#b8860b; --gold-l:#d4a843; --parchment:#f5ede0;
@@ -144,7 +144,7 @@ body.login-mode #loginCard button {
 
 <!-- 로그인 -->
 <div id="loginPage">
-  <div class="hdr"><div class="em">☯</div><h1>제일라 사주 AI 플랫폼</h1><div class="sub">LOGIN</div></div>
+  <div class="hdr"><div class="em">☯</div><h1>루월당 사주 AI 플랫폼</h1><div class="sub">LOGIN</div></div>
   <div id="loginCard" class="card" style="max-width:420px;margin:0 auto;">
     <div class="card-t">로그인</div>
     <input id="liName" placeholder="이름">
@@ -175,7 +175,7 @@ body.login-mode #loginCard button {
 <!-- 대시보드 (사용자) -->
 <div id="dashPage" class="hidden">
   <div class="nav">
-    <div class="left">🔮 제일라 사주 AI 플랫폼</div>
+    <div class="left">🔮 루월당 사주 AI 플랫폼</div>
     <div class="right">
       <span class="uname" id="navName"></span>
       <button class="btn-ghost btn-sm hidden" id="adminBtn" onclick="location.href='/admin.html'">🛡️ 관리자 모드</button>
@@ -267,18 +267,36 @@ body.login-mode #loginCard button {
     </div>
   </div>
 
-  <div class="menu" style="grid-template-columns:1fr 1fr;">
-    <div class="menu-item" onclick="location.href='/free.html'">
-      <div class="ic">🎁</div>
-      <div class="ttl">무료 사주</div>
-      <div class="desc">스레드 홍보용<br>반말 + 자동 파싱</div>
-    </div>
-    <div class="menu-item" onclick="location.href='/reviews.html'">
-      <div class="ic">⭐</div>
-      <div class="ttl">후기 관리</div>
-      <div class="desc">받은 후기 확인<br>캡처 홍보용</div>
+  <<div class="menu" style="grid-template-columns:1fr 1fr 1fr;">
+
+  <div class="menu-item" onclick="location.href='/free.html'">
+    <div class="ic">🎁</div>
+    <div class="ttl">무료 사주</div>
+    <div class="desc">
+      스레드 홍보용<br>
+      반말 + 자동 파싱
     </div>
   </div>
+
+  <div class="menu-item" onclick="location.href='/free-platform.html'">
+    <div class="ic">🌐</div>
+    <div class="ttl">무료사주 웹사이트</div>
+    <div class="desc">
+      브랜드 링크 생성<br>
+      무료 PDF 상담 유도
+    </div>
+  </div>
+
+  <div class="menu-item" onclick="location.href='/reviews.html'">
+    <div class="ic">⭐</div>
+    <div class="ttl">후기 관리</div>
+    <div class="desc">
+      받은 후기 확인<br>
+      캡처 홍보용
+    </div>
+  </div>
+
+</div>
 
   <div class="card">
     <div class="card-t">최근 리포트</div>
