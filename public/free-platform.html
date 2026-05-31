@@ -79,8 +79,12 @@ document.getElementById('saveBtn').addEventListener('click', async function () {
   const siteLink = document.getElementById('siteLink');
 
   siteLink.href = url;
-  siteLink.textContent = url;
+  siteLink.innerText = url;
+
   document.getElementById('resultBox').style.display = 'block';
+
+  document.getElementById('resultBox')
+    .scrollIntoView({ behavior:'smooth' });
 });
 
 document.getElementById('copyBtn').addEventListener('click', function () {
