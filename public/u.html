@@ -66,11 +66,60 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
 .a4{left:150px;top:220px;width:80px;transform:rotate(-80deg)}
 .a5{left:270px;top:120px;width:80px;transform:rotate(110deg)}
 
-.luck-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px}
-.luck-card{min-width:58px;text-align:center}
-.luck-age{font-size:12px;color:#6b5d52}
-.luck-box{border-radius:8px;padding:9px 4px;font-size:24px;font-weight:900;background:#f4c06a;border:1px solid #c9a15b}
-.luck-sub{font-size:11px;color:#6b5d52;margin-top:4px}
+.luck-row{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:10px 0 16px;
+}
+
+.luck-card{
+  min-width:58px;
+  text-align:center;
+  flex:0 0 auto;
+}
+
+.luck-age{
+  font-size:12px;
+  color:#5f5248;
+  margin-bottom:4px;
+  line-height:1.2;
+}
+
+.luck-ten{
+  font-size:11px;
+  color:#4d4036;
+  margin-bottom:3px;
+}
+
+.luck-box{
+  border-radius:7px;
+  overflow:hidden;
+  border:1px solid #c99a43;
+  background:#f6c365;
+  box-shadow:0 2px 0 rgba(0,0,0,.08);
+}
+
+.luck-gan,
+.luck-ji{
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  font-weight:900;
+  line-height:1;
+}
+
+.luck-gan{
+  border-bottom:1px solid rgba(110,70,15,.25);
+}
+
+.luck-sub{
+  font-size:10px;
+  color:#75685d;
+  margin-top:4px;
+}
 
 .toc{line-height:2;padding-left:22px}
 .summary{line-height:1.8;color:#4a3a2f}
@@ -283,14 +332,22 @@ function makeLuck(rowId, items){
 
   items.forEach(x => {
     const p = x.pillar || '-';
-    const top = x.age ? x.age + '세' : (x.year || x.month || '');
-    const label = x.label || '';
+    const gan = p && p.length >= 2 ? p[0] : '-';
+    const ji = p && p.length >= 2 ? p[1] : '-';
+
+    const top = x.age
+      ? x.age + '세'
+      : (x.year || x.month || '');
 
     row.innerHTML += `
       <div class="luck-card">
         <div class="luck-age">${top}</div>
-        <div class="luck-box">${p}</div>
-        <div class="luck-sub">${label}</div>
+        <div class="luck-ten">${x.tenGod || ''}</div>
+        <div class="luck-box">
+          <div class="luck-gan">${gan}</div>
+          <div class="luck-ji">${ji}</div>
+        </div>
+        <div class="luck-sub">${x.twelveState || x.label || ''}</div>
       </div>
     `;
   });
