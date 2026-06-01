@@ -1,117 +1,227 @@
 const { Solar, Lunar } = require('lunar-javascript');
 
-const STEM_ELEMENT = {
-  甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수',
-  갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'
-};
-
-const BRANCH_ELEMENT = {
-  子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수',
-  자:'수',축:'토',인:'목',묘:'목',진:'토',사:'화',오:'화',미:'토',신:'금',유:'금',술:'토',해:'수'
-};
+const { getYearPillar } = require('./pillars/yearPillar');
+const { getMonthPillar } = require('./pillars/monthPillar');
+const { getDayPillar } = require('./pillars/dayPillar');
+const { getHourPillar } = require('./pillars/hourPillar');
 
 function parseBirth(birth) {
   const m = String(birth || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
-  if (!m) throw new Error('생년월일 형식이 올바르지 않습니다.');
-  return { year:Number(m[1]), month:Number(m[2]), day:Number(m[3]) };
+
+  if (!m) {
+    throw new Error('생년월일 형식이 올바르지 않습니다.');
+  }
+
+  return {
+    year: Number(m[1]),
+    month: Number(m[2]),
+    day: Number(m[3])
+  };
 }
 
 function parseHour(birthTime) {
   if (!birthTime || String(birthTime).includes('모름')) return null;
-  const m = String(birthTime).match(/(\d{1,2})/);
-  return m ? Number(m[1]) : null;
+
+  const text = String(birthTime);
+
+  if (text.includes('자시')) return 0;
+  if (text.includes('축시')) return 2;
+  if (text.includes('인시')) return 4;
+  if (text.includes('묘시')) return 6;
+  if (text.includes('진시')) return 8;
+  if (text.includes('사시')) return 10;
+  if (text.includes('오시')) return 12;
+  if (text.includes('미시')) return 14;
+  if (text.includes('신시')) return 16;
+  if (text.includes('유시')) return 18;
+  if (text.includes('술시')) return 20;
+  if (text.includes('해시')) return 22;
+
+  const m = text.match(/(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+
+  const hour = Number(m[1]);
+  const minute = Number(m[2]);
+  const total = hour * 60 + minute;
+
+  if (total >= 1410 || total < 90) return 0;
+  if (total >= 90 && total < 210) return 2;
+  if (total >= 210 && total < 330) return 4;
+  if (total >= 330 && total < 450) return 6;
+  if (total >= 450 && total < 570) return 8;
+  if (total >= 570 && total < 690) return 10;
+  if (total >= 690 && total < 810) return 12;
+  if (total >= 810 && total < 930) return 14;
+  if (total >= 930 && total < 1050) return 16;
+  if (total >= 1050 && total < 1170) return 18;
+  if (total >= 1170 && total < 1290) return 20;
+
+  return 22;
 }
 
 function splitPillar(pillar) {
-  if (!pillar || pillar === '미상') return { gan:'-', ji:'-', full:'미상' };
-  return { gan:pillar[0], ji:pillar[1], full:pillar };
+  if (!pillar || pillar.hanja === '미상') {
+    return {
+      gan: '-',
+      ji: '-',
+      full: '미상'
+    };
+  }
+
+  return {
+    gan: pillar.stem.hanja,
+    ji: pillar.branch.hanja,
+    full: pillar.hanja,
+    korean: pillar.korean,
+    stem: pillar.stem,
+    branch: pillar.branch
+  };
 }
 
 function calcElements(pillars) {
-  const count = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+  const count = {
+    목: 0,
+    화: 0,
+    토: 0,
+    금: 0,
+    수: 0
+  };
 
   Object.values(pillars).forEach(p => {
-    if (!p || p === '미상') return;
-    const gan = p[0];
-    const ji = p[1];
-    if (STEM_ELEMENT[gan]) count[STEM_ELEMENT[gan]]++;
-    if (BRANCH_ELEMENT[ji]) count[BRANCH_ELEMENT[ji]]++;
+    if (!p || p.hanja === '미상') return;
+
+    if (p.stem && p.stem.element) {
+      count[p.stem.element]++;
+    }
+
+    if (p.branch && p.branch.element) {
+      count[p.branch.element]++;
+    }
   });
 
-  const total = Object.values(count).reduce((a,b)=>a+b,0) || 1;
+  const total = Object.values(count).reduce((a, b) => a + b, 0) || 1;
+
   const percent = {};
+
   Object.keys(count).forEach(k => {
     percent[k] = Math.round(count[k] / total * 1000) / 10;
   });
 
-  return { count, percent };
+  return {
+    count,
+    percent
+  };
 }
 
 function calcYearly(nowYear) {
   const list = [];
+
   for (let y = nowYear; y < nowYear + 10; y++) {
-    const lunar = Solar.fromYmdHms(y, 2, 4, 12, 0, 0).getLunar();
-    list.push({ year:y, pillar:lunar.getYearInGanZhi(), label:'세운' });
+    const year = getYearPillar(y, 2, 4);
+
+    list.push({
+      year: y,
+      pillar: year.hanja,
+      korean: year.korean,
+      label: '세운'
+    });
   }
+
   return list;
 }
 
 function calcMonthly(nowYear) {
   const list = [];
+
   for (let m = 1; m <= 12; m++) {
-    const lunar = Solar.fromYmdHms(nowYear, m, 15, 12, 0, 0).getLunar();
-    list.push({ month:m + '월', pillar:lunar.getMonthInGanZhi(), label:'월운' });
+    const year = getYearPillar(nowYear, m, 15);
+    const month = getMonthPillar(year.stemIndex, m, 15);
+
+    list.push({
+      month: m + '월',
+      pillar: month.hanja,
+      korean: month.korean,
+      label: '월운'
+    });
   }
+
   return list;
 }
 
 function calculateSajuEngine(input) {
   const name = String(input.name || '').trim();
-  if (!name) throw new Error('이름을 입력해주세요.');
+
+  if (!name) {
+    throw new Error('이름을 입력해주세요.');
+  }
 
   const gender = String(input.gender || '').trim();
   const calendar = String(input.calendar || '양력').trim();
   const birthTime = String(input.birthTime || '시간 모름').trim();
 
-  const { year, month, day } = parseBirth(input.birth);
-  const hour = parseHour(birthTime);
-  const calcHour = hour === null ? 12 : hour;
+  const parsed = parseBirth(input.birth);
 
   let solar;
 
   if (calendar === '음력') {
-    solar = Lunar.fromYmdHms(year, month, day, calcHour, 0, 0).getSolar();
+    solar = Lunar
+      .fromYmdHms(parsed.year, parsed.month, parsed.day, 12, 0, 0)
+      .getSolar();
   } else {
-    solar = Solar.fromYmdHms(year, month, day, calcHour, 0, 0);
+    solar = Solar.fromYmdHms(parsed.year, parsed.month, parsed.day, 12, 0, 0);
   }
 
-  const lunar = solar.getLunar();
-  const ec = lunar.getEightChar();
+  const solarYear = solar.getYear();
+  const solarMonth = solar.getMonth();
+  const solarDay = solar.getDay();
+
+  const hour = parseHour(birthTime);
+
+  const yearPillar = getYearPillar(solarYear, solarMonth, solarDay);
+  const monthPillar = getMonthPillar(
+    yearPillar.stemIndex,
+    solarMonth,
+    solarDay
+  );
+
+  const dayPillar = getDayPillar(solarYear, solarMonth, solarDay);
+
+  let hourPillar = {
+    hanja: '미상',
+    korean: '미상'
+  };
+
+  if (hour !== null) {
+    hourPillar = getHourPillar(dayPillar.stem.index, hour);
+  }
 
   const pillars = {
-    year: ec.getYear(),
-    month: ec.getMonth(),
-    day: ec.getDay(),
-    hour: hour === null ? '미상' : ec.getTime()
+    year: yearPillar,
+    month: monthPillar,
+    day: dayPillar,
+    hour: hourPillar
   };
 
   const element = calcElements(pillars);
-  const dayMaster = splitPillar(pillars.day).gan;
-  const dayElement = STEM_ELEMENT[dayMaster] || '';
-
-  let daeyun = [];
-  try {
-    const genderNum = gender === '남성' ? 1 : 0;
-    daeyun = ec.getYun(genderNum).getDaYun().slice(1, 11).map(d => ({
-      age: d.getStartAge(),
-      pillar: d.getGanZhi(),
-      label: '대운'
-    }));
-  } catch (e) {
-    daeyun = [];
-  }
 
   const nowYear = new Date().getFullYear();
+
+  const daeyun = [];
+
+  for (let i = 0; i < 10; i++) {
+    const p = getMonthPillar(
+      yearPillar.stemIndex,
+      ((solarMonth + i) % 12) + 1,
+      15
+    );
+
+    daeyun.push({
+      age: 4 + i * 10,
+      pillar: p.hanja,
+      korean: p.korean,
+      label: '대운'
+    });
+  }
 
   return {
     profile: {
@@ -120,27 +230,45 @@ function calculateSajuEngine(input) {
       gender,
       calendar,
       birthTime,
-      solarDate: `${solar.getYear()}년 ${solar.getMonth()}월 ${solar.getDay()}일`,
-      lunarDate: `${lunar.getYear()}년 ${lunar.getMonth()}월 ${lunar.getDay()}일`
+      solarDate: `${solarYear}년 ${solarMonth}월 ${solarDay}일`,
+      lunarDate: `${solar.getLunar().getYear()}년 ${solar.getLunar().getMonth()}월 ${solar.getLunar().getDay()}일`
     },
-    pillars,
+
+    pillars: {
+      year: yearPillar.hanja,
+      month: monthPillar.hanja,
+      day: dayPillar.hanja,
+      hour: hourPillar.hanja
+    },
+
     pillarDetail: {
-      year: splitPillar(pillars.year),
-      month: splitPillar(pillars.month),
-      day: splitPillar(pillars.day),
-      hour: splitPillar(pillars.hour)
+      year: splitPillar(yearPillar),
+      month: splitPillar(monthPillar),
+      day: splitPillar(dayPillar),
+      hour: splitPillar(hourPillar)
     },
-    dayMaster: { stem: dayMaster, element: dayElement },
+
+    dayMaster: {
+      stem: dayPillar.stem.hanja,
+      korean: dayPillar.stem.korean,
+      element: dayPillar.stem.element,
+      yinYang: dayPillar.stem.yinYang
+    },
+
     elementCount: element.count,
     elementPercent: element.percent,
+
     daeyun,
     yearly: calcYearly(nowYear),
     months: calcMonthly(nowYear),
+
     summary:
-      `${name}님은 일간 ${dayMaster}(${dayElement || '오행'}) 기운을 중심으로 사주가 구성됩니다. ` +
+      `${name}님은 일간 ${dayPillar.stem.hanja}(${dayPillar.stem.element}) 기운을 중심으로 사주가 구성됩니다. ` +
       `현재 무료 리포트는 기본 만세력, 오행 분포, 대운·세운·월운의 흐름을 요약해서 보여드립니다. ` +
       `정확한 용신·기신과 세부 운세는 프리미엄 상담에서 더 깊게 볼 수 있습니다.`
   };
 }
 
-module.exports = { calculateSajuEngine };
+module.exports = {
+  calculateSajuEngine
+};
