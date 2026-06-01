@@ -2,6 +2,7 @@ const { Solar, Lunar } = require('lunar-javascript');
 const { heavenlyStems } = require('./data/stems');
 const { earthlyBranches } = require('./data/branches');
 const { getHourPillar } = require('./pillars/hourPillar');
+const { calcTenGods } = require('./analysis/tenGods');
 
 function parseBirth(birth) {
   const m = String(birth || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
@@ -286,6 +287,7 @@ function calculateSajuEngine(input) {
   };
 
   const element = calcElements(pillars);
+  const tenGods = calcTenGods(dayPillar.stem, pillars);
 
   const nowYear = new Date().getFullYear();
 
@@ -383,6 +385,7 @@ function calculateSajuEngine(input) {
     elementCount: element.count,
 
     elementPercent: element.percent,
+    tenGods,
 
     daeyun,
 

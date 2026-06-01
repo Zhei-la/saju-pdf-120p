@@ -320,6 +320,13 @@ async function makeResult(){
   const [hg,hj]=splitPillar(data.pillars.hour);
 
   put('yGan',yg); put('yJi',yj); put('mGan',mg); put('mJi',mj); put('dGan',dg); put('dJi',dj); put('hGan',hg); put('hJi',hj);
+  const tg = data.tenGods && data.tenGods.byPillar ? data.tenGods.byPillar : {};
+
+put('hTen', tg.hour || '-');
+put('dTen', '일간');
+put('mTen', tg.month || '-');
+put('yTen', tg.year || '-');
+
   put('dyGan',yg); put('dyJi',yj); put('dmGan',mg); put('dmJi',mj); put('ddGan',dg); put('ddJi',dj); put('dhGan',hg); put('dhJi',hj);
 
   const e=data.elementPercent||{};
