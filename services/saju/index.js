@@ -141,15 +141,23 @@ function ganjiFromLunarDate(year, month, day) {
     .getEightChar();
 }
 
+function getGanjiByYear(year) {
+  const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+  const stemIndex = ((year - 4) % 10 + 10) % 10;
+  const branchIndex = ((year - 4) % 12 + 12) % 12;
+
+  return stems[stemIndex] + branches[branchIndex];
+}
+
 function calcYearly(nowYear) {
   const list = [];
 
   for (let y = nowYear; y < nowYear + 10; y++) {
-    const ec = ganjiFromLunarDate(y, 2, 4);
-
     list.push({
       year: y,
-      pillar: ec.getYear(),
+      pillar: getGanjiByYear(y),
       label: '세운'
     });
   }
@@ -160,12 +168,35 @@ function calcYearly(nowYear) {
 function calcMonthly(nowYear) {
   const list = [];
 
-  for (let m = 1; m <= 12; m++) {
-    const ec = ganjiFromLunarDate(nowYear, m, 15);
+  const yearPillar = makePillar(getGanjiByYear(nowYear));
+  const yearStemIndex = yearPillar.stem.index;
+
+  const firstMonthStemByYearStem = {
+    0: 2,
+    5: 2,
+    1: 4,
+    6: 4,
+    2: 6,
+    7: 6,
+    3: 8,
+    8: 8,
+    4: 0,
+    9: 0
+  };
+
+  const monthBranches = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+  const monthNames = ['2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월','1월'];
+
+  const startStem = firstMonthStemByYearStem[yearStemIndex];
+
+  for (let i = 0; i < 12; i++) {
+    const stemIndex = (startStem + i) % 10;
+    const stem = heavenlyStems[stemIndex].hanja;
+    const branch = monthBranches[i];
 
     list.push({
-      month: m + '월',
-      pillar: ec.getMonth(),
+      month: monthNames[i],
+      pillar: stem + branch,
       label: '월운'
     });
   }
