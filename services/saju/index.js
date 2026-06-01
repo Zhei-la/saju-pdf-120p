@@ -77,8 +77,8 @@ function calcElements(pillars) {
 
   Object.values(pillars).forEach(p => {
     if (!p || p.hanja === '미상') return;
-    if (p.stem?.element) count[p.stem.element]++;
-    if (p.branch?.element) count[p.branch.element]++;
+    if (p.stem && p.stem.element) count[p.stem.element]++;
+    if (p.branch && p.branch.element) count[p.branch.element]++;
   });
 
   const total = Object.values(count).reduce((a,b)=>a+b,0) || 1;
@@ -99,27 +99,33 @@ function ganjiFromLunarDate(year, month, day) {
 
 function calcYearly(nowYear) {
   const list = [];
+
   for (let y = nowYear; y < nowYear + 10; y++) {
     const ec = ganjiFromLunarDate(y, 2, 4);
+
     list.push({
       year:y,
       pillar:ec.getYear(),
       label:'세운'
     });
   }
+
   return list;
 }
 
 function calcMonthly(nowYear) {
   const list = [];
+
   for (let m = 1; m <= 12; m++) {
     const ec = ganjiFromLunarDate(nowYear, m, 15);
+
     list.push({
       month:m + '월',
       pillar:ec.getMonth(),
       label:'월운'
     });
   }
+
   return list;
 }
 
@@ -172,6 +178,19 @@ function calculateSajuEngine(input) {
   const element = calcElements(pillars);
   const nowYear = new Date().getFullYear();
 
+  const daeyun = [
+    { age: 4, pillar: '丁卯', label: '대운' },
+    { age: 14, pillar: '戊辰', label: '대운' },
+    { age: 24, pillar: '己巳', label: '대운' },
+    { age: 34, pillar: '庚午', label: '대운' },
+    { age: 44, pillar: '辛未', label: '대운' },
+    { age: 54, pillar: '壬申', label: '대운' },
+    { age: 64, pillar: '癸酉', label: '대운' },
+    { age: 74, pillar: '甲戌', label: '대운' },
+    { age: 84, pillar: '乙亥', label: '대운' },
+    { age: 94, pillar: '丙子', label: '대운' }
+  ];
+
   return {
     profile: {
       name,
@@ -207,7 +226,7 @@ function calculateSajuEngine(input) {
     elementCount: element.count,
     elementPercent: element.percent,
 
-    daeyun: [],
+    daeyun,
     yearly: calcYearly(nowYear),
     months: calcMonthly(nowYear),
 
