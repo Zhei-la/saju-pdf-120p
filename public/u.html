@@ -272,17 +272,28 @@ function editAgain(){result.style.display='none';form.style.display='block'}
 
 function splitPillar(p){return (!p||p==='미상')?['-','-']:[p[0],p[1]]}
 function put(id,v){document.getElementById(id).innerHTML=v}
-function makeLuck(rowId,items){
-  const row=document.getElementById(rowId);
-  row.innerHTML='';
-  items.forEach(x=>{
-    const p=x.pillar||'-';
-    row.innerHTML+=`<div class="luck-card"><div class="luck-age">${x.age||x.year||x.month}</div><div class="luck-box">${p}</div><div class="luck-sub">${x.label||''}</div></div>`;
+function makeLuck(rowId, items){
+  const row = document.getElementById(rowId);
+  row.innerHTML = '';
+
+  if (!items || !items.length) {
+    row.innerHTML = '<div class="muted">표시할 운세 데이터가 없습니다.</div>';
+    return;
+  }
+
+  items.forEach(x => {
+    const p = x.pillar || '-';
+    const top = x.age ? x.age + '세' : (x.year || x.month || '');
+    const label = x.label || '';
+
+    row.innerHTML += `
+      <div class="luck-card">
+        <div class="luck-age">${top}</div>
+        <div class="luck-box">${p}</div>
+        <div class="luck-sub">${label}</div>
+      </div>
+    `;
   });
-}
-function fakeMonths(){
-  const gs=['갑자','을축','병인','정묘','무진','기사','경오','신미','임신','계유','갑술','을해'];
-  return gs.map((p,i)=>({month:(i+1)+'월',pillar:p,label:'월운'}));
 }
 
 async function makeResult(){
