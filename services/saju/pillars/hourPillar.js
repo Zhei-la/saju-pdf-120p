@@ -1,29 +1,62 @@
 const { heavenlyStems } = require('../data/stems');
 const { earthlyBranches } = require('../data/branches');
+const { SAJU_CONFIG } = require('../config');
 
-function getHourBranchIndex(hour) {
-  if (hour >= 23 || hour < 1) return 0;   // 子
-  if (hour < 3) return 1;                 // 丑
-  if (hour < 5) return 2;                 // 寅
-  if (hour < 7) return 3;                 // 卯
-  if (hour < 9) return 4;                 // 辰
-  if (hour < 11) return 5;                // 巳
-  if (hour < 13) return 6;                // 午
-  if (hour < 15) return 7;                // 未
-  if (hour < 17) return 8;                // 申
-  if (hour < 19) return 9;                // 酉
-  if (hour < 21) return 10;               // 戌
-  return 11;                              // 亥
+function timeToMinutes(time) {
+  const [h, m] = time.split(':').map(Number);
+  return h * 60 + m;
 }
 
-function getHourPillar(dayStemIndex, hour) {
-  const hourBranchIndex = getHourBranchIndex(hour);
+function getHourBranchIndexByMinutes(totalMinutes) {
+  const ranges = SAJU_CONFIG.hourRanges;
 
-  // 甲/己일 → 甲子시 시작
-  // 乙/庚일 → 丙子시 시작
-  // 丙/辛일 → 戊子시 시작
-  // 丁/壬일 → 庚子시 시작
-  // 戊/癸일 → 壬子시 시작
+  for (const range of ranges) {
+    const start = timeToMinutes(range.start);
+    const end = timeToMinutes(range.end);
+
+    const inRange =
+      start < end
+        ? totalMinutes >= start && totalMinutes < end
+        : totalMinutes >= start || totalMinutes < end;
+
+    if (inRange) {
+      return earthlyBranches.find(b => b.hanja === range.branch).index;
+    }
+  }
+
+  return null;
+}
+
+function getHourBranchIndex(hour, minute = 0) {
+  const totalMinutes = hour * 60 + minute;
+
+  if (SAJU_CONFIG.hourBranchMode === 'korea_30min_adjusted') {
+    return getHourBranchIndexByMinutes(totalMinutes);
+  }
+
+  if (hour >= 23 || hour < 1) return 0;
+  if (hour < 3) return 1;
+  if (hour < 5) return 2;
+  if (hour < 7) return 3;
+  if (hour < 9) return 4;
+  if (hour < 11) return 5;
+  if (hour < 13) return 6;
+  if (hour < 15) return 7;
+  if (hour < 17) return 8;
+  if (hour < 19) return 9;
+  if (hour < 21) return 10;
+  return 11;
+}
+
+function getHourPillar(dayStemIndex, hour, minute = 0) {
+  const hourBranchIndex = getHourBranchIndex(hour, minute);
+
+  if (hourBranchIndex === null || hourBranchIndex === undefined) {
+    return {
+      hanja: '미상',
+      korean: '미상'
+    };
+  }
 
   const startHourStemIndex = (dayStemIndex % 5) * 2;
   const hourStemIndex = (startHourStemIndex + hourBranchIndex) % 10;

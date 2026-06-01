@@ -20,43 +20,35 @@ function parseBirth(birth) {
 }
 
 function parseHour(birthTime) {
-  if (!birthTime || String(birthTime).includes('모름')) return null;
+  if (!birthTime || String(birthTime).includes('모름')) {
+    return null;
+  }
 
   const text = String(birthTime);
 
-  if (text.includes('자시')) return 0;
-  if (text.includes('축시')) return 2;
-  if (text.includes('인시')) return 4;
-  if (text.includes('묘시')) return 6;
-  if (text.includes('진시')) return 8;
-  if (text.includes('사시')) return 10;
-  if (text.includes('오시')) return 12;
-  if (text.includes('미시')) return 14;
-  if (text.includes('신시')) return 16;
-  if (text.includes('유시')) return 18;
-  if (text.includes('술시')) return 20;
-  if (text.includes('해시')) return 22;
+  if (text.includes('자시')) return { hour: 0, minute: 0 };
+  if (text.includes('축시')) return { hour: 2, minute: 0 };
+  if (text.includes('인시')) return { hour: 4, minute: 0 };
+  if (text.includes('묘시')) return { hour: 6, minute: 0 };
+  if (text.includes('진시')) return { hour: 8, minute: 0 };
+  if (text.includes('사시')) return { hour: 10, minute: 0 };
+  if (text.includes('오시')) return { hour: 12, minute: 0 };
+  if (text.includes('미시')) return { hour: 14, minute: 0 };
+  if (text.includes('신시')) return { hour: 16, minute: 0 };
+  if (text.includes('유시')) return { hour: 18, minute: 0 };
+  if (text.includes('술시')) return { hour: 20, minute: 0 };
+  if (text.includes('해시')) return { hour: 22, minute: 0 };
 
   const m = text.match(/(\d{1,2}):(\d{2})/);
-  if (!m) return null;
 
-  const hour = Number(m[1]);
-  const minute = Number(m[2]);
-  const total = hour * 60 + minute;
+  if (!m) {
+    return null;
+  }
 
-  if (total >= 1410 || total < 90) return 0;
-  if (total >= 90 && total < 210) return 2;
-  if (total >= 210 && total < 330) return 4;
-  if (total >= 330 && total < 450) return 6;
-  if (total >= 450 && total < 570) return 8;
-  if (total >= 570 && total < 690) return 10;
-  if (total >= 690 && total < 810) return 12;
-  if (total >= 810 && total < 930) return 14;
-  if (total >= 930 && total < 1050) return 16;
-  if (total >= 1050 && total < 1170) return 18;
-  if (total >= 1170 && total < 1290) return 20;
-
-  return 22;
+  return {
+    hour: Number(m[1]),
+    minute: Number(m[2])
+  };
 }
 
 function splitPillar(pillar) {
@@ -192,7 +184,11 @@ function calculateSajuEngine(input) {
   };
 
   if (hour !== null) {
-    hourPillar = getHourPillar(dayPillar.stem.index, hour);
+    hourPillar = getHourPillar(
+  dayPillar.stem.index,
+  hour.hour,
+  hour.minute
+);
   }
 
   const pillars = {
