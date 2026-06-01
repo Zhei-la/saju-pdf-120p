@@ -152,14 +152,68 @@ function getGanjiByYear(year) {
   return stems[stemIndex] + branches[branchIndex];
 }
 
-function calcYearly(nowYear) {
+function calcYearlyByDaeun(birthYear, daeunAge) {
   const list = [];
+  const startYear = birthYear + daeunAge - 1;
 
-  for (let y = nowYear; y < nowYear + 10; y++) {
+  for (let y = startYear; y < startYear + 10; y++) {
     list.push({
       year: y,
       pillar: getGanjiByYear(y),
       label: '세운'
+    });
+  }
+
+  return list;
+}
+
+function calcMonthlyByYear(year) {
+  const list = [];
+
+  const yearPillar = makePillar(getGanjiByYear(year));
+  const yearStemIndex = yearPillar.stem.index;
+
+  const firstMonthStemByYearStem = {
+    0: 2,
+    5: 2,
+    1: 4,
+    6: 4,
+    2: 6,
+    7: 6,
+    3: 8,
+    8: 8,
+    4: 0,
+    9: 0
+  };
+
+  const monthBranches = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+
+  const monthNames = [
+    '2월 寅월',
+    '3월 卯월',
+    '4월 辰월',
+    '5월 巳월',
+    '6월 午월',
+    '7월 未월',
+    '8월 申월',
+    '9월 酉월',
+    '10월 戌월',
+    '11월 亥월',
+    '12월 子월',
+    '1월 丑월'
+  ];
+
+  const startStem = firstMonthStemByYearStem[yearStemIndex];
+
+  for (let i = 0; i < 12; i++) {
+    const stemIndex = (startStem + i) % 10;
+    const stem = heavenlyStems[stemIndex].hanja;
+    const branch = monthBranches[i];
+
+    list.push({
+      month: monthNames[i],
+      pillar: stem + branch,
+      label: '월운'
     });
   }
 
@@ -389,9 +443,9 @@ function calculateSajuEngine(input) {
 
     daeyun,
 
-    yearly: calcYearly(nowYear),
+   yearly: calcYearlyByDaeun(parsed.year, daeyun[0].age),
 
-    months: calcMonthly(nowYear),
+months: calcMonthlyByYear(parsed.year + daeyun[0].age - 1),
 
     summary:
       `${name}님은 일간 ` +
