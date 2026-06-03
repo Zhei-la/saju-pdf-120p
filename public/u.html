@@ -196,10 +196,10 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
         <tbody>
           <tr>
             <th>천간</th>
-            <td><div class="big-kanji" id="hGan">-</div><div class="sub" id="hGanSub"></div></td>
-            <td><div class="big-kanji" id="dGan">-</div><div class="sub" id="dGanSub"></div></td>
-            <td><div class="big-kanji" id="mGan">-</div><div class="sub" id="mGanSub"></div></td>
-            <td><div class="big-kanji" id="yGan">-</div><div class="sub" id="yGanSub"></div></td>
+            <td><div class="big-kanji" id="hGan"></div><div class="sub" id="hTen"></div></td>
+            <td><div class="big-kanji" id="dGan"></div><div class="sub" id="dTen"></div></td>
+            <td><div class="big-kanji" id="mGan"></div><div class="sub" id="mTen"></div></td>
+            <td><div class="big-kanji" id="yGan"></div><div class="sub" id="yTen"></div></td>
           </tr>
           <tr>
             <th>지지</th>
@@ -208,10 +208,7 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
             <td><div class="big-kanji" id="mJi">-</div><div class="sub" id="mJiSub"></div></td>
             <td><div class="big-kanji" id="yJi">-</div><div class="sub" id="yJiSub"></div></td>
           </tr>
-          <tr>
-            <th>십성</th>
-            <td id="hTen">-</td><td id="dTen">일간</td><td id="mTen">-</td><td id="yTen">-</td>
-          </tr>
+          
           <tr>
             <th>12운성</th>
             <td id="hUn">-</td><td id="dUn">-</td><td id="mUn">-</td><td id="yUn">-</td>
@@ -425,7 +422,7 @@ put('hJiSub', btg.hour || '-');
 put('dJiSub', btg.day || '-');
 put('mJiSub', btg.month || '-');
 put('yJiSub', btg.year || '-');
-put('dTen', '일간');
+put('dTen', '자신');
 put('mTen', tg.month || '-');
 put('yTen', tg.year || '-');
 
