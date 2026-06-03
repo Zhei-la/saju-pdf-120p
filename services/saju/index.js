@@ -341,7 +341,7 @@ function calculateSajuEngine(input) {
   };
 
   const element = calcElements(pillars);
-  const tenGods = calcTenGods(dayPillar.stem, pillars);
+  const tenGods = calcTenGods(dayPillar.stem, pillars, heavenlyStems);
 
   const nowYear = new Date().getFullYear();
 
