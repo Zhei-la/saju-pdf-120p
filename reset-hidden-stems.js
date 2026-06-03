@@ -1,3 +1,8 @@
+﻿const fs = require('fs');
+
+const file = 'services/saju/analysis/hiddenStems.js';
+
+const code = `
 const hiddenStems = {
   子: ['癸'],
   丑: ['癸', '辛', '己'],
@@ -20,4 +25,9 @@ function getHiddenStems(branchHanja) {
 module.exports = {
   hiddenStems,
   getHiddenStems
-};\n
+};
+`;
+
+fs.writeFileSync(file, code.trim() + '\\n', 'utf8');
+
+console.log('hiddenStems.js reset');
