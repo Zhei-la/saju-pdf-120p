@@ -3,6 +3,7 @@ const { heavenlyStems } = require('./data/stems');
 const { earthlyBranches } = require('./data/branches');
 const { getHourPillar } = require('./pillars/hourPillar');
 const { calcTenGods } = require('./analysis/tenGods');
+const { getHiddenStems } = require('./analysis/hiddenStems');
 
 function parseBirth(birth) {
   const m = String(birth || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
@@ -106,6 +107,21 @@ function calcElements(pillars) {
     금: 0,
     수: 0
   };
+
+  function calcHiddenStems(pillars) {
+  const result = {};
+
+  Object.entries(pillars).forEach(([key, pillar]) => {
+    if (!pillar || pillar.hanja === '미상' || !pillar.branch) {
+      result[key] = [];
+      return;
+    }
+
+    result[key] = getHiddenStems(pillar.branch.hanja);
+  });
+
+  return result;
+}
 
   Object.values(pillars).forEach(p => {
     if (!p || p.hanja === '미상') return;
@@ -342,6 +358,7 @@ function calculateSajuEngine(input) {
 
   const element = calcElements(pillars);
   const tenGods = calcTenGods(dayPillar.stem, pillars, heavenlyStems);
+  const hiddenStemsResult = calcHiddenStems(pillars);
 
   const nowYear = new Date().getFullYear();
 

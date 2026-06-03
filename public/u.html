@@ -210,6 +210,14 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
           </tr>
           
           <tr>
+  <th>지장간</th>
+  <td id="hHidden"></td>
+  <td id="dHidden"></td>
+  <td id="mHidden"></td>
+  <td id="yHidden"></td>
+</tr>
+
+          <tr>
             <th>12운성</th>
             <td id="hUn">-</td><td id="dUn">-</td><td id="mUn">-</td><td id="yUn">-</td>
           </tr>
@@ -416,12 +424,19 @@ async function makeResult(){
   put('yGan',yg); put('yJi',yj); put('mGan',mg); put('mJi',mj); put('dGan',dg); put('dJi',dj); put('hGan',hg); put('hJi',hj);
   const tg = data.tenGods && data.tenGods.byPillar ? data.tenGods.byPillar : {};
   const btg = data.tenGods && data.tenGods.branch ? data.tenGods.branch : {};
+  const hs = data.hiddenStems || {};
 
-put('hTen', tg.hour || '-');
 put('hJiSub', btg.hour || '-');
 put('dJiSub', btg.day || '-');
 put('mJiSub', btg.month || '-');
 put('yJiSub', btg.year || '-');
+
+put('hHidden', (hs.hour || []).join(''));
+put('dHidden', (hs.day || []).join(''));
+put('mHidden', (hs.month || []).join(''));
+put('yHidden', (hs.year || []).join(''));
+
+put('hTen', tg.hour || '-');
 put('dTen', tg.day || '-');
 put('mTen', tg.month || '-');
 put('yTen', tg.year || '-');
