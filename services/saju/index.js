@@ -151,6 +151,21 @@ function calcElements(pillars) {
   };
 }
 
+function calcHiddenStems(pillars) {
+  const result = {};
+
+  Object.entries(pillars).forEach(([key, pillar]) => {
+    if (!pillar || pillar.hanja === '미상' || !pillar.branch) {
+      result[key] = [];
+      return;
+    }
+
+    result[key] = getHiddenStems(pillar.branch.hanja);
+  });
+
+  return result;
+}
+
 function ganjiFromLunarDate(year, month, day) {
   return Solar
     .fromYmdHms(year, month, day, 12, 0, 0)
