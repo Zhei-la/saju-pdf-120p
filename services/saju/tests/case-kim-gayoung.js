@@ -14,6 +14,7 @@ console.log(JSON.stringify({
   tenGods: result.tenGods,
   hiddenStems: result.hiddenStems,
   twelveStates: result.twelveStates,
+  twelveGods: result.twelveGods,
   daeyun: result.daeyun
 }, null, 2));
 

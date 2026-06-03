@@ -5,6 +5,7 @@ const { getHourPillar } = require('./pillars/hourPillar');
 const { calcTenGods } = require('./analysis/tenGods');
 const { getHiddenStems } = require('./analysis/hiddenStems');
 const { getTwelveState } = require('./analysis/twelveStates');
+const { calcTwelveGods } = require('./analysis/twelveGods');
 
 function parseBirth(birth) {
   const m = String(birth || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
@@ -397,6 +398,7 @@ function calculateSajuEngine(input) {
   const tenGods = calcTenGods(dayPillar.stem, pillars, heavenlyStems);
   const hiddenStemsResult = calcHiddenStems(pillars);
   const twelveStates = calcTwelveStates(dayPillar.stem, pillars);
+  const twelveGods = calcTwelveGods(dayPillar.branch, pillars);
 
   const nowYear = new Date().getFullYear();
 
@@ -498,6 +500,7 @@ function calculateSajuEngine(input) {
 
     hiddenStems: hiddenStemsResult,
     twelveStates,
+    twelveGods,
 
     daeyun,
 

@@ -219,6 +219,13 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
 
           <tr>
             <th>12운성</th>
+            <tr>
+  <th>12신살</th>
+  <td id="hGod"></td>
+  <td id="dGod"></td>
+  <td id="mGod"></td>
+  <td id="yGod"></td>
+</tr>
             <td id="hUn">-</td><td id="dUn">-</td><td id="mUn">-</td><td id="yUn">-</td>
           </tr>
         </tbody>
@@ -445,6 +452,7 @@ async function makeResult(){
   const btg = data.tenGods && data.tenGods.branch ? data.tenGods.branch : {};
   const hs = data.hiddenStems || {};
 const ts = data.twelveStates || {};
+const gods = data.twelveGods || {};
 
 put('hJiSub', btg.hour || '-');
 put('dJiSub', btg.day || '-');
@@ -465,6 +473,11 @@ put('hTen', tg.hour || '-');
 put('dTen', tg.day || '-');
 put('mTen', tg.month || '-');
 put('yTen', tg.year || '-');
+
+put('hGod', gods.hour || '-');
+put('dGod', gods.day || '-');
+put('mGod', gods.month || '-');
+put('yGod', gods.year || '-');
 
   put('dyGan',yg); put('dyJi',yj); put('dmGan',mg); put('dmJi',mj); put('ddGan',dg); put('ddJi',dj); put('dhGan',hg); put('dhJi',hj);
 
