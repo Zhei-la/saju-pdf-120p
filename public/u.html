@@ -399,6 +399,7 @@ function makeLuck(rowId, items){
 }
 
 async 
+
 function stemListToKorean(arr){
   const map = {
     甲:'갑',
@@ -416,7 +417,7 @@ function stemListToKorean(arr){
   return (arr || []).map(x => map[x] || x).join(' ');
 }
 
-function makeResult(){
+async function makeResult(){
   const name=nameInput();
   const birth=document.getElementById('birth').value.trim();
   const gender=document.getElementById('gender').value;
