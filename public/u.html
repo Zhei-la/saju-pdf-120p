@@ -414,7 +414,7 @@ function stemListToKorean(arr){
     癸:'계'
   };
 
-  return (arr || []).map(x => map[x] || x).join(' ');
+  return (arr || []).map(x => map[x] || x).join('');
 }
 
 async function makeResult(){
