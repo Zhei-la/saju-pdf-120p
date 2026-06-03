@@ -3,7 +3,7 @@ const SAJU_CONFIG = {
 
   solarTermTime: 'korean_standard_time',
 
-  hourBranchMode: 'korea_30min_adjusted',
+  hourBranchMode: 'standard_2hour',
 
   dayChangeMode: 'midnight_day_change',
 

@@ -11,6 +11,8 @@ const result = calculateSajuEngine({
 console.log(JSON.stringify({
   pillars: result.pillars,
   elementPercent: result.elementPercent,
+  tenGods: result.tenGods,
+  hiddenStems: result.hiddenStems,
   daeyun: result.daeyun
 }, null, 2));
 
