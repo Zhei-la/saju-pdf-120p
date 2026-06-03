@@ -398,7 +398,17 @@ function makeLuck(rowId, items){
   });
 }
 
-async function makeResult(){
+async 
+function stemListToKorean(arr){
+  const map = {
+    甲:'갑',乙:'을',丙:'병',丁:'정',戊:'무',
+    己:'기',庚:'경',辛:'신',壬:'임',癸:'계'
+  };
+
+  return (arr || []).map(x => (map[x] || x) + x).join(' ');
+}
+
+function makeResult(){
   const name=nameInput();
   const birth=document.getElementById('birth').value.trim();
   const gender=document.getElementById('gender').value;
@@ -431,10 +441,10 @@ put('dJiSub', btg.day || '-');
 put('mJiSub', btg.month || '-');
 put('yJiSub', btg.year || '-');
 
-put('hHidden', (hs.hour || []).join(''));
-put('dHidden', (hs.day || []).join(''));
-put('mHidden', (hs.month || []).join(''));
-put('yHidden', (hs.year || []).join(''));
+put('hHidden', stemListToKorean(hs.hour));
+put('dHidden', stemListToKorean(hs.day));
+put('mHidden', stemListToKorean(hs.month));
+put('yHidden', stemListToKorean(hs.year));
 
 put('hTen', tg.hour || '-');
 put('dTen', tg.day || '-');
