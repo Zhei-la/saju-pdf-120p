@@ -473,6 +473,8 @@ function calculateSajuEngine(input) {
     elementPercent: element.percent,
     tenGods,
 
+    hiddenStems: hiddenStemsResult,
+
     daeyun,
 
    yearly: calcYearlyByDaeun(parsed.year, daeyun[0].age),
