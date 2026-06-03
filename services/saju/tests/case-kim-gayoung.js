@@ -13,6 +13,7 @@ console.log(JSON.stringify({
   elementPercent: result.elementPercent,
   tenGods: result.tenGods,
   hiddenStems: result.hiddenStems,
+  twelveStates: result.twelveStates,
   daeyun: result.daeyun
 }, null, 2));
 

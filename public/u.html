@@ -444,6 +444,7 @@ async function makeResult(){
   const tg = data.tenGods && data.tenGods.byPillar ? data.tenGods.byPillar : {};
   const btg = data.tenGods && data.tenGods.branch ? data.tenGods.branch : {};
   const hs = data.hiddenStems || {};
+const ts = data.twelveStates || {};
 
 put('hJiSub', btg.hour || '-');
 put('dJiSub', btg.day || '-');
