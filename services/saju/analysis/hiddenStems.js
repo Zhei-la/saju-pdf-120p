@@ -1,4 +1,4 @@
-const hiddenStems = {
+﻿const hiddenStems = {
   子: ['癸'],
   丑: ['癸', '辛', '己'],
   寅: ['戊', '丙', '甲'],
@@ -20,4 +20,4 @@ function getHiddenStems(branchHanja) {
 module.exports = {
   hiddenStems,
   getHiddenStems
-};\n
+};
