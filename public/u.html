@@ -401,11 +401,19 @@ function makeLuck(rowId, items){
 async 
 function stemListToKorean(arr){
   const map = {
-    甲:'갑',乙:'을',丙:'병',丁:'정',戊:'무',
-    己:'기',庚:'경',辛:'신',壬:'임',癸:'계'
+    甲:'갑',
+    乙:'을',
+    丙:'병',
+    丁:'정',
+    戊:'무',
+    己:'기',
+    庚:'경',
+    辛:'신',
+    壬:'임',
+    癸:'계'
   };
 
-  return (arr || []).map(x => (map[x] || x) + x).join(' ');
+  return (arr || []).map(x => map[x] || x).join(' ');
 }
 
 function makeResult(){
