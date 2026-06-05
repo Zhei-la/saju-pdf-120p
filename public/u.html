@@ -149,7 +149,10 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
     <input id="name" placeholder="김가영">
     <label>생년월일</label>
     <input id="birth" placeholder="1999.02.21">
-    <label>성별</label>
+    <label>출생지역</label>
+<input id="location" placeholder="예: 강원도, 서울특별시">
+
+<label>성별</label>
     <select id="gender"><option>여성</option><option>남성</option></select>
     <label>양력/음력</label>
     <select id="calendar"><option>양력</option><option>음력</option></select>
@@ -409,6 +412,7 @@ async function makeResult(){
   const name=nameInput();
   const birth=document.getElementById('birth').value.trim();
   const gender=document.getElementById('gender').value;
+  const location=document.getElementById('location') ? document.getElementById('location').value.trim() : '';
   const calendar=document.getElementById('calendar').value;
   const leapMonth=document.getElementById('leapMonth') ? document.getElementById('leapMonth').value === 'true' : false;
   const birthTime=document.getElementById('birthTime').value;
@@ -422,7 +426,7 @@ async function makeResult(){
   const res=await fetch('/api/free-saju/calc',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name,birth,gender,calendar,birthTime,leapMonth})
+    body:JSON.stringify({name,birth,gender,calendar,birthTime,leapMonth,location})
   });
 
   const data=await res.json();
@@ -438,7 +442,15 @@ async function makeResult(){
   result.style.display='block';
 
   resultTitle.textContent=name+'님의 사주풀이';
-  profileText.innerHTML=`양 ${data.profile.solarDate}<br>음 ${data.profile.lunarDate}<br>${birthTime}`;
+  if(data.profileTop){
+    profileText.innerHTML =
+      '<b>' + data.profileTop.profileGanji.display + ' ⓘ</b><br>' +
+      data.profileTop.birthInfo.solar.display + '<br>' +
+      data.profileTop.birthInfo.lunar.display +
+      (data.profileTop.birthInfo.corrected.enabled ? '<br>' + data.profileTop.birthInfo.corrected.display : '');
+  } else {
+    profileText.innerHTML=`양 ${data.profile.solarDate}<br>음 ${data.profile.lunarDate}<br>${birthTime}`;
+  }
 
   const [yg,yj]=splitPillar(data.pillars.year);
   const [mg,mj]=splitPillar(data.pillars.month);
