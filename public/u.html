@@ -410,6 +410,7 @@ async function makeResult(){
   const birth=document.getElementById('birth').value.trim();
   const gender=document.getElementById('gender').value;
   const calendar=document.getElementById('calendar').value;
+  const leapMonth=document.getElementById('leapMonth') ? document.getElementById('leapMonth').value === 'true' : false;
   const birthTime=document.getElementById('birthTime').value;
 
   if(!name){alert('이름을 입력해주세요');return}
@@ -421,7 +422,7 @@ async function makeResult(){
   const res=await fetch('/api/free-saju/calc',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name,birth,gender,calendar,birthTime})
+    body:JSON.stringify({name,birth,gender,calendar,birthTime,leapMonth})
   });
 
   const data=await res.json();
