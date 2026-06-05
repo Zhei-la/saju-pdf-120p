@@ -330,97 +330,50 @@ async function loadBrand(){
 function startForm(){hero.style.display='none';form.style.display='block'}
 function backHero(){form.style.display='none';hero.style.display='block'}
 function editAgain(){result.style.display='none';form.style.display='block'}
+function nameInput(){return document.getElementById('name').value.trim()}
+function put(id,v){const el=document.getElementById(id); if(el) el.innerHTML=v}
 
-function splitPillar(p){return (!p||p==='미상')?['-','-']:[p[0],p[1]]}
-function put(id,v){document.getElementById(id).innerHTML=v}
-const ganKor = {
-  甲:'갑',乙:'을',丙:'병',丁:'정',戊:'무',
-  己:'기',庚:'경',辛:'신',壬:'임',癸:'계',
-  子:'자',丑:'축',寅:'인',卯:'묘',辰:'진',
-  巳:'사',午:'오',未:'미',申:'신',酉:'유',
-  戌:'술',亥:'해'
-};
+function splitPillar(p){
+  if(!p || p==='미상') return ['-','-'];
+  return [p[0],p[1]];
+}
+
+function stemListToKorean(arr){
+  const map={甲:'갑',乙:'을',丙:'병',丁:'정',戊:'무',己:'기',庚:'경',辛:'신',壬:'임',癸:'계'};
+  return (arr || []).map(x => map[x] || x).join('');
+}
 
 function makeLuck(rowId, items){
-  const row = document.getElementById(rowId);
-
-  row.innerHTML = '';
-
+  const row=document.getElementById(rowId);
+  row.innerHTML='';
   if(!items || !items.length){
-    row.innerHTML = '<div class="muted">표시할 데이터 없음</div>';
+    row.innerHTML='<div class="muted">표시할 데이터 없음</div>';
     return;
   }
 
-  const displayItems = [...items].reverse();
+  const ganKor={甲:'갑',乙:'을',丙:'병',丁:'정',戊:'무',己:'기',庚:'경',辛:'신',壬:'임',癸:'계',子:'자',丑:'축',寅:'인',卯:'묘',辰:'진',巳:'사',午:'오',未:'미',申:'신',酉:'유',戌:'술',亥:'해'};
+  const displayItems=[...items].reverse();
 
-  displayItems.forEach(x => {
-
-    const p = x.pillar || '--';
-
-    const gan = p[0] || '-';
-    const ji = p[1] || '-';
-
-    const kor =
-      (ganKor[gan] || '') +
-      (ganKor[ji] || '');
-
-    const top =
-      x.age
-        ? x.age + '세'
-        : (x.year || x.month || '');
+  displayItems.forEach(x=>{
+    const p=x.pillar || '--';
+    const gan=p[0] || '-';
+    const ji=p[1] || '-';
+    const kor=(ganKor[gan]||'')+(ganKor[ji]||'');
+    const top=x.age ? x.age+'세' : (x.year || x.month || '');
 
     row.innerHTML += `
       <div class="luck-card">
-
-        <div class="luck-top">
-          ${top}
-        </div>
-
-        <div class="luck-ten">
-          ${x.tenGod || ''}
-        </div>
-
+        <div class="luck-top">${top}</div>
+        <div class="luck-ten">${x.tenGod || ''}</div>
         <div class="luck-box">
-
-          <div class="luck-gan">
-            ${gan}
-          </div>
-
-          <div class="luck-ji">
-            ${ji}
-          </div>
-
+          <div class="luck-gan">${gan}</div>
+          <div class="luck-ji">${ji}</div>
         </div>
-
-        <div class="luck-kor">
-          ${kor}
-        </div>
-
-        <div class="luck-bottom">
-          ${x.twelveState || x.label || ''}
-        </div>
-
+        <div class="luck-kor">${kor}</div>
+        <div class="luck-bottom">${x.twelveState || x.label || ''}</div>
       </div>
     `;
   });
-}
-
-async function makeResult(){
-function stemListToKorean(arr){
-  const map = {
-    甲:'갑',
-    乙:'을',
-    丙:'병',
-    丁:'정',
-    戊:'무',
-    己:'기',
-    庚:'경',
-    辛:'신',
-    壬:'임',
-    癸:'계'
-  };
-
-  return (arr || []).map(x => map[x] || x).join('');
 }
 
 async function makeResult(){
@@ -429,15 +382,31 @@ async function makeResult(){
   const gender=document.getElementById('gender').value;
   const calendar=document.getElementById('calendar').value;
   const birthTime=document.getElementById('birthTime').value;
+
   if(!name){alert('이름을 입력해주세요');return}
   if(!birth){alert('생년월일을 입력해주세요');return}
 
-  form.style.display='none'; loading.style.display='block';
-  const res=await fetch('/api/free-saju/calc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,birth,gender,calendar,birthTime})});
-  const data=await res.json();
-  if(!res.ok){loading.style.display='none';form.style.display='block';alert(data.error||'사주 계산 실패');return}
+  form.style.display='none';
+  loading.style.display='block';
 
-  loading.style.display='none'; result.style.display='block';
+  const res=await fetch('/api/free-saju/calc',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name,birth,gender,calendar,birthTime})
+  });
+
+  const data=await res.json();
+
+  if(!res.ok){
+    loading.style.display='none';
+    form.style.display='block';
+    alert(data.error || '사주 계산 실패');
+    return;
+  }
+
+  loading.style.display='none';
+  result.style.display='block';
+
   resultTitle.textContent=name+'님의 사주풀이';
   profileText.innerHTML=`양 ${data.profile.solarDate}<br>음 ${data.profile.lunarDate}<br>${birthTime}`;
 
@@ -446,60 +415,77 @@ async function makeResult(){
   const [dg,dj]=splitPillar(data.pillars.day);
   const [hg,hj]=splitPillar(data.pillars.hour);
 
-  put('yGan',yg); put('yJi',yj); put('mGan',mg); put('mJi',mj); put('dGan',dg); put('dJi',dj); put('hGan',hg); put('hJi',hj);
-  const tg = data.tenGods && data.tenGods.byPillar ? data.tenGods.byPillar : {};
-  const btg = data.tenGods && data.tenGods.branch ? data.tenGods.branch : {};
-  const hs = data.hiddenStems || {};
-const ts = data.twelveStates || {};
-const gods = data.twelveGods || {};
+  put('yGan',yg); put('yJi',yj);
+  put('mGan',mg); put('mJi',mj);
+  put('dGan',dg); put('dJi',dj);
+  put('hGan',hg); put('hJi',hj);
 
-put('hJiSub', btg.hour || '-');
-put('dJiSub', btg.day || '-');
-put('mJiSub', btg.month || '-');
-put('yJiSub', btg.year || '-');
+  const tg=data.tenGods?.stem || {};
+  const btg=data.tenGods?.branch || {};
+  const hs=data.hiddenStems || {};
+  const ts=data.twelveStates || {};
+  const gods=data.twelveGods || {};
 
-put('hHidden', stemListToKorean(hs.hour));
-put('dHidden', stemListToKorean(hs.day));
-put('mHidden', stemListToKorean(hs.month));
-put('yHidden', stemListToKorean(hs.year));
+  put('hTen', tg.hour || '-');
+  put('dTen', tg.day || '-');
+  put('mTen', tg.month || '-');
+  put('yTen', tg.year || '-');
 
-put('hUn', ts.hour || '-');
-put('dUn', ts.day || '-');
-put('mUn', ts.month || '-');
-put('yUn', ts.year || '-');
+  put('hJiSub', btg.hour || '-');
+  put('dJiSub', btg.day || '-');
+  put('mJiSub', btg.month || '-');
+  put('yJiSub', btg.year || '-');
 
-put('hTen', tg.hour || '-');
-put('dTen', tg.day || '-');
-put('mTen', tg.month || '-');
-put('yTen', tg.year || '-');
+  put('hHidden', stemListToKorean(hs.hour));
+  put('dHidden', stemListToKorean(hs.day));
+  put('mHidden', stemListToKorean(hs.month));
+  put('yHidden', stemListToKorean(hs.year));
 
-put('hGod', gods.hour || '-');
-put('dGod', gods.day || '-');
-put('mGod', gods.month || '-');
-put('yGod', gods.year || '-');
+  put('hUn', ts.hour || '-');
+  put('dUn', ts.day || '-');
+  put('mUn', ts.month || '-');
+  put('yUn', ts.year || '-');
 
-  put('dyGan',yg); put('dyJi',yj); put('dmGan',mg); put('dmJi',mj); put('ddGan',dg); put('ddJi',dj); put('dhGan',hg); put('dhJi',hj);
+  put('hGod', gods.hour || '-');
+  put('dGod', gods.day || '-');
+  put('mGod', gods.month || '-');
+  put('yGod', gods.year || '-');
 
-  const e=data.elementPercent||{};
+  const e=data.elementPercent || {};
   const wood=e.목||0, fire=e.화||0, earth=e.토||0, metal=e.금||0, water=e.수||0;
-  woodP.textContent=wood+'%'; fireP.textContent=fire+'%'; earthP.textContent=earth+'%'; metalP.textContent=metal+'%'; waterP.textContent=water+'%';
-  relWood.innerHTML='목<br>'+wood+'%'; relFire.innerHTML='화<br>'+fire+'%'; relEarth.innerHTML='토<br>'+earth+'%'; relMetal.innerHTML='금<br>'+metal+'%'; relWater.innerHTML='수<br>'+water+'%';
 
-  const maxName=Object.entries(e).sort((a,b)=>b[1]-a[1])[0]?.[0]||'목';
-  mainElement.textContent=maxName;
-  elementDonut.style.background=`conic-gradient(#2d8a47 0 ${wood}%,#c43b2d ${wood}% ${wood+fire}%,#c78b2b ${wood+fire}% ${wood+fire+earth}%,#b9b5aa ${wood+fire+earth}% ${wood+fire+earth+metal}%,#2459a6 ${wood+fire+earth+metal}% 100%)`;
+  if(typeof woodP!=='undefined') woodP.textContent=wood+'%';
+  if(typeof fireP!=='undefined') fireP.textContent=fire+'%';
+  if(typeof earthP!=='undefined') earthP.textContent=earth+'%';
+  if(typeof metalP!=='undefined') metalP.textContent=metal+'%';
+  if(typeof waterP!=='undefined') waterP.textContent=water+'%';
 
-  makeLuck('daeunRow',data.daeyun||[]);
-  makeLuck('yearRow',data.yearly||[]);
-  makeLuck('monthRow',data.months||fakeMonths());
-  summary.textContent=data.summary||'';
+  if(typeof relWood!=='undefined') relWood.innerHTML='목<br>'+wood+'%';
+  if(typeof relFire!=='undefined') relFire.innerHTML='화<br>'+fire+'%';
+  if(typeof relEarth!=='undefined') relEarth.innerHTML='토<br>'+earth+'%';
+  if(typeof relMetal!=='undefined') relMetal.innerHTML='금<br>'+metal+'%';
+  if(typeof relWater!=='undefined') relWater.innerHTML='수<br>'+water+'%';
+
+  if(typeof mainElement!=='undefined'){
+    const maxName=Object.entries(e).sort((a,b)=>b[1]-a[1])[0]?.[0] || '목';
+    mainElement.textContent=maxName;
+  }
+
+  makeLuck('daeunRow',data.daeyun || []);
+  makeLuck('yearRow',data.yearly || []);
+  makeLuck('monthRow',data.months || []);
+
+  if(typeof summary!=='undefined') summary.textContent=data.summary || '';
 }
 
-function nameInput(){return document.getElementById('name').value.trim()}
 function goKakao(){
-  if(!siteData.kakaoLink || siteData.kakaoLink==='#'){alert('상담 링크가 설정되지 않았습니다.');return}
+  if(!siteData.kakaoLink || siteData.kakaoLink==='#'){
+    alert('상담 링크가 설정되지 않았습니다.');
+    return;
+  }
   location.href=siteData.kakaoLink;
 }
+
 loadBrand();
 </script>
 </body>
