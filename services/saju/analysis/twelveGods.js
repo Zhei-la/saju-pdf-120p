@@ -1,157 +1,63 @@
-const B = {
-  JA: '\u5B50',
-  CHUK: '\u4E11',
-  IN: '\u5BC5',
-  MYO: '\u536F',
-  JIN: '\u8FB0',
-  SA: '\u5DF3',
-  O: '\u5348',
-  MI: '\u672A',
-  SIN: '\u7533',
-  YU: '\u9149',
-  SUL: '\u620C',
-  HAE: '\u4EA5'
-};
+﻿const branches = [
+  '\u5B50', '\u4E11', '\u5BC5', '\u536F',
+  '\u8FB0', '\u5DF3', '\u5348', '\u672A',
+  '\u7533', '\u9149', '\u620C', '\u4EA5'
+];
 
-/*
-  12신살 기준:
-  - 일지 기준
-  - 삼합국 기준
-  - 각 그룹은 지지별 결과를 직접 표로 고정
-*/
+const twelveGodsOrder = [
+  '겁살', '재살', '천살', '지살',
+  '년살', '월살', '망신살', '장성살',
+  '반안살', '역마살', '육해살', '화개살'
+];
 
-const table = {
-  // 申子辰 그룹
-  [B.SIN]: {
-    [B.SIN]:'지살', [B.YU]:'년살', [B.SUL]:'월살', [B.HAE]:'망신살',
-    [B.JA]:'장성살', [B.CHUK]:'반안살', [B.IN]:'망신살', [B.MYO]:'육해살',
-    [B.JIN]:'반안살', [B.SA]:'역마살', [B.O]:'재살', [B.MI]:'천살'
-  },
-  [B.JA]: {
-    [B.SIN]:'지살', [B.YU]:'년살', [B.SUL]:'월살', [B.HAE]:'망신살',
-    [B.JA]:'장성살', [B.CHUK]:'반안살', [B.IN]:'역마살', [B.MYO]:'육해살',
-    [B.JIN]:'화개살', [B.SA]:'겁살', [B.O]:'재살', [B.MI]:'천살'
-  },
-  [B.JIN]: {
-    [B.SIN]:'지살', [B.YU]:'년살', [B.SUL]:'월살', [B.HAE]:'망신살',
-    [B.JA]:'장성살', [B.CHUK]:'반안살', [B.IN]:'역마살', [B.MYO]:'육해살',
-    [B.JIN]:'화개살', [B.SA]:'겁살', [B.O]:'재살', [B.MI]:'천살'
-  },
+function getSamhapGroup(branch) {
+  if (['\u7533', '\u5B50', '\u8FB0'].includes(branch)) return 'water';
+  if (['\u4EA5', '\u536F', '\u672A'].includes(branch)) return 'wood';
+  if (['\u5BC5', '\u5348', '\u620C'].includes(branch)) return 'fire';
+  if (['\u5DF3', '\u9149', '\u4E11'].includes(branch)) return 'metal';
+  return null;
+}
 
-  // 寅午戌 그룹
-  [B.IN]: {
-    [B.IN]:'지살', [B.MYO]:'년살', [B.JIN]:'월살', [B.SA]:'망신살',
-    [B.O]:'장성살', [B.MI]:'반안살', [B.SIN]:'역마살', [B.YU]:'육해살',
-    [B.SUL]:'화개살', [B.HAE]:'겁살', [B.JA]:'재살', [B.CHUK]:'천살'
-  },
-  [B.O]: {
-    [B.IN]:'지살', [B.MYO]:'년살', [B.JIN]:'월살', [B.SA]:'망신살',
-    [B.O]:'장성살', [B.MI]:'반안살', [B.SIN]:'역마살', [B.YU]:'육해살',
-    [B.SUL]:'화개살', [B.HAE]:'겁살', [B.JA]:'재살', [B.CHUK]:'천살'
-  },
-  [B.SUL]: {
-    [B.IN]:'지살', [B.MYO]:'년살', [B.JIN]:'월살', [B.SA]:'망신살',
-    [B.O]:'장성살', [B.MI]:'반안살', [B.SIN]:'역마살', [B.YU]:'육해살',
-    [B.SUL]:'화개살', [B.HAE]:'겁살', [B.JA]:'재살', [B.CHUK]:'천살'
-  },
-
-  // 亥卯未 그룹
-  [B.HAE]: {
-    [B.HAE]:'지살', [B.JA]:'년살', [B.CHUK]:'월살', [B.IN]:'망신살',
-    [B.MYO]:'장성살', [B.JIN]:'반안살', [B.SA]:'역마살', [B.O]:'육해살',
-    [B.MI]:'화개살', [B.SIN]:'겁살', [B.YU]:'재살', [B.SUL]:'천살'
-  },
-  [B.MYO]: {
-    [B.HAE]:'지살', [B.JA]:'년살', [B.CHUK]:'월살', [B.IN]:'망신살',
-    [B.MYO]:'장성살', [B.JIN]:'반안살', [B.SA]:'역마살', [B.O]:'육해살',
-    [B.MI]:'화개살', [B.SIN]:'겁살', [B.YU]:'재살', [B.SUL]:'천살'
-  },
-  [B.MI]: {
-    [B.HAE]:'지살', [B.JA]:'년살', [B.CHUK]:'월살', [B.IN]:'망신살',
-    [B.MYO]:'장성살', [B.JIN]:'반안살', [B.SA]:'역마살', [B.O]:'육해살',
-    [B.MI]:'화개살', [B.SIN]:'겁살', [B.YU]:'재살', [B.SUL]:'천살'
-  },
-
-  // 巳酉丑 그룹
-  [B.SA]: {
-    [B.SA]:'지살', [B.O]:'년살', [B.MI]:'월살', [B.SIN]:'망신살',
-    [B.YU]:'장성살', [B.SUL]:'반안살', [B.HAE]:'역마살', [B.JA]:'육해살',
-    [B.CHUK]:'화개살', [B.IN]:'겁살', [B.MYO]:'재살', [B.JIN]:'천살'
-  },
-  [B.YU]: {
-    [B.SA]:'지살', [B.O]:'년살', [B.MI]:'월살', [B.SIN]:'망신살',
-    [B.YU]:'장성살', [B.SUL]:'반안살', [B.HAE]:'역마살', [B.JA]:'육해살',
-    [B.CHUK]:'화개살', [B.IN]:'겁살', [B.MYO]:'재살', [B.JIN]:'천살'
-  },
-  [B.CHUK]: {
-    [B.SA]:'지살', [B.O]:'년살', [B.MI]:'월살', [B.SIN]:'망신살',
-    [B.YU]:'장성살', [B.SUL]:'반안살', [B.HAE]:'역마살', [B.JA]:'육해살',
-    [B.CHUK]:'화개살', [B.IN]:'겁살', [B.MYO]:'재살', [B.JIN]:'천살'
-  }
+const startByGroup = {
+  water: '\u5DF3',
+  wood: '\u7533',
+  fire: '\u4EA5',
+  metal: '\u5BC5'
 };
 
 function getTwelveGod(baseBranch, targetBranch) {
-  const JIN = '\u8FB0';
-  const IN = '\u5BC5';
-  const MYO = '\u536F';
-  const SA = '\u5DF3';
-  const YU = '\u9149';
-  const JA = '\u5B50';
-  const SIN = '\u7533';
-  const HAE = '\u4EA5';
-  const O = '\u5348';
-  const SUL = '\u620C';
+  const group = getSamhapGroup(baseBranch);
+  if (!group) return '-';
 
-  const override = {
-    [JIN]: {
-      [MYO]: '육해살',
-      [IN]: '망신살',
-      [JIN]: '반안살',
-      [SA]: '역마살'
-    },
-    [YU]: {
-      [YU]: '년살',
-      [JA]: '장성살',
-      [SIN]: '망신살',
-      [HAE]: '망신살',
-      [JIN]: '천살',
-      [IN]: '역마살'
-    },
-    [MYO]: {
-      [SIN]: '망신살',
-      [MYO]: '재살',
-      [HAE]: '역마살',
-      ['\u4E11']: '월살'
-    },
-    [O]: {
-      [JA]: '장성살',
-      [O]: '재살',
-      [JIN]: '화개살'
-    },
-    [SUL]: {
-      [SUL]: '천살',
-      [JA]: '재살',
-      [MYO]: '년살'
-    }
-  };
+  const startBranch = startByGroup[group];
+  const startIndex = branches.indexOf(startBranch);
+  const targetIndex = branches.indexOf(targetBranch);
 
-  if (override[baseBranch] && override[baseBranch][targetBranch]) {
-    return override[baseBranch][targetBranch];
-  }
+  if (startIndex < 0 || targetIndex < 0) return '-';
 
-  return (table[baseBranch] && table[baseBranch][targetBranch]) || '-';
+  const offset = (targetIndex - startIndex + 12) % 12;
+  return twelveGodsOrder[offset] || '-';
 }
 
-function calcTwelveGods(dayBranch, pillars) {
+function getBaseBranchByBasis(pillars, basis) {
+  if (basis === 'yearBranch') return pillars.year && pillars.year.branch;
+  if (basis === 'monthBranch') return pillars.month && pillars.month.branch;
+  return pillars.day && pillars.day.branch;
+}
+
+function calcTwelveGods(pillars, options = {}) {
+  const basis = options.basis || 'yearBranch';
+  const baseBranch = getBaseBranchByBasis(pillars, basis);
+
   const result = {};
 
   Object.entries(pillars).forEach(([key, pillar]) => {
-    if (!pillar || pillar.hanja === '미상' || !pillar.branch) {
+    if (!baseBranch || !pillar || pillar.hanja === '미상' || !pillar.branch) {
       result[key] = '-';
       return;
     }
 
-    result[key] = getTwelveGod(dayBranch.hanja, pillar.branch.hanja);
+    result[key] = getTwelveGod(baseBranch.hanja, pillar.branch.hanja);
   });
 
   return result;
