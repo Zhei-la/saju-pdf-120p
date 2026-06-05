@@ -347,7 +347,7 @@ function makeProfileTop({ name, gender, location, calendar, leapMonth, birthTime
     수:'검은'
   };
 
-  const profileGanji = yearPillar;
+  const profileGanji = dayPillar;
   const animal = zodiacAnimals[profileGanji.branch.hanja] || '';
   const colorLabel = elementColorLabel[profileGanji.stem.element] || '';
 
@@ -374,6 +374,7 @@ function makeProfileTop({ name, gender, location, calendar, leapMonth, birthTime
     gender,
     location,
     profileGanji: {
+      mode: 'dayPillar',
       hanja: profileGanji.hanja,
       korean: profileGanji.korean,
       stem: profileGanji.stem.hanja,
