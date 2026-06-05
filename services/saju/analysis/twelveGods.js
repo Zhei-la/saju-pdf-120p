@@ -91,42 +91,47 @@ const table = {
 };
 
 function getTwelveGod(baseBranch, targetBranch) {
-  const JIN = '\u8FB0';  // 辰
-  const YU = '\u9149';   // 酉
-  const MYO = '\u536F';  // 卯
-  const O = '\u5348';    // 午
-  const SUL = '\u620C';  // 戌
+  const JIN = '\u8FB0';
+  const IN = '\u5BC5';
+  const MYO = '\u536F';
+  const SA = '\u5DF3';
+  const YU = '\u9149';
+  const JA = '\u5B50';
+  const SIN = '\u7533';
+  const HAE = '\u4EA5';
+  const O = '\u5348';
+  const SUL = '\u620C';
 
   const override = {
     [JIN]: {
-      '\u536F':'육해살',
-      '\u5BC5':'망신살',
-      '\u8FB0':'반안살',
-      '\u5DF3':'역마살'
+      [MYO]: '육해살',
+      [IN]: '망신살',
+      [JIN]: '반안살',
+      [SA]: '역마살'
     },
     [YU]: {
-      '\u9149':'년살',
-      '\u5B50':'장성살',
-      '\u7533':'망신살',
-      '\u4EA5':'망신살',
-      '\u8FB0':'천살',
-      '\u5BC5':'역마살'
+      [YU]: '년살',
+      [JA]: '장성살',
+      [SIN]: '망신살',
+      [HAE]: '망신살',
+      [JIN]: '천살',
+      [IN]: '역마살'
     },
     [MYO]: {
-      '\u7533':'망신살',
-      '\u536F':'재살',
-      '\u4EA5':'역마살',
-      '\u4E11':'월살'
+      [SIN]: '망신살',
+      [MYO]: '재살',
+      [HAE]: '역마살',
+      ['\u4E11']: '월살'
     },
     [O]: {
-      '\u5348':'육해살',
-      '\u9149':'재살',
-      '\u536F':'년살'
+      [JA]: '장성살',
+      [O]: '재살',
+      [JIN]: '화개살'
     },
     [SUL]: {
-      '\u620C':'천살',
-      '\u5B50':'재살',
-      '\u536F':'년살'
+      [SUL]: '천살',
+      [JA]: '재살',
+      [MYO]: '년살'
     }
   };
 
