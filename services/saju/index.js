@@ -375,6 +375,7 @@ function makeProfileTop({ name, gender, location, calendar, leapMonth, birthTime
     location,
     profileGanji: {
       mode: 'dayPillar',
+      mode: 'dayPillar',
       hanja: profileGanji.hanja,
       korean: profileGanji.korean,
       stem: profileGanji.stem.hanja,
@@ -573,6 +574,8 @@ const dayPillar =
 
   return {
     debug,
+
+    profileTop,
 
     profile: {
       name,
