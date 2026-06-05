@@ -419,8 +419,12 @@ function calculateSajuEngine(input) {
   const calendar =
     String(input.calendar || '양력').trim();
 
+  const leapMonth = input.leapMonth === true || input.leapMonth === 'true';
+
   const birthTime =
     String(input.birthTime || '시간 모름').trim();
+
+  const location = String(input.location || '').trim();
 
   const parsed = parseBirth(input.birth);
 
