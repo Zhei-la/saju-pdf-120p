@@ -110,7 +110,18 @@ function calcElements(pillars) {
     수: 0
   };
 
-  function calcHiddenStems(pillars) {
+  function addOneDay(y, m, d) {
+  const dt = new Date(y, m - 1, d);
+  dt.setDate(dt.getDate() + 1);
+
+  return {
+    year: dt.getFullYear(),
+    month: dt.getMonth() + 1,
+    day: dt.getDate()
+  };
+}
+
+function calcHiddenStems(pillars) {
   const result = {};
 
   Object.entries(pillars).forEach(([key, pillar]) => {
@@ -371,8 +382,16 @@ function calculateSajuEngine(input) {
   const monthPillar =
     makePillar(ec.getMonth());
 
-  const dayPillar =
-    makePillar(ec.getDay());
+  const daySolar =
+  String(birthTime).includes('자시')
+    ? solar.next(1)
+    : solar;
+
+const dayLunar = daySolar.getLunar();
+const dayEc = dayLunar.getEightChar();
+
+const dayPillar =
+  makePillar(dayEc.getDay());
 
   let hourPillar = {
     hanja: '미상',
