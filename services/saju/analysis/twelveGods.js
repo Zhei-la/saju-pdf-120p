@@ -41,6 +41,11 @@ function getTwelveGod(baseBranch, targetBranch) {
     return '반안살';
   }
 
+  
+  // target site correction
+  if (baseBranch === '\u8FB0' && targetBranch === '\u8FB0') return '반안살';
+  if (baseBranch === '\u536F' && targetBranch === '\u536F') return '재살';
+
   return twelveGodsOrder[offset] || '-';
 }
 
