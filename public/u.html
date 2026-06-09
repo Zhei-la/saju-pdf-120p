@@ -194,6 +194,17 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
   font-size:12px;
   line-height:1.55;
 }
+.unknown-time-row{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-top:8px;
+  white-space:nowrap;
+  font-size:14px;
+}
+.unknown-time-row input{
+  width:auto;
+}
 </style>
 </head>
 <body>
@@ -220,11 +231,11 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
     <label>양력/음력</label>
     <select id="calendar"><option>양력</option><option>음력</option></select>
     <label>태어난 시간</label>
-    <input id="birthTime" type="time" value="09:30" step="60">
+    <input id="birthTime" type="text" inputmode="numeric" placeholder="예: 09:30" value="09:30">
 
-<label style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+<label class="unknown-time-row">
   <input id="unknownTime" type="checkbox">
-  시간 모름
+  <span>시간 모름</span>
 </label>
 
 <div class="time-help">
