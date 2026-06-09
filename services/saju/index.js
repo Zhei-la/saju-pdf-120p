@@ -518,7 +518,7 @@ const dayPillar =
   const tenGods = calcTenGods(dayPillar.stem, pillars, heavenlyStems);
   const hiddenStemsResult = calcHiddenStems(pillars);
   const twelveStates = calcTwelveStates(dayPillar.stem, pillars);
-  const twelveGods = calcTwelveGods(pillars, { basis: 'posteller' });
+  const twelveGods = calcTwelveGods(pillars, { basis: 'dayBranch' });
 
   const nowYear = new Date().getFullYear();
 
