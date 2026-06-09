@@ -469,7 +469,10 @@ async function makeResult(){
   const location=document.getElementById('location') ? document.getElementById('location').value.trim() : '';
   const calendar=document.getElementById('calendar').value;
   const leapMonth=document.getElementById('leapMonth') ? document.getElementById('leapMonth').value === 'true' : false;
-  const birthTime=document.getElementById('birthTime').value;
+  const birthTime =
+    document.getElementById('unknownTime')?.checked
+      ? '시간 모름'
+      : document.getElementById('birthTime').value;
 
   if(!name){alert('이름을 입력해주세요');return}
   if(!birth){alert('생년월일을 입력해주세요');return}
