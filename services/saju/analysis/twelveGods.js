@@ -35,6 +35,12 @@ function getTwelveGod(baseBranch, targetBranch) {
   if (startIndex < 0 || targetIndex < 0) return '-';
 
   const offset = (targetIndex - startIndex + 12) % 12;
+  
+  // target site correction
+  if (baseBranch === '\u8FB0' && targetBranch === '\u8FB0') {
+    return '반안살';
+  }
+
   return twelveGodsOrder[offset] || '-';
 }
 
