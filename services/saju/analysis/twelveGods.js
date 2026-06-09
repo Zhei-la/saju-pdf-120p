@@ -10,6 +10,13 @@ const twelveGodsOrder = [
   '반안살', '역마살', '육해살', '화개살'
 ];
 
+const startByGroup = {
+  water: '\u5DF3',
+  wood: '\u7533',
+  fire: '\u4EA5',
+  metal: '\u5BC5'
+};
+
 function getSamhapGroup(branch) {
   if (['\u7533', '\u5B50', '\u8FB0'].includes(branch)) return 'water';
   if (['\u4EA5', '\u536F', '\u672A'].includes(branch)) return 'wood';
@@ -18,19 +25,11 @@ function getSamhapGroup(branch) {
   return null;
 }
 
-const startByGroup = {
-  water: '\u5DF3',
-  wood: '\u7533',
-  fire: '\u4EA5',
-  metal: '\u5BC5'
-};
-
 function getTwelveGod(baseBranch, targetBranch) {
   const group = getSamhapGroup(baseBranch);
   if (!group) return '-';
 
-  const startBranch = startByGroup[group];
-  const startIndex = branches.indexOf(startBranch);
+  const startIndex = branches.indexOf(startByGroup[group]);
   const targetIndex = branches.indexOf(targetBranch);
 
   if (startIndex < 0 || targetIndex < 0) return '-';
@@ -39,15 +38,13 @@ function getTwelveGod(baseBranch, targetBranch) {
   return twelveGodsOrder[offset] || '-';
 }
 
-function getBaseBranchByBasis(pillars, basis) {
-  if (basis === 'yearBranch') return pillars.year && pillars.year.branch;
-  if (basis === 'monthBranch') return pillars.month && pillars.month.branch;
-  return pillars.day && pillars.day.branch;
-}
-
 function calcTwelveGods(pillars, options = {}) {
   const basis = options.basis || 'yearBranch';
-  const baseBranch = getBaseBranchByBasis(pillars, basis);
+
+  const baseBranch =
+    basis === 'dayBranch' ? pillars.day && pillars.day.branch :
+    basis === 'monthBranch' ? pillars.month && pillars.month.branch :
+    pillars.year && pillars.year.branch;
 
   const result = {};
 
