@@ -230,8 +230,8 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
     <select id="gender"><option>여성</option><option>남성</option></select>
     <label>양력/음력</label>
     <select id="calendar"><option>양력</option><option>음력</option></select>
-    <label>태어난 시간</label>
-    <input id="birthTime" type="text" inputmode="numeric" placeholder="예: 09:30" value="09:30">
+    <label>태어난 시간 <span onclick="openTimeTableModal()" style="cursor:pointer;font-size:12px">&#9432;</span></label>
+    <input id="birthTime" type="text" inputmode="numeric" placeholder="예: 09:30">
 
 <label class="unknown-time-row">
   <input id="unknownTime" type="checkbox">
@@ -669,5 +669,37 @@ function openAnimalModal(){
 }
 function closeAnimalModal(){
  document.getElementById('animalModal').style.display='none';
+}
+</script>
+
+
+<div id="timeTableModal" class="animalModal" style="display:none">
+  <div class="animalModalBox">
+    <button class="animalClose" onclick="closeTimeTableModal()">×</button>
+    <h3>12간지 시간표</h3>
+    <table style="width:100%;border-collapse:collapse;text-align:center;font-size:13px">
+      <tr><th>간지</th><th>시간</th></tr>
+      <tr><td>자시</td><td>23:30~01:30</td></tr>
+      <tr><td>축시</td><td>01:30~03:30</td></tr>
+      <tr><td>인시</td><td>03:30~05:30</td></tr>
+      <tr><td>묘시</td><td>05:30~07:30</td></tr>
+      <tr><td>진시</td><td>07:30~09:30</td></tr>
+      <tr><td>사시</td><td>09:30~11:30</td></tr>
+      <tr><td>오시</td><td>11:30~13:30</td></tr>
+      <tr><td>미시</td><td>13:30~15:30</td></tr>
+      <tr><td>신시</td><td>15:30~17:30</td></tr>
+      <tr><td>유시</td><td>17:30~19:30</td></tr>
+      <tr><td>술시</td><td>19:30~21:30</td></tr>
+      <tr><td>해시</td><td>21:30~23:30</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+function openTimeTableModal(){
+  document.getElementById('timeTableModal').style.display='block';
+}
+function closeTimeTableModal(){
+  document.getElementById('timeTableModal').style.display='none';
 }
 </script>
