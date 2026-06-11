@@ -194,17 +194,7 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
   font-size:12px;
   line-height:1.55;
 }
-.unknown-time-row{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  margin-top:8px;
-  white-space:nowrap;
-  font-size:14px;
-}
-.unknown-time-row input{
-  width:auto;
-}
+
 </style>
 </head>
 <body>
@@ -233,10 +223,7 @@ input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;ma
     <label>태어난 시간 <span onclick="openTimeTableModal()" style="cursor:pointer;font-size:12px">&#9432;</span></label>
     <input id="birthTime" type="text" inputmode="numeric" placeholder="예: 09:30">
 
-<label class="unknown-time-row">
-  <input id="unknownTime" type="checkbox">
-  <span>시간 모름</span>
-</label>
+
 
 <div class="time-help">
   간지에 맞춰 시간을 입력하실 때는 시스템 자동 보정값을 고려해
@@ -486,10 +473,7 @@ async function makeResult(){
   const location=document.getElementById('location') ? document.getElementById('location').value.trim() : '';
   const calendar=document.getElementById('calendar').value;
   const leapMonth=document.getElementById('leapMonth') ? document.getElementById('leapMonth').value === 'true' : false;
-  const birthTime =
-    document.getElementById('unknownTime') && document.getElementById('unknownTime').checked
-      ? '시간모름'
-      : document.getElementById('birthTime').value;
+  const birthTime=document.getElementById('birthTime').value;
 
   if(!name){alert('이름을 입력해주세요');return}
   if(!birth){alert('생년월일을 입력해주세요');return}
