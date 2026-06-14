@@ -28,7 +28,7 @@ function parseHour(birthTime) {
 
   const text = String(birthTime);
 
-  if (text.includes('자시')) return { hour: 0, minute: 0 };
+  if (text.includes('?먯떆') || text.includes('23:30-01:30')) return { hour: 1, minute: 0 };
   if (text.includes('축시')) return { hour: 2, minute: 0 };
   if (text.includes('인시')) return { hour: 4, minute: 0 };
   if (text.includes('묘시')) return { hour: 6, minute: 0 };
