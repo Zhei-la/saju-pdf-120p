@@ -126,9 +126,10 @@ function calcTwelveGods(pillars, options = {}) {
 
     if (basis === 'posteller') {
       // 포스텔러 원국 기준:
-      // 생시/생일/생월은 년지 기준, 생년은 일지 기준
+      // 생년은 일지 기준
+      // 생월/생일/생시는 년지 기준
       baseBranch =
-        (key === 'year' || key === 'month')
+        key === 'year'
           ? pillars.day && pillars.day.branch
           : pillars.year && pillars.year.branch;
     } else if (basis === 'dayBranch') {
@@ -154,3 +155,4 @@ module.exports = {
   getTwelveGod,
   calcTwelveGods
 };
+
